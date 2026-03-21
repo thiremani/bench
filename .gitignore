@@ -5,19 +5,19 @@ __pycache__/
 *.out
 
 # Common native build outputs
-benchmarks/*/main
-benchmarks/*/*.exe
-benchmarks/*/*.dSYM/
-benchmarks/*/*.pdb
-benchmarks/*/*.ilk
-benchmarks/*/*.obj
-benchmarks/*/*.a
-benchmarks/*/*.so
-benchmarks/*/*.dylib
-benchmarks/*/*.dll
-benchmarks/*/*.bc
-benchmarks/*/*.ll
-benchmarks/*/*.s
+benchmarks/**/main
+benchmarks/**/*.exe
+benchmarks/**/*.dSYM/
+benchmarks/**/*.pdb
+benchmarks/**/*.ilk
+benchmarks/**/*.obj
+benchmarks/**/*.a
+benchmarks/**/*.so
+benchmarks/**/*.dylib
+benchmarks/**/*.dll
+benchmarks/**/*.bc
+benchmarks/**/*.ll
+benchmarks/**/*.s
 
 # Common toolchain caches and output directories
 **/.zig-cache/

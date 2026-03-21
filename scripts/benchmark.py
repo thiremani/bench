@@ -217,6 +217,34 @@ def copy_case_files(source_dir: Path, workdir: Path) -> None:
         shutil.copy2(path, workdir / path.name)
 
 
+def zig_compile_target_args() -> list[str]:
+    machine = platform.machine().lower()
+    machine = {
+        "amd64": "x86_64",
+        "arm64": "aarch64",
+    }.get(machine, machine)
+
+    if sys.platform.startswith("linux"):
+        triple = {
+            "x86_64": "x86_64-linux-gnu",
+            "aarch64": "aarch64-linux-gnu",
+        }.get(machine)
+    elif sys.platform == "darwin":
+        triple = {
+            "x86_64": "x86_64-macos-none",
+            "aarch64": "aarch64-macos-none",
+        }.get(machine)
+    else:
+        triple = None
+
+    if triple is None:
+        return []
+
+    # Keep Zig on a generic baseline target so its codegen is comparable with
+    # the other native compilers in the suite.
+    return ["-target", triple, "-mcpu", "baseline"]
+
+
 def commands_for(
     source: CaseSource, workdir: Path, pluto_bin: Path
 ) -> tuple[list[str] | None, list[str]]:
@@ -245,6 +273,7 @@ def commands_for(
             "build-exe",
             "-O",
             "ReleaseFast",
+            *zig_compile_target_args(),
             f"-femit-bin={workdir / stem}",
             source.source_name,
         ]

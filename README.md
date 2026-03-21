@@ -180,7 +180,8 @@ PLUTO_BIN=/path/to/pluto python3 scripts/benchmark.py
 - C and C++ are built with `-O3` for consistency with the native comparison.
 - Swift is built with `swiftc -O`.
 - Rust is built with `rustc -C opt-level=3`.
-- Zig is built with `zig build-exe -O ReleaseFast`.
+- Zig is built with `zig build-exe -O ReleaseFast` and a baseline CPU target
+  for fairer comparison with the other native compilers.
 - Go uses the default optimized `go build` pipeline.
 - Julia runs with `julia --startup-file=no`.
 - The harness creates isolated temp work directories and copies each benchmark into them before running.
