@@ -27,6 +27,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.25"
+          cache-dependency-path: pluto/go.sum
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -42,11 +43,6 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.9"
-
-      - name: Set up Zig
-        uses: mlugg/setup-zig@v1
-        with:
-          version: "0.15.2"
 
       - name: Set up Julia
         uses: julia-actions/setup-julia@v2
@@ -101,6 +97,16 @@ jobs:
           wget -q "${SWIFT_URL}"
           tar xzf "${SWIFT_ARCHIVE}"
           echo "${PWD}/swift-${SWIFT_VERSION}-RELEASE-${SWIFT_PLATFORM}/usr/bin" >> "$GITHUB_PATH"
+
+      - name: Install Zig 0.15.2
+        run: |
+          ZIG_VERSION=0.15.2
+          ZIG_ARCHIVE=zig-x86_64-linux-${ZIG_VERSION}.tar.xz
+          ZIG_URL=https://ziglang.org/download/${ZIG_VERSION}/${ZIG_ARCHIVE}
+
+          wget -q "${ZIG_URL}"
+          tar xf "${ZIG_ARCHIVE}"
+          echo "${PWD}/zig-x86_64-linux-${ZIG_VERSION}" >> "$GITHUB_PATH"
 
       - name: Build Pluto
         working-directory: pluto
