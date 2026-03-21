@@ -585,7 +585,7 @@ def write_snapshot(
         results_by_case=results_by_case,
         metric_name="compile",
         log_scale=False,
-)
+    )
 
 
 def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result:

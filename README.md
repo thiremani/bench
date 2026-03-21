@@ -180,4 +180,5 @@ PLUTO_BIN=/path/to/pluto python3 scripts/benchmark.py
 - It copies the benchmark files into that directory, including Pluto support `.pt` files when present.
 - Every timed sample launches a fresh process, so the published `run_ms` numbers are end-to-end wall-clock timings.
 - One warm-up execution runs before each timed sample.
+- Short runtime cases such as `sum`, `fib_tail`, and `harmonic` still include non-trivial process-startup noise, so treat small differences there with caution.
 - Output is checked against `expected.txt` for the benchmark.
