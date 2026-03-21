@@ -330,19 +330,6 @@ def format_ms(value: float) -> str:
     return f"{value:.2f} ms"
 
 
-def runtime_tick_values(min_val: float, max_val: float) -> list[float]:
-    ticks = []
-    start = max(0, int(math.floor(math.log10(min_val))))
-    end = int(math.ceil(math.log10(max_val)))
-    for exponent in range(start, end + 1):
-        for base in (1, 2, 5):
-            tick = base * (10 ** exponent)
-            if min_val <= tick <= max_val:
-                ticks.append(float(tick))
-    if not ticks:
-        ticks = [min_val, max_val]
-    return ticks
-
 
 def compile_tick_values(max_val: float) -> list[float]:
     if max_val <= 100:
@@ -355,17 +342,7 @@ def compile_tick_values(max_val: float) -> list[float]:
     return [float(tick) for tick in range(0, limit + step, step)]
 
 
-def plot_y(value: float, min_val: float, max_val: float, top: float, height: float, log_scale: bool) -> float:
-    if log_scale:
-        min_log = math.log10(min_val)
-        max_log = math.log10(max_val)
-        ratio = (math.log10(value) - min_log) / (max_log - min_log)
-    else:
-        ratio = (value - min_val) / (max_val - min_val)
-    return top + height - (ratio * height)
-
-
-def render_metric_chart(
+def render_bar_chart(
     path: Path,
     *,
     title: str,
@@ -373,159 +350,163 @@ def render_metric_chart(
     cases: list[str],
     results_by_case: dict[str, list[Result]],
     metric_name: str,
-    log_scale: bool,
 ) -> None:
-    languages = []
-    for language in LANGUAGE_ORDER:
-        points = []
-        for case in cases:
-            for result in results_by_case.get(case, []):
-                if result.language != language:
-                    continue
-                value = result.run_ms if metric_name == "run" else result.compile_ms
-                if value is not None:
-                    points.append((case, value))
-                break
-        if points:
-            languages.append((language, points))
+    font = (
+        'font-family="ui-sans-serif, system-ui, -apple-system, '
+        'BlinkMacSystemFont, sans-serif"'
+    )
 
-    if not languages:
+    # Collect per-case entries sorted by value (fastest first).
+    case_data: list[tuple[str, list[tuple[str, float]]]] = []
+    all_values: list[float] = []
+    for case in cases:
+        entries: list[tuple[str, float]] = []
+        for result in results_by_case.get(case, []):
+            value = result.run_ms if metric_name == "run" else result.compile_ms
+            if value is not None:
+                entries.append((result.language, value))
+                all_values.append(value)
+        # Pin Pluto at the top, then sort the rest by value.
+        pluto_entries = [e for e in entries if e[0] == "pluto"]
+        other_entries = sorted(
+            (e for e in entries if e[0] != "pluto"), key=lambda e: e[1],
+        )
+        case_data.append((case, pluto_entries + other_entries))
+
+    if not all_values:
         return
 
-    all_values = [value for _, points in languages for _, value in points]
-    min_val = min(all_values)
-    max_val = max(all_values)
+    # Layout constants.
+    label_w = 80
+    bar_max = 580
+    svg_width = 920
+    header_h = 100
+    bar_h = 24
+    pluto_bar_h = 28
+    bar_gap = 6
+    case_title_h = 34
+    case_gap = 24
+    footer_h = 36
 
-    if log_scale:
-        min_val = 10 ** math.floor(math.log10(min_val))
-        max_val = 10 ** math.ceil(math.log10(max_val))
-        ticks = runtime_tick_values(min_val, max_val)
-    else:
-        min_val = 0.0
-        max_val = max_val * 1.08 if max_val else 1.0
-        ticks = compile_tick_values(max_val)
-        max_val = max(ticks)
-
-    width = 1280
-    height = 760
-    left = 110
-    top = 110
-    right = 260
-    bottom = 95
-    plot_width = width - left - right
-    plot_height = height - top - bottom
-
-    x_positions = {}
-    if len(cases) == 1:
-        x_positions[cases[0]] = left + (plot_width / 2)
-    else:
-        step = plot_width / (len(cases) - 1)
-        for index, case in enumerate(cases):
-            x_positions[case] = left + (index * step)
+    # Calculate SVG height from content.
+    content_h = 0
+    for _, entries in case_data:
+        if not entries:
+            continue
+        content_h += case_title_h + case_gap
+        for lang, _ in entries:
+            h = pluto_bar_h if lang == "pluto" else bar_h
+            content_h += h + bar_gap
+            if lang == "pluto":
+                content_h += 12
+    svg_height = header_h + content_h + footer_h
 
     lines: list[str] = []
     lines.append(
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
-        f'viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">'
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{svg_width}" '
+        f'height="{svg_height}" viewBox="0 0 {svg_width} {svg_height}" '
+        f'role="img" aria-labelledby="chart-title chart-desc">'
     )
-    lines.append("<defs>")
-    lines.append('<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">')
-    lines.append('<stop offset="0%" stop-color="#f8fafc" />')
-    lines.append('<stop offset="100%" stop-color="#eef2ff" />')
-    lines.append("</linearGradient>")
-    lines.append("</defs>")
-    lines.append(f"<title>{svg_escape(title)}</title>")
-    lines.append(f"<desc>{svg_escape(subtitle)}</desc>")
-    lines.append(f'<rect width="{width}" height="{height}" fill="url(#bg)" />')
+    lines.append(f'<title id="chart-title">{svg_escape(title)}</title>')
+    lines.append(f'<desc id="chart-desc">{svg_escape(subtitle)}</desc>')
+    lines.append(f'<rect width="{svg_width}" height="{svg_height}" fill="#f8fafc" />')
     lines.append(
-        f'<text x="{left}" y="52" fill="#0f172a" font-size="28" font-weight="700" '
-        'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
-        f"{svg_escape(title)}</text>"
+        f'<text x="{label_w}" y="40" fill="#0f172a" font-size="24" '
+        f'font-weight="700" {font}>{svg_escape(title)}</text>'
     )
     lines.append(
-        f'<text x="{left}" y="80" fill="#475569" font-size="15" '
-        'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
-        f"{svg_escape(subtitle)}</text>"
-    )
-    lines.append(
-        f'<rect x="{left}" y="{top}" width="{plot_width}" height="{plot_height}" '
-        'rx="18" fill="#ffffff" fill-opacity="0.82" stroke="#cbd5e1" />'
+        f'<text x="{label_w}" y="64" fill="#475569" font-size="13" '
+        f'{font}>{svg_escape(subtitle)}</text>'
     )
 
-    for tick in ticks:
-        y = plot_y(tick, min_val, max_val, top, plot_height, log_scale)
+    # Render each case as a group of horizontal bars with per-case scaling.
+    y = header_h
+    for case, entries in case_data:
+        if not entries:
+            continue
+
+        # Per-case axis range (linear).
+        case_max_val = max(v for _, v in entries)
+        raw_max = case_max_val * 1.08 if case_max_val else 1.0
+        case_ticks = compile_tick_values(raw_max)
+        case_axis_max = max(case_ticks)
+
+        # Case title.
+        case_label = CASE_LABELS.get(case, case.replace("_", " ").title())
         lines.append(
-            f'<line x1="{left}" y1="{y:.2f}" x2="{left + plot_width}" y2="{y:.2f}" '
-            'stroke="#e2e8f0" stroke-width="1" />'
-        )
-        lines.append(
-            f'<text x="{left - 16}" y="{y + 5:.2f}" text-anchor="end" fill="#475569" font-size="13" '
-            'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
-            f"{svg_escape(format_ms(tick))}</text>"
+            f'<text x="16" y="{y + 20}" fill="#0f172a" font-size="15" '
+            f'font-weight="700" {font}>{svg_escape(case_label)}</text>'
         )
 
-    for case, x in x_positions.items():
-        label = CASE_LABELS.get(case, case.replace("_", " ").title())
-        lines.append(
-            f'<line x1="{x:.2f}" y1="{top}" x2="{x:.2f}" y2="{top + plot_height}" '
-            'stroke="#f1f5f9" stroke-width="1" />'
-        )
-        lines.append(
-            f'<text x="{x:.2f}" y="{top + plot_height + 34}" text-anchor="middle" fill="#0f172a" font-size="14" '
-            'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
-            f"{svg_escape(label)}</text>"
-        )
-    lines.append(
-        f'<text x="{left + plot_width / 2:.2f}" y="{height - 28}" text-anchor="middle" fill="#64748b" font-size="13" '
-        'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
-        'Lower is better</text>'
-    )
-
-    for language, points in languages:
-        color = LANGUAGE_COLORS[language]
-        stroke_width = 4.0 if language == "pluto" else 2.2
-        opacity = 1.0 if language == "pluto" else 0.88
-        commands = []
-        for idx, (case, value) in enumerate(points):
-            x = x_positions[case]
-            y = plot_y(value, min_val, max_val, top, plot_height, log_scale)
-            commands.append(f'{"M" if idx == 0 else "L"} {x:.2f} {y:.2f}')
-        lines.append(
-            f'<path d="{" ".join(commands)}" fill="none" stroke="{color}" '
-            f'stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round" '
-            f'opacity="{opacity}" />'
-        )
-        for case, value in points:
-            x = x_positions[case]
-            y = plot_y(value, min_val, max_val, top, plot_height, log_scale)
-            radius = 5 if language == "pluto" else 3.5
+        # Per-case gridlines (inline, spanning the bars of this case).
+        case_bars_h = 0
+        for lang, _ in entries:
+            h = pluto_bar_h if lang == "pluto" else bar_h
+            case_bars_h += h + bar_gap
+            if lang == "pluto":
+                case_bars_h += 12
+        grid_top = y + case_title_h
+        grid_bottom = grid_top + case_bars_h
+        for tick in case_ticks:
+            tx = label_w + (tick / case_axis_max) * bar_max
             lines.append(
-                f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{radius}" fill="{color}" '
-                'stroke="#ffffff" stroke-width="1.5" />'
+                f'<line x1="{tx:.1f}" y1="{grid_top}" x2="{tx:.1f}" '
+                f'y2="{grid_bottom}" stroke="#e2e8f0" stroke-width="1" />'
+            )
+            lines.append(
+                f'<text x="{tx:.1f}" y="{grid_top - 6}" text-anchor="middle" '
+                f'fill="#cbd5e1" font-size="10" {font}>'
+                f'{svg_escape(format_ms(tick))}</text>'
             )
 
-    legend_x = left + plot_width + 26
-    legend_y = top + 18
-    lines.append(
-        f'<text x="{legend_x}" y="{legend_y}" fill="#0f172a" font-size="16" font-weight="700" '
-        'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
-        'Languages</text>'
-    )
-    for index, (language, _) in enumerate(languages):
-        y = legend_y + 30 + (index * 28)
-        color = LANGUAGE_COLORS[language]
-        label = LANGUAGE_LABELS[language] + (" (baseline)" if language == "pluto" else "")
-        weight = "700" if language == "pluto" else "500"
-        lines.append(
-            f'<line x1="{legend_x}" y1="{y}" x2="{legend_x + 26}" y2="{y}" '
-            f'stroke="{color}" stroke-width="4" stroke-linecap="round" />'
-        )
-        lines.append(
-            f'<text x="{legend_x + 36}" y="{y + 4}" fill="#0f172a" font-size="14" font-weight="{weight}" '
-            'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
-            f"{svg_escape(label)}</text>"
-        )
+        y += case_title_h
 
+        for language, value in entries:
+            is_pluto = language == "pluto"
+            color = LANGUAGE_COLORS[language]
+            bw = max((value / case_axis_max) * bar_max, 2)
+            current_bar_h = pluto_bar_h if is_pluto else bar_h
+            bar_y = y
+            text_y = bar_y + current_bar_h / 2 + 4.5
+
+            # Language label.
+            weight = '700' if is_pluto else '400'
+            lines.append(
+                f'<text x="{label_w - 10}" y="{text_y:.1f}" text-anchor="end" '
+                f'fill="#0f172a" font-size="13" font-weight="{weight}" '
+                f'{font}>{svg_escape(LANGUAGE_LABELS[language])}</text>'
+            )
+
+            # Bar.
+            opacity = "1.0" if is_pluto else "0.82"
+            border = (
+                f' stroke="{color}" stroke-width="1.5"' if is_pluto else ""
+            )
+            lines.append(
+                f'<rect x="{label_w}" y="{bar_y}" width="{bw:.1f}" '
+                f'height="{current_bar_h}" rx="4" fill="{color}" '
+                f'fill-opacity="{opacity}"{border} />'
+            )
+
+            # Value label.
+            val_x = label_w + bw + 8
+            lines.append(
+                f'<text x="{val_x:.1f}" y="{text_y:.1f}" fill="#334155" '
+                f'font-size="12" {font}>{format_ms(value)}</text>'
+            )
+
+
+            y += current_bar_h + bar_gap
+            if is_pluto:
+                y += 12  # Extra spacing after Pluto baseline.
+        y += case_gap
+
+    # Footer.
+    lines.append(
+        f'<text x="{label_w + bar_max / 2:.1f}" y="{svg_height - 12}" '
+        f'text-anchor="middle" fill="#94a3b8" font-size="12" {font}>'
+        f'Lower is better</text>'
+    )
     lines.append("</svg>")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -568,23 +549,21 @@ def write_snapshot(
         encoding="utf-8",
     )
 
-    render_metric_chart(
+    render_bar_chart(
         snapshot_dir / "run-times.svg",
         title="Run Time Median by Benchmark",
-        subtitle="Log scale. All languages are timed as fresh processes. Lower is better.",
+        subtitle="Each benchmark uses its own linear scale. Pluto pinned as baseline, rest sorted fastest-first.",
         cases=cases,
         results_by_case=results_by_case,
         metric_name="run",
-        log_scale=True,
     )
-    render_metric_chart(
+    render_bar_chart(
         snapshot_dir / "compile-times.svg",
         title="Compile Time Median by Benchmark",
         subtitle="Native languages only. Pluto includes frontend plus LLVM opt, llc, and link.",
         cases=cases,
         results_by_case=results_by_case,
         metric_name="compile",
-        log_scale=False,
     )
 
 
