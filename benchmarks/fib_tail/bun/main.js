@@ -10,7 +10,7 @@ function fib(n) {
 }
 
 let sum = 0;
-const repeats = 100_000;
+const repeats = 1_000_000;
 
 for (let i = 0; i < repeats; i += 1) {
     sum += fib(32 + (i % 2));

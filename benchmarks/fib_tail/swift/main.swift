@@ -10,7 +10,7 @@ func fib(_ n: UInt64) -> UInt64 {
 }
 
 var sum: UInt64 = 0
-let repeats: UInt64 = 100_000
+let repeats: UInt64 = 1_000_000
 
 for i in 0..<repeats {
     sum += fib(32 + (i % 2))

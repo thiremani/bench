@@ -9,7 +9,7 @@ fib(n::UInt64) = fib_aux(n, UInt64(0), UInt64(1))
 
 function run_fib_tail()
     acc = UInt64(0)
-    repeats = UInt64(100_000)
+    repeats = UInt64(1_000_000)
 
     for i in UInt64(0):(repeats - 1)
         acc += fib(UInt64(32) + (i % UInt64(2)))

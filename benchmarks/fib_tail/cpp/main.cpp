@@ -14,7 +14,7 @@ static std::uint64_t fib(std::uint64_t n) {
 
 int main() {
     std::uint64_t sum = 0;
-    const std::uint64_t repeats = 100000;
+    const std::uint64_t repeats = 1000000;
 
     for (std::uint64_t i = 0; i < repeats; ++i) {
         sum += fib(32 + (i % 2));

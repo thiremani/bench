@@ -9,7 +9,7 @@ def fib(n: int) -> int:
 
 
 total = 0
-repeats = 100_000
+repeats = 1_000_000
 
 for i in range(repeats):
     total += fib(32 + (i % 2))

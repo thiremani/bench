@@ -15,7 +15,7 @@ func fib(n uint64) uint64 {
 
 func main() {
 	var sum uint64
-	const repeats uint64 = 100000
+	const repeats uint64 = 1000000
 
 	for i := uint64(0); i < repeats; i++ {
 		sum += fib(32 + (i % 2))

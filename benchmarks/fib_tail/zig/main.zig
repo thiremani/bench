@@ -15,7 +15,7 @@ pub fn main() !void {
     var stdout_buffer: [1024]u8 = undefined;
     var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
     var sum: u64 = 0;
-    const repeats: u64 = 100_000;
+    const repeats: u64 = 1_000_000;
     var i: u64 = 0;
 
     while (i < repeats) : (i += 1) {
