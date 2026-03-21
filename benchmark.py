@@ -82,6 +82,14 @@ def copy_source(src: Path, workdir: Path) -> Path:
     return dst
 
 
+def copy_support_files(src: Path, workdir: Path) -> None:
+    # Pluto code templates live in companion .pt files. Copy the case-specific
+    # one when present so each benchmark stays isolated.
+    companion_pt = ROOT / f"{src.stem}.pt"
+    if src.suffix == ".spt" and companion_pt.exists():
+        shutil.copy2(companion_pt, workdir / companion_pt.name)
+
+
 def commands_for(
     src: Path, copied_src: Path, pluto_bin: Path
 ) -> tuple[list[str] | None, list[str]]:
@@ -119,6 +127,7 @@ def benchmark_source(src: Path, repeat: int, pluto_bin: Path) -> Result:
     for idx in range(repeat):
         workdir = prepare_workdir(src.stem, language, idx)
         copied_src = copy_source(src, workdir)
+        copy_support_files(src, workdir)
         compile_cmd, run_cmd = commands_for(src, copied_src, pluto_bin)
         if compile_cmd is not None:
             compile_ms, _ = timed_run(compile_cmd, workdir)
@@ -195,7 +204,7 @@ def main() -> int:
     parser.add_argument(
         "cases",
         nargs="*",
-        help="Case basenames to benchmark, for example: hello t",
+        help="Case basenames to benchmark, for example: sum fib t",
     )
     parser.add_argument(
         "--repeat",
