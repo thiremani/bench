@@ -22,6 +22,7 @@ jobs:
           repository: thiremani/pluto
           path: pluto
           fetch-depth: 0
+          submodules: recursive
 
       - name: Set up Go
         uses: actions/setup-go@v5
