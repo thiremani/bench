@@ -93,11 +93,10 @@ files such as `support.pt`.
 
 ## Running
 
-By default the harness looks for Pluto at `../pluto/pluto`, which matches:
+Run the full suite:
 
-```text
-/Users/tejas/Downloads/bench
-/Users/tejas/Downloads/pluto/pluto
+```sh
+python3 scripts/benchmark.py
 ```
 
 Run a single benchmark:
@@ -109,22 +108,23 @@ python3 scripts/benchmark.py fib_tail
 python3 scripts/benchmark.py harmonic
 ```
 
-Run the full suite:
+By default the harness looks for Pluto at `../pluto/pluto`, which matches:
 
-```sh
-python3 scripts/benchmark.py sum fib fib_tail harmonic
+```text
+/Users/tejas/Downloads/bench
+/Users/tejas/Downloads/pluto/pluto
 ```
 
-Override the Pluto binary:
+If your Pluto binary is elsewhere, override it with:
 
 ```sh
-python3 scripts/benchmark.py --pluto /path/to/pluto sum fib fib_tail harmonic
+python3 scripts/benchmark.py --pluto /path/to/pluto
 ```
 
 or:
 
 ```sh
-PLUTO_BIN=/path/to/pluto python3 scripts/benchmark.py sum fib fib_tail harmonic
+PLUTO_BIN=/path/to/pluto python3 scripts/benchmark.py
 ```
 
 ## Measurement Notes
