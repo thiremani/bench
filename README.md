@@ -5,8 +5,15 @@ Small cross-language benchmarks for Pluto, C, C++, and Python.
 ## Files
 
 - `hello.*`: minimal smoke test that should compile and print `Hello world`
-- `t.*`: simple integer workload for comparing execution time
+- `t.*`: harmonic-sum floating-point workload for comparing execution time
 - `benchmark.py`: times compile and run phases separately and checks output parity
+
+## Notes on measurement
+
+- Pluto, C, and C++ report native compile time and execution time separately.
+- Python is reported as interpreted execution only. Its compile column is shown as `-` because `py_compile` bytecode generation is not comparable to native compilation.
+- The benchmark uses repeated runs and reports the median.
+- `hello` is mainly a smoke test. Its run time is dominated by process startup, so use `t` for runtime comparisons.
 
 ## Pluto compiler path
 
@@ -37,4 +44,4 @@ python3 benchmark.py t
 python3 benchmark.py hello t --repeat 5
 ```
 
-The script prints compile time and execution time separately for each language and also checks that outputs match.
+The script prints compile time and execution time separately where that makes sense, and checks that outputs match.

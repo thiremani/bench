@@ -36,7 +36,7 @@ SUFFIX_TO_LANGUAGE = {
 class Result:
     case: str
     language: str
-    compile_ms: float
+    compile_ms: float | None
     run_ms: float
     output: str
 
@@ -82,7 +82,9 @@ def copy_source(src: Path, workdir: Path) -> Path:
     return dst
 
 
-def commands_for(src: Path, copied_src: Path, pluto_bin: Path) -> tuple[list[str], list[str]]:
+def commands_for(
+    src: Path, copied_src: Path, pluto_bin: Path
+) -> tuple[list[str] | None, list[str]]:
     stem = copied_src.stem
     if src.suffix == ".spt":
         compile_cmd = [str(pluto_bin), copied_src.name]
@@ -94,7 +96,7 @@ def commands_for(src: Path, copied_src: Path, pluto_bin: Path) -> tuple[list[str
         compile_cmd = ["c++", "-O2", copied_src.name, "-o", stem]
         run_cmd = [str(copied_src.parent / stem)]
     elif src.suffix == ".py":
-        compile_cmd = [sys.executable, "-m", "py_compile", copied_src.name]
+        compile_cmd = None
         run_cmd = [sys.executable, copied_src.name]
     else:
         raise ValueError(f"unsupported file type: {src}")
@@ -118,17 +120,21 @@ def benchmark_source(src: Path, repeat: int, pluto_bin: Path) -> Result:
         workdir = prepare_workdir(src.stem, language, idx)
         copied_src = copy_source(src, workdir)
         compile_cmd, run_cmd = commands_for(src, copied_src, pluto_bin)
-        compile_ms, _ = timed_run(compile_cmd, workdir)
+        if compile_cmd is not None:
+            compile_ms, _ = timed_run(compile_cmd, workdir)
+            compile_samples.append(compile_ms)
+
+        # Warm up one execution before timing to reduce one-off startup noise.
+        timed_run(run_cmd, workdir)
         run_ms, run_proc = timed_run(run_cmd, workdir)
-        compile_samples.append(compile_ms)
         run_samples.append(run_ms)
         last_output = run_proc.stdout.strip()
 
     return Result(
         case=src.stem,
         language=language,
-        compile_ms=statistics.mean(compile_samples),
-        run_ms=statistics.mean(run_samples),
+        compile_ms=statistics.median(compile_samples) if compile_samples else None,
+        run_ms=statistics.median(run_samples),
         output=last_output,
     )
 
@@ -165,9 +171,10 @@ def print_case(results: list[Result]) -> None:
     print(f"Case: {case}")
     print(f"{'Language':<8} {'Compile ms':>12} {'Run ms':>12}")
     for result in results:
+        compile_text = "-" if result.compile_ms is None else f"{result.compile_ms:>.3f}"
         print(
             f"{LANGUAGE_LABELS[result.language]:<8} "
-            f"{result.compile_ms:>12.3f} "
+            f"{compile_text:>12} "
             f"{result.run_ms:>12.3f}"
         )
 
@@ -193,8 +200,8 @@ def main() -> int:
     parser.add_argument(
         "--repeat",
         type=int,
-        default=1,
-        help="Number of times to compile and run each source, averaged in the output.",
+        default=5,
+        help="Number of times to compile and run each source; results use the median.",
     )
     parser.add_argument(
         "--pluto",
