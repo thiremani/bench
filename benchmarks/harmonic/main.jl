@@ -1,6 +1,6 @@
 using Printf
 
-function bench_output()
+function run_harmonic()
     acc = 0.0
     n = UInt64(10_000_001)
 
@@ -8,9 +8,7 @@ function bench_output()
         acc += 1.0 / Float64(i)
     end
 
-    return @sprintf("%.6f", acc)
+    return acc
 end
 
-if abspath(PROGRAM_FILE) == @__FILE__
-    println(bench_output())
-end
+println(@sprintf("%.6f", run_harmonic()))

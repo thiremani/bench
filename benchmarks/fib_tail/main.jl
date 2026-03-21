@@ -7,7 +7,7 @@ end
 
 fib(n::UInt64) = fib_aux(n, UInt64(0), UInt64(1))
 
-function bench_output()
+function run_fib_tail()
     acc = UInt64(0)
     repeats = UInt64(100_000)
 
@@ -15,9 +15,7 @@ function bench_output()
         acc += fib(UInt64(32) + (i % UInt64(2)))
     end
 
-    return string(acc)
+    return acc
 end
 
-if abspath(PROGRAM_FILE) == @__FILE__
-    println(bench_output())
-end
+println(run_fib_tail())

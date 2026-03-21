@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
+import datetime as dt
+import json
+import math
 import os
+import platform
 import shutil
 import statistics
 import subprocess
@@ -17,6 +21,13 @@ BENCHMARKS_DIR = REPO_ROOT / "benchmarks"
 DEFAULT_PLUTO = (REPO_ROOT / "../pluto/pluto").resolve()
 PT_MOD = REPO_ROOT / "pt.mod"
 WORK_ROOT = Path(tempfile.gettempdir()) / "pluto-bench"
+CASE_ORDER = ("sum", "fib", "fib_tail", "harmonic")
+CASE_LABELS = {
+    "sum": "Sum",
+    "fib": "Fib",
+    "fib_tail": "Fib Tail",
+    "harmonic": "Harmonic",
+}
 
 LANGUAGE_ORDER = (
     "pluto",
@@ -80,12 +91,18 @@ LANGUAGE_TO_VERSION_CMD = {
     "bun": ["bun", "--version"],
     "python": [sys.executable, "--version"],
 }
-STEADY_STATE_LANGUAGES = {"julia", "node", "bun", "python"}
-STEADY_STATE_WORKERS = {
-    "python": REPO_ROOT / "scripts" / "runtime_worker.py",
-    "julia": REPO_ROOT / "scripts" / "runtime_worker.jl",
-    "node": REPO_ROOT / "scripts" / "runtime_worker.js",
-    "bun": REPO_ROOT / "scripts" / "runtime_worker.js",
+LANGUAGE_COLORS = {
+    "pluto": "#c2410c",
+    "c": "#2563eb",
+    "cpp": "#16a34a",
+    "swift": "#dc2626",
+    "go": "#0891b2",
+    "rust": "#6d28d9",
+    "zig": "#ca8a04",
+    "julia": "#7c3aed",
+    "node": "#15803d",
+    "bun": "#0f172a",
+    "python": "#9333ea",
 }
 
 
@@ -105,6 +122,13 @@ class CaseSource:
     case_dir: Path
     language: str
     source_name: str
+
+
+def ordered_cases(cases: list[str] | set[str]) -> list[str]:
+    seen = set(cases)
+    ordered = [case for case in CASE_ORDER if case in seen]
+    ordered.extend(sorted(case for case in seen if case not in set(CASE_ORDER)))
+    return ordered
 
 
 def first_line(text: str) -> str:
@@ -289,10 +313,282 @@ def load_expected(case_dir: Path) -> str | None:
     return expected_file.read_text(encoding="utf-8").strip()
 
 
-def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result:
-    if source.language in STEADY_STATE_LANGUAGES:
-        return benchmark_steady_state_source(source, repeat, pluto_bin)
+def svg_escape(text: str) -> str:
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
+
+def format_ms(value: float) -> str:
+    if value >= 100:
+        return f"{value:.0f} ms"
+    if value >= 10:
+        return f"{value:.1f} ms"
+    return f"{value:.2f} ms"
+
+
+def runtime_tick_values(min_val: float, max_val: float) -> list[float]:
+    ticks = []
+    start = max(0, int(math.floor(math.log10(min_val))))
+    end = int(math.ceil(math.log10(max_val)))
+    for exponent in range(start, end + 1):
+        for base in (1, 2, 5):
+            tick = base * (10 ** exponent)
+            if min_val <= tick <= max_val:
+                ticks.append(float(tick))
+    if not ticks:
+        ticks = [min_val, max_val]
+    return ticks
+
+
+def compile_tick_values(max_val: float) -> list[float]:
+    if max_val <= 100:
+        step = 20
+    elif max_val <= 250:
+        step = 50
+    else:
+        step = 100
+    limit = int(math.ceil(max_val / step) * step)
+    return [float(tick) for tick in range(0, limit + step, step)]
+
+
+def plot_y(value: float, min_val: float, max_val: float, top: float, height: float, log_scale: bool) -> float:
+    if log_scale:
+        min_log = math.log10(min_val)
+        max_log = math.log10(max_val)
+        ratio = (math.log10(value) - min_log) / (max_log - min_log)
+    else:
+        ratio = (value - min_val) / (max_val - min_val)
+    return top + height - (ratio * height)
+
+
+def render_metric_chart(
+    path: Path,
+    *,
+    title: str,
+    subtitle: str,
+    cases: list[str],
+    results_by_case: dict[str, list[Result]],
+    metric_name: str,
+    log_scale: bool,
+) -> None:
+    languages = []
+    for language in LANGUAGE_ORDER:
+        points = []
+        for case in cases:
+            for result in results_by_case.get(case, []):
+                if result.language != language:
+                    continue
+                value = result.run_ms if metric_name == "run" else result.compile_ms
+                if value is not None:
+                    points.append((case, value))
+                break
+        if points:
+            languages.append((language, points))
+
+    if not languages:
+        return
+
+    all_values = [value for _, points in languages for _, value in points]
+    min_val = min(all_values)
+    max_val = max(all_values)
+
+    if log_scale:
+        min_val = 10 ** math.floor(math.log10(min_val))
+        max_val = 10 ** math.ceil(math.log10(max_val))
+        ticks = runtime_tick_values(min_val, max_val)
+    else:
+        min_val = 0.0
+        max_val = max_val * 1.08 if max_val else 1.0
+        ticks = compile_tick_values(max_val)
+        max_val = max(ticks)
+
+    width = 1280
+    height = 760
+    left = 110
+    top = 110
+    right = 260
+    bottom = 95
+    plot_width = width - left - right
+    plot_height = height - top - bottom
+
+    x_positions = {}
+    if len(cases) == 1:
+        x_positions[cases[0]] = left + (plot_width / 2)
+    else:
+        step = plot_width / (len(cases) - 1)
+        for index, case in enumerate(cases):
+            x_positions[case] = left + (index * step)
+
+    lines: list[str] = []
+    lines.append(
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">'
+    )
+    lines.append("<defs>")
+    lines.append('<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">')
+    lines.append('<stop offset="0%" stop-color="#f8fafc" />')
+    lines.append('<stop offset="100%" stop-color="#eef2ff" />')
+    lines.append("</linearGradient>")
+    lines.append("</defs>")
+    lines.append(f"<title>{svg_escape(title)}</title>")
+    lines.append(f"<desc>{svg_escape(subtitle)}</desc>")
+    lines.append(f'<rect width="{width}" height="{height}" fill="url(#bg)" />')
+    lines.append(
+        f'<text x="{left}" y="52" fill="#0f172a" font-size="28" font-weight="700" '
+        'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
+        f"{svg_escape(title)}</text>"
+    )
+    lines.append(
+        f'<text x="{left}" y="80" fill="#475569" font-size="15" '
+        'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
+        f"{svg_escape(subtitle)}</text>"
+    )
+    lines.append(
+        f'<rect x="{left}" y="{top}" width="{plot_width}" height="{plot_height}" '
+        'rx="18" fill="#ffffff" fill-opacity="0.82" stroke="#cbd5e1" />'
+    )
+
+    for tick in ticks:
+        y = plot_y(tick, min_val, max_val, top, plot_height, log_scale)
+        lines.append(
+            f'<line x1="{left}" y1="{y:.2f}" x2="{left + plot_width}" y2="{y:.2f}" '
+            'stroke="#e2e8f0" stroke-width="1" />'
+        )
+        lines.append(
+            f'<text x="{left - 16}" y="{y + 5:.2f}" text-anchor="end" fill="#475569" font-size="13" '
+            'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
+            f"{svg_escape(format_ms(tick))}</text>"
+        )
+
+    for case, x in x_positions.items():
+        label = CASE_LABELS.get(case, case.replace("_", " ").title())
+        lines.append(
+            f'<line x1="{x:.2f}" y1="{top}" x2="{x:.2f}" y2="{top + plot_height}" '
+            'stroke="#f1f5f9" stroke-width="1" />'
+        )
+        lines.append(
+            f'<text x="{x:.2f}" y="{top + plot_height + 34}" text-anchor="middle" fill="#0f172a" font-size="14" '
+            'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
+            f"{svg_escape(label)}</text>"
+        )
+    lines.append(
+        f'<text x="{left + plot_width / 2:.2f}" y="{height - 28}" text-anchor="middle" fill="#64748b" font-size="13" '
+        'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
+        'Lower is better</text>'
+    )
+
+    for language, points in languages:
+        color = LANGUAGE_COLORS[language]
+        stroke_width = 4.0 if language == "pluto" else 2.2
+        opacity = 1.0 if language == "pluto" else 0.88
+        commands = []
+        for idx, (case, value) in enumerate(points):
+            x = x_positions[case]
+            y = plot_y(value, min_val, max_val, top, plot_height, log_scale)
+            commands.append(f'{"M" if idx == 0 else "L"} {x:.2f} {y:.2f}')
+        lines.append(
+            f'<path d="{" ".join(commands)}" fill="none" stroke="{color}" '
+            f'stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round" '
+            f'opacity="{opacity}" />'
+        )
+        for case, value in points:
+            x = x_positions[case]
+            y = plot_y(value, min_val, max_val, top, plot_height, log_scale)
+            radius = 5 if language == "pluto" else 3.5
+            lines.append(
+                f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{radius}" fill="{color}" '
+                'stroke="#ffffff" stroke-width="1.5" />'
+            )
+
+    legend_x = left + plot_width + 26
+    legend_y = top + 18
+    lines.append(
+        f'<text x="{legend_x}" y="{legend_y}" fill="#0f172a" font-size="16" font-weight="700" '
+        'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
+        'Languages</text>'
+    )
+    for index, (language, _) in enumerate(languages):
+        y = legend_y + 30 + (index * 28)
+        color = LANGUAGE_COLORS[language]
+        label = LANGUAGE_LABELS[language] + (" (baseline)" if language == "pluto" else "")
+        weight = "700" if language == "pluto" else "500"
+        lines.append(
+            f'<line x1="{legend_x}" y1="{y}" x2="{legend_x + 26}" y2="{y}" '
+            f'stroke="{color}" stroke-width="4" stroke-linecap="round" />'
+        )
+        lines.append(
+            f'<text x="{legend_x + 36}" y="{y + 4}" fill="#0f172a" font-size="14" font-weight="{weight}" '
+            'font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">'
+            f"{svg_escape(label)}</text>"
+        )
+
+    lines.append("</svg>")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def write_snapshot(
+    snapshot_dir: Path,
+    *,
+    cases: list[str],
+    results_by_case: dict[str, list[Result]],
+    repeat: int,
+    pluto_bin: Path,
+) -> None:
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    generated_at = dt.datetime.now().astimezone().isoformat()
+    snapshot = {
+        "generated_at": generated_at,
+        "repeat": repeat,
+        "pluto_bin": str(pluto_bin),
+        "platform": platform.platform(),
+        "machine": platform.machine(),
+        "cases": [
+            {
+                "name": case,
+                "results": [
+                    {
+                        "language": result.language,
+                        "version": result.version,
+                        "compile_ms": result.compile_ms,
+                        "run_ms": result.run_ms,
+                        "output": result.output,
+                    }
+                    for result in results_by_case.get(case, [])
+                ],
+            }
+            for case in cases
+        ],
+    }
+    (snapshot_dir / "results.json").write_text(
+        json.dumps(snapshot, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    render_metric_chart(
+        snapshot_dir / "run-times.svg",
+        title="Run Time Median by Benchmark",
+        subtitle="Log scale. All languages are timed as fresh processes. Lower is better.",
+        cases=cases,
+        results_by_case=results_by_case,
+        metric_name="run",
+        log_scale=True,
+    )
+    render_metric_chart(
+        snapshot_dir / "compile-times.svg",
+        title="Compile Time Median by Benchmark",
+        subtitle="Native languages only. Pluto includes frontend plus LLVM opt, llc, and link.",
+        cases=cases,
+        results_by_case=results_by_case,
+        metric_name="compile",
+        log_scale=False,
+)
+
+
+def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result:
     compile_samples = []
     run_samples = []
     last_output = ""
@@ -324,102 +620,6 @@ def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result
     )
 
 
-def worker_command(language: str, source_name: str) -> list[str]:
-    worker = STEADY_STATE_WORKERS[language]
-    if language == "python":
-        return [sys.executable, str(worker), source_name]
-    if language == "julia":
-        return ["julia", "--startup-file=no", str(worker), source_name]
-    if language == "node":
-        return ["node", str(worker), source_name]
-    if language == "bun":
-        return ["bun", str(worker), source_name]
-    raise ValueError(f"unsupported steady-state language: {language}")
-
-
-def start_worker(source: CaseSource, workdir: Path) -> subprocess.Popen[str]:
-    return subprocess.Popen(
-        worker_command(source.language, source.source_name),
-        cwd=workdir,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        bufsize=1,
-    )
-
-
-def stop_worker(proc: subprocess.Popen[str]) -> None:
-    if proc.poll() is None and proc.stdin is not None:
-        try:
-            proc.stdin.write("exit\n")
-            proc.stdin.flush()
-        except BrokenPipeError:
-            pass
-    try:
-        proc.communicate(timeout=5)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        proc.communicate()
-
-
-def timed_worker_run(proc: subprocess.Popen[str]) -> tuple[float, str]:
-    if proc.stdin is None or proc.stdout is None:
-        raise RuntimeError("worker process pipes are not available")
-
-    start = time.perf_counter()
-    proc.stdin.write("run\n")
-    proc.stdin.flush()
-    line = proc.stdout.readline()
-    elapsed_ms = (time.perf_counter() - start) * 1000.0
-
-    if not line:
-        stderr = ""
-        if proc.stderr is not None:
-            stderr = proc.stderr.read().strip()
-        raise RuntimeError(
-            "worker exited unexpectedly"
-            + (f"\n{stderr}" if stderr else "")
-        )
-
-    status, _, payload = line.rstrip("\n").partition(" ")
-    if status != "OK":
-        raise RuntimeError(f"worker failed: {payload}")
-    return elapsed_ms, payload
-
-
-def benchmark_steady_state_source(
-    source: CaseSource, repeat: int, pluto_bin: Path
-) -> Result:
-    run_samples = []
-    last_output = ""
-    workdir = prepare_workdir(source.case, source.language, "steady")
-
-    try:
-        copy_case_files(source.case_dir, workdir)
-        worker = start_worker(source, workdir)
-        try:
-            # Warm up once in the same interpreter/runtime before timing.
-            timed_worker_run(worker)
-            for _ in range(repeat):
-                run_ms, output = timed_worker_run(worker)
-                run_samples.append(run_ms)
-                last_output = output
-        finally:
-            stop_worker(worker)
-    finally:
-        shutil.rmtree(workdir, ignore_errors=True)
-
-    return Result(
-        case=source.case,
-        language=source.language,
-        version=language_version(source.language, pluto_bin),
-        compile_ms=None,
-        run_ms=statistics.median(run_samples),
-        output=last_output,
-    )
-
-
 def discover_cases(selected: list[str] | None) -> list[str]:
     if selected:
         return selected
@@ -429,7 +629,7 @@ def discover_cases(selected: list[str] | None) -> list[str]:
         for path in BENCHMARKS_DIR.iterdir()
         if path.is_dir()
     }
-    return sorted(cases)
+    return ordered_cases(cases)
 
 
 def sources_for_case(case: str) -> list[CaseSource]:
@@ -513,6 +713,13 @@ def main() -> int:
         "--pluto",
         help="Path to the Pluto compiler binary. Defaults to ../pluto/pluto or $PLUTO_BIN.",
     )
+    parser.add_argument(
+        "--snapshot-dir",
+        help=(
+            "Optional directory for writing a machine-readable results snapshot plus "
+            "SVG charts."
+        ),
+    )
     args = parser.parse_args()
 
     if args.repeat < 1:
@@ -529,13 +736,23 @@ def main() -> int:
 
     shutil.rmtree(WORK_ROOT, ignore_errors=True)
     try:
+        results_by_case: dict[str, list[Result]] = {}
         for case in cases:
             results = benchmark_case(case, args.repeat, pluto_bin)
+            results_by_case[case] = results
             if not results:
                 print(f"Case: {case}")
                 print("No runnable sources found.\n")
                 continue
             print_case(results)
+        if args.snapshot_dir:
+            write_snapshot(
+                Path(args.snapshot_dir).resolve(),
+                cases=cases,
+                results_by_case=results_by_case,
+                repeat=args.repeat,
+                pluto_bin=pluto_bin,
+            )
     finally:
         shutil.rmtree(WORK_ROOT, ignore_errors=True)
 
