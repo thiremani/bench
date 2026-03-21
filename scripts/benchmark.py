@@ -18,18 +18,39 @@ DEFAULT_PLUTO = (REPO_ROOT / "../pluto/pluto").resolve()
 PT_MOD = REPO_ROOT / "pt.mod"
 WORK_ROOT = Path(tempfile.gettempdir()) / "pluto-bench"
 
-LANGUAGE_ORDER = ("pluto", "c", "cpp", "python")
+LANGUAGE_ORDER = ("pluto", "c", "cpp", "go", "rust", "zig", "python")
 LANGUAGE_LABELS = {
     "pluto": "Pluto",
     "c": "C",
     "cpp": "C++",
+    "go": "Go",
+    "rust": "Rust",
+    "zig": "Zig",
     "python": "Python",
 }
 SUFFIX_TO_LANGUAGE = {
     ".spt": "pluto",
     ".c": "c",
     ".cpp": "cpp",
+    ".go": "go",
+    ".rs": "rust",
+    ".zig": "zig",
     ".py": "python",
+}
+LANGUAGE_TO_TOOL = {
+    "c": "cc",
+    "cpp": "c++",
+    "go": "go",
+    "rust": "rustc",
+    "zig": "zig",
+}
+LANGUAGE_TO_VERSION_CMD = {
+    "c": ["cc", "--version"],
+    "cpp": ["c++", "--version"],
+    "go": ["go", "version"],
+    "rust": ["rustc", "--version"],
+    "zig": ["zig", "version"],
+    "python": [sys.executable, "--version"],
 }
 
 
@@ -37,6 +58,7 @@ SUFFIX_TO_LANGUAGE = {
 class Result:
     case: str
     language: str
+    version: str
     compile_ms: float | None
     run_ms: float
     output: str
@@ -48,6 +70,32 @@ class CaseSource:
     case_dir: Path
     language: str
     source_name: str
+
+
+def first_line(text: str) -> str:
+    return text.strip().splitlines()[0] if text.strip() else ""
+
+
+def normalize_version(language: str, raw: str) -> str:
+    if not raw:
+        return "unknown"
+    if language == "pluto":
+        return raw.split(" (", 1)[0]
+    if language in {"c", "cpp"} and raw.startswith("Apple clang version "):
+        parts = raw.split()
+        if len(parts) >= 4:
+            return f"Apple clang {parts[3]}"
+    if language == "go" and raw.startswith("go version "):
+        parts = raw.split()
+        if len(parts) >= 3:
+            return parts[2]
+    if language == "rust" and raw.startswith("rustc "):
+        parts = raw.split()
+        if len(parts) >= 2:
+            return f"rustc {parts[1]}"
+    if language == "zig":
+        return f"zig {raw}"
+    return raw
 
 
 def timed_run(cmd: list[str], cwd: Path) -> tuple[float, subprocess.CompletedProcess[str]]:
@@ -102,10 +150,26 @@ def commands_for(
         compile_cmd = [str(pluto_bin), source.source_name]
         run_cmd = [str(workdir / stem)]
     elif source.language == "c":
-        compile_cmd = ["cc", "-O2", source.source_name, "-o", stem]
+        compile_cmd = ["cc", "-O3", source.source_name, "-o", stem]
         run_cmd = [str(workdir / stem)]
     elif source.language == "cpp":
-        compile_cmd = ["c++", "-O2", source.source_name, "-o", stem]
+        compile_cmd = ["c++", "-O3", source.source_name, "-o", stem]
+        run_cmd = [str(workdir / stem)]
+    elif source.language == "go":
+        compile_cmd = ["go", "build", "-trimpath", "-o", stem, source.source_name]
+        run_cmd = [str(workdir / stem)]
+    elif source.language == "rust":
+        compile_cmd = ["rustc", "-C", "opt-level=3", source.source_name, "-o", stem]
+        run_cmd = [str(workdir / stem)]
+    elif source.language == "zig":
+        compile_cmd = [
+            "zig",
+            "build-exe",
+            "-O",
+            "ReleaseFast",
+            f"-femit-bin={workdir / stem}",
+            source.source_name,
+        ]
         run_cmd = [str(workdir / stem)]
     elif source.language == "python":
         compile_cmd = None
@@ -120,6 +184,38 @@ def resolve_pluto(path_arg: str | None) -> Path:
     if raw_path:
         return Path(raw_path).expanduser().resolve()
     return DEFAULT_PLUTO
+
+
+def language_available(language: str, pluto_bin: Path) -> bool:
+    if language == "pluto":
+        return pluto_bin.exists()
+    if language == "python":
+        return True
+    tool = LANGUAGE_TO_TOOL.get(language)
+    if tool is None:
+        return False
+    return shutil.which(tool) is not None
+
+
+def language_version(language: str, pluto_bin: Path) -> str:
+    if language == "pluto":
+        if not pluto_bin.exists():
+            return "not found"
+        proc = subprocess.run(
+            [str(pluto_bin), "--version"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        text = proc.stdout if proc.stdout.strip() else proc.stderr
+        return normalize_version(language, first_line(text))
+
+    cmd = LANGUAGE_TO_VERSION_CMD.get(language)
+    if cmd is None:
+        return "unknown"
+    proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    text = proc.stdout if proc.stdout.strip() else proc.stderr
+    return normalize_version(language, first_line(text))
 
 
 def load_expected(case_dir: Path) -> str | None:
@@ -151,6 +247,7 @@ def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result
     return Result(
         case=source.case,
         language=source.language,
+        version=language_version(source.language, pluto_bin),
         compile_ms=statistics.median(compile_samples) if compile_samples else None,
         run_ms=statistics.median(run_samples),
         output=last_output,
@@ -190,7 +287,7 @@ def sources_for_case(case: str) -> list[CaseSource]:
 def benchmark_case(case: str, repeat: int, pluto_bin: Path) -> list[Result]:
     results = []
     for source in sources_for_case(case):
-        if source.language == "pluto" and not pluto_bin.exists():
+        if not language_available(source.language, pluto_bin):
             continue
         results.append(benchmark_source(source, repeat, pluto_bin))
     return sorted(results, key=lambda result: LANGUAGE_ORDER.index(result.language))
@@ -202,11 +299,12 @@ def print_case(results: list[Result]) -> None:
 
     case = results[0].case
     print(f"Case: {case}")
-    print(f"{'Language':<8} {'Compile ms':>12} {'Run ms':>12}")
+    print(f"{'Language':<8} {'Version':<18} {'Compile ms':>12} {'Run ms':>12}")
     for result in results:
         compile_text = "-" if result.compile_ms is None else f"{result.compile_ms:>.3f}"
         print(
             f"{LANGUAGE_LABELS[result.language]:<8} "
+            f"{result.version[:18]:<18} "
             f"{compile_text:>12} "
             f"{result.run_ms:>12.3f}"
         )
