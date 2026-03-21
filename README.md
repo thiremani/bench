@@ -8,62 +8,62 @@ them in each language, checks output parity, and reports timings.
 
 ## Latest Results
 
-Tested on `2026-03-21 10:48:45 IST` with:
+Tested on `2026-03-21 10:54:47 IST` with:
 
 - Machine: Apple M1 Pro
 - CPU cores: 10
 - Memory: 16 GiB
 - OS: macOS 26.3.1 (25D2128)
 - Command: `python3 scripts/benchmark.py sum fib fib_tail harmonic --repeat 3`
-- Benchmark mode: median of 3 samples, with one warm-up execution before each timed run
+- Benchmark mode: median of 10 samples, with one warm-up execution before each timed run
 
 ### Sum
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| Pluto | `pluto dev` | 92.434 | 2.844 | `200000010000000` |
-| C | `Apple clang 17.0.0` | 61.984 | 2.405 | `200000010000000` |
-| C++ | `Apple clang 17.0.0` | 350.879 | 2.951 | `200000010000000` |
-| Go | `go1.26.1` | 130.921 | 11.278 | `200000010000000` |
-| Rust | `rustc 1.94.0` | 108.398 | 16.734 | `200000010000000` |
-| Zig | `zig 0.15.2` | 216.619 | 2.878 | `200000010000000` |
-| Python | `Python 3.14.3` | - | 1402.363 | `200000010000000` |
+| Pluto | `pluto dev` | 92.730 | 2.383 | `200000010000000` |
+| C | `Apple clang 17.0.0` | 62.663 | 2.397 | `200000010000000` |
+| C++ | `Apple clang 17.0.0` | 302.589 | 2.526 | `200000010000000` |
+| Go | `go1.26.1` | 116.699 | 13.500 | `200000010000000` |
+| Rust | `rustc 1.94.0` | 93.472 | 19.221 | `200000010000000` |
+| Zig | `zig 0.15.2` | 193.207 | 2.998 | `200000010000000` |
+| Python | `Python 3.14.3` | - | 1253.118 | `200000010000000` |
 
 ### Fib
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| Pluto | `pluto dev` | 97.323 | 30.349 | `2178309` |
-| C | `Apple clang 17.0.0` | 65.963 | 11.137 | `2178309` |
-| C++ | `Apple clang 17.0.0` | 380.943 | 12.631 | `2178309` |
-| Go | `go1.26.1` | 119.198 | 14.427 | `2178309` |
-| Rust | `rustc 1.94.0` | 96.002 | 13.359 | `2178309` |
-| Zig | `zig 0.15.2` | 257.850 | 10.866 | `2178309` |
-| Python | `Python 3.14.3` | - | 311.287 | `2178309` |
+| Pluto | `pluto dev` | 98.446 | 30.606 | `2178309` |
+| C | `Apple clang 17.0.0` | 66.964 | 10.073 | `2178309` |
+| C++ | `Apple clang 17.0.0` | 362.147 | 9.862 | `2178309` |
+| Go | `go1.26.1` | 125.090 | 13.337 | `2178309` |
+| Rust | `rustc 1.94.0` | 102.671 | 12.850 | `2178309` |
+| Zig | `zig 0.15.2` | 207.064 | 14.191 | `2178309` |
+| Python | `Python 3.14.3` | - | 306.886 | `2178309` |
 
 ### Fib Tail
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| Pluto | `pluto dev` | 102.379 | 2.309 | `2178309` |
-| C | `Apple clang 17.0.0` | 63.117 | 2.561 | `2178309` |
-| C++ | `Apple clang 17.0.0` | 299.517 | 2.249 | `2178309` |
-| Go | `go1.26.1` | 116.772 | 3.475 | `2178309` |
-| Rust | `rustc 1.94.0` | 95.773 | 2.511 | `2178309` |
-| Zig | `zig 0.15.2` | 200.101 | 3.037 | `2178309` |
-| Python | `Python 3.14.3` | - | 20.506 | `2178309` |
+| Pluto | `pluto dev` | 101.958 | 2.608 | `2178309` |
+| C | `Apple clang 17.0.0` | 68.100 | 2.608 | `2178309` |
+| C++ | `Apple clang 17.0.0` | 322.300 | 2.497 | `2178309` |
+| Go | `go1.26.1` | 127.517 | 3.251 | `2178309` |
+| Rust | `rustc 1.94.0` | 100.230 | 2.915 | `2178309` |
+| Zig | `zig 0.15.2` | 206.296 | 2.831 | `2178309` |
+| Python | `Python 3.14.3` | - | 20.128 | `2178309` |
 
 ### Harmonic
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| Pluto | `pluto dev` | 86.463 | 15.698 | `16.695311` |
-| C | `Apple clang 17.0.0` | 61.034 | 14.911 | `16.695311` |
-| C++ | `Apple clang 17.0.0` | 336.066 | 13.379 | `16.695311` |
-| Go | `go1.26.1` | 127.401 | 17.205 | `16.695311` |
-| Rust | `rustc 1.94.0` | 107.859 | 16.874 | `16.695311` |
-| Zig | `zig 0.15.2` | 408.873 | 17.507 | `16.695311` |
-| Python | `Python 3.14.3` | - | 771.609 | `16.695311` |
+| Pluto | `pluto dev` | 93.380 | 14.618 | `16.695311` |
+| C | `Apple clang 17.0.0` | 61.262 | 17.262 | `16.695311` |
+| C++ | `Apple clang 17.0.0` | 319.618 | 17.371 | `16.695311` |
+| Go | `go1.26.1` | 124.915 | 18.034 | `16.695311` |
+| Rust | `rustc 1.94.0` | 97.323 | 17.676 | `16.695311` |
+| Zig | `zig 0.15.2` | 378.977 | 17.738 | `16.695311` |
+| Python | `Python 3.14.3` | - | 763.578 | `16.695311` |
 
 ## Benchmarks
 

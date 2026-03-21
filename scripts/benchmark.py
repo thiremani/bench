@@ -337,7 +337,7 @@ def main() -> int:
     parser.add_argument(
         "--repeat",
         type=int,
-        default=5,
+        default=10,
         help="Number of times to compile and run each source; results use the median.",
     )
     parser.add_argument(
