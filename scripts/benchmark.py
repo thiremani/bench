@@ -18,38 +18,66 @@ DEFAULT_PLUTO = (REPO_ROOT / "../pluto/pluto").resolve()
 PT_MOD = REPO_ROOT / "pt.mod"
 WORK_ROOT = Path(tempfile.gettempdir()) / "pluto-bench"
 
-LANGUAGE_ORDER = ("pluto", "c", "cpp", "go", "rust", "zig", "python")
+LANGUAGE_ORDER = (
+    "pluto",
+    "c",
+    "cpp",
+    "swift",
+    "go",
+    "rust",
+    "zig",
+    "julia",
+    "node",
+    "bun",
+    "python",
+)
 LANGUAGE_LABELS = {
     "pluto": "Pluto",
     "c": "C",
     "cpp": "C++",
+    "swift": "Swift",
     "go": "Go",
     "rust": "Rust",
     "zig": "Zig",
+    "julia": "Julia",
+    "node": "Node",
+    "bun": "Bun",
     "python": "Python",
 }
-SUFFIX_TO_LANGUAGE = {
-    ".spt": "pluto",
-    ".c": "c",
-    ".cpp": "cpp",
-    ".go": "go",
-    ".rs": "rust",
-    ".zig": "zig",
-    ".py": "python",
+LANGUAGE_TO_SOURCE = {
+    "pluto": "main.spt",
+    "c": "main.c",
+    "cpp": "main.cpp",
+    "swift": "main.swift",
+    "go": "main.go",
+    "rust": "main.rs",
+    "zig": "main.zig",
+    "julia": "main.jl",
+    "node": "main.js",
+    "bun": "main.js",
+    "python": "main.py",
 }
 LANGUAGE_TO_TOOL = {
     "c": "cc",
     "cpp": "c++",
+    "swift": "swiftc",
     "go": "go",
     "rust": "rustc",
     "zig": "zig",
+    "julia": "julia",
+    "node": "node",
+    "bun": "bun",
 }
 LANGUAGE_TO_VERSION_CMD = {
     "c": ["cc", "--version"],
     "cpp": ["c++", "--version"],
+    "swift": ["swift", "--version"],
     "go": ["go", "version"],
     "rust": ["rustc", "--version"],
     "zig": ["zig", "version"],
+    "julia": ["julia", "--version"],
+    "node": ["node", "--version"],
+    "bun": ["bun", "--version"],
     "python": [sys.executable, "--version"],
 }
 
@@ -85,6 +113,13 @@ def normalize_version(language: str, raw: str) -> str:
         parts = raw.split()
         if len(parts) >= 4:
             return f"Apple clang {parts[3]}"
+    if language == "swift":
+        marker = "Swift version "
+        idx = raw.find(marker)
+        if idx != -1:
+            tail = raw[idx + len(marker):].split()
+            if tail:
+                return f"Swift {tail[0]}"
     if language == "go" and raw.startswith("go version "):
         parts = raw.split()
         if len(parts) >= 3:
@@ -95,6 +130,14 @@ def normalize_version(language: str, raw: str) -> str:
             return f"rustc {parts[1]}"
     if language == "zig":
         return f"zig {raw}"
+    if language == "julia" and raw.startswith("julia version "):
+        parts = raw.split()
+        if len(parts) >= 3:
+            return f"Julia {parts[2]}"
+    if language == "node" and raw.startswith("v"):
+        return f"Node {raw}"
+    if language == "bun":
+        return f"Bun {raw}"
     return raw
 
 
@@ -155,6 +198,9 @@ def commands_for(
     elif source.language == "cpp":
         compile_cmd = ["c++", "-O3", source.source_name, "-o", stem]
         run_cmd = [str(workdir / stem)]
+    elif source.language == "swift":
+        compile_cmd = ["swiftc", "-O", source.source_name, "-o", stem]
+        run_cmd = [str(workdir / stem)]
     elif source.language == "go":
         compile_cmd = ["go", "build", "-trimpath", "-o", stem, source.source_name]
         run_cmd = [str(workdir / stem)]
@@ -171,6 +217,15 @@ def commands_for(
             source.source_name,
         ]
         run_cmd = [str(workdir / stem)]
+    elif source.language == "julia":
+        compile_cmd = None
+        run_cmd = ["julia", "--startup-file=no", source.source_name]
+    elif source.language == "node":
+        compile_cmd = None
+        run_cmd = ["node", source.source_name]
+    elif source.language == "bun":
+        compile_cmd = None
+        run_cmd = ["bun", source.source_name]
     elif source.language == "python":
         compile_cmd = None
         run_cmd = [sys.executable, source.source_name]
@@ -272,8 +327,8 @@ def discover_cases(selected: list[str] | None) -> list[str]:
 def sources_for_case(case: str) -> list[CaseSource]:
     case_dir = BENCHMARKS_DIR / case
     sources = []
-    for suffix, language in SUFFIX_TO_LANGUAGE.items():
-        source_name = f"main{suffix}"
+    for language in LANGUAGE_ORDER:
+        source_name = LANGUAGE_TO_SOURCE[language]
         source_path = case_dir / source_name
         if source_path.exists():
             sources.append(
@@ -331,8 +386,8 @@ def print_case(results: list[Result]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Time compile and execution for Pluto, C, C++, Go, Rust, Zig, "
-            "and Python sources."
+            "Time compile and execution for Pluto, C, C++, Swift, Go, Rust, "
+            "Zig, Julia, Node, Bun, and Python sources."
         )
     )
     parser.add_argument(
