@@ -131,6 +131,11 @@ Run the full suite:
 python3 scripts/benchmark.py
 ```
 
+GitHub Actions also runs the suite on `ubuntu-24.04`. That workflow checks out
+`pluto`, builds it with LLVM 21, runs the same harness, and uploads a separate
+snapshot artifact under `results/linux-gha` semantics. It does not overwrite the
+checked-in `results/latest` macOS snapshot.
+
 Regenerate the checked-in charts and snapshot:
 
 ```sh
