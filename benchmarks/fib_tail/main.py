@@ -8,10 +8,15 @@ def fib(n: int) -> int:
     return fib_aux(n, 0, 1)
 
 
-sum = 0
-repeats = 100_000
+def bench_output() -> str:
+    total = 0
+    repeats = 100_000
 
-for i in range(repeats):
-    sum += fib(32 + (i % 2))
+    for i in range(repeats):
+        total += fib(32 + (i % 2))
 
-print(sum)
+    return str(total)
+
+
+if __name__ == "__main__":
+    print(bench_output())

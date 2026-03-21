@@ -5,4 +5,12 @@ function fib(n) {
     return fib(n - 1) + fib(n - 2);
 }
 
-console.log(fib(32));
+function benchOutput() {
+    return String(fib(32));
+}
+
+if (typeof require !== "undefined" && require.main === module) {
+    console.log(benchOutput());
+}
+
+module.exports = { benchOutput };

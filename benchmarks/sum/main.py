@@ -1,7 +1,12 @@
-sum = 0
-n = 100_000_000
+def bench_output() -> str:
+    total = 0
+    n = 20_000_000
 
-for i in range(1, n + 1):
-    sum += i
+    for i in range(1, n + 1):
+        total += (i * 3) % 17
 
-print(sum)
+    return str(total)
+
+
+if __name__ == "__main__":
+    print(bench_output())

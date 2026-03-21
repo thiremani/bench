@@ -1,6 +1,6 @@
 using Printf
 
-function main()
+function bench_output()
     acc = 0.0
     n = UInt64(10_000_001)
 
@@ -8,7 +8,9 @@ function main()
         acc += 1.0 / Float64(i)
     end
 
-    @printf("%.6f\n", acc)
+    return @sprintf("%.6f", acc)
 end
 
-main()
+if abspath(PROGRAM_FILE) == @__FILE__
+    println(bench_output())
+end

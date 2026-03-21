@@ -8,87 +8,89 @@ them in each language, checks output parity, and reports timings.
 
 ## Latest Results
 
-Tested on `2026-03-21 11:57:34 IST` with:
+Tested on `2026-03-21 12:25:18 IST` with:
 
 - Machine: Apple M1 Pro
 - CPU cores: 10
 - Memory: 16 GiB
 - OS: macOS 26.3.1 (25D2128)
 - Command: `python3 scripts/benchmark.py --repeat 10`
-- Benchmark mode: median of 10 samples, with one warm-up execution before each timed run
+- Benchmark mode: median of 10 samples
+- Native languages use one warm-up execution before each timed run
+- Runtime languages use one warm-up call inside a persistent worker process
 - Pluto rows are marked as `Pluto (baseline)` for quick comparison
 
 ### Sum
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| **Pluto (baseline)** | `pluto dev` | **94.082** | **2.324** | `5000000050000000` |
-| C | `Apple clang 17.0.0` | 62.264 | 2.356 | `5000000050000000` |
-| C++ | `Apple clang 17.0.0` | 345.001 | 2.746 | `5000000050000000` |
-| Swift | `Swift 6.2.4` | 213.228 | 38.086 | `5000000050000000` |
-| Go | `go1.26.1` | 122.646 | 37.666 | `5000000050000000` |
-| Rust | `rustc 1.94.0` | 104.104 | 68.859 | `5000000050000000` |
-| Zig | `zig 0.15.2` | 213.171 | 2.992 | `5000000050000000` |
-| Julia | `Julia 1.12.5` | - | 150.692 | `5000000050000000` |
-| Node | `Node v25.8.1` | - | 725.256 | `5000000050000000` |
-| Bun | `Bun 1.3.9` | - | 110.074 | `5000000050000000` |
-| Python | `Python 3.14.3` | - | 6474.846 | `5000000050000000` |
+| **Pluto (baseline)** | `pluto dev` | **96.602** | **19.913** | `160000000` |
+| C | `Apple clang 17.0.0` | 65.583 | 15.842 | `160000000` |
+| C++ | `Apple clang 17.0.0` | 338.244 | 17.140 | `160000000` |
+| Swift | `Swift 6.2.4` | 195.456 | 21.740 | `160000000` |
+| Go | `go1.26.1` | 125.666 | 24.807 | `160000000` |
+| Rust | `rustc 1.94.0` | 103.681 | 27.049 | `160000000` |
+| Zig | `zig 0.15.2` | 207.721 | 19.575 | `160000000` |
+| Julia | `Julia 1.12.5` | - | 11.863 | `160000000` |
+| Node | `Node v25.8.1` | - | 20.005 | `160000000` |
+| Bun | `Bun 1.3.9` | - | 15.722 | `160000000` |
+| Python | `Python 3.14.3` | - | 826.621 | `160000000` |
 
 ### Fib
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| **Pluto (baseline)** | `pluto dev` | **86.080** | **30.799** | `2178309` |
-| C | `Apple clang 17.0.0` | 61.698 | 13.202 | `2178309` |
-| C++ | `Apple clang 17.0.0` | 316.187 | 13.023 | `2178309` |
-| Swift | `Swift 6.2.4` | 208.918 | 14.356 | `2178309` |
-| Go | `go1.26.1` | 126.885 | 13.926 | `2178309` |
-| Rust | `rustc 1.94.0` | 102.353 | 12.159 | `2178309` |
-| Zig | `zig 0.15.2` | 212.021 | 14.783 | `2178309` |
-| Julia | `Julia 1.12.5` | - | 165.159 | `2178309` |
-| Node | `Node v25.8.1` | - | 85.864 | `2178309` |
-| Bun | `Bun 1.3.9` | - | 22.015 | `2178309` |
-| Python | `Python 3.14.3` | - | 304.807 | `2178309` |
+| **Pluto (baseline)** | `pluto dev` | **94.679** | **30.120** | `2178309` |
+| C | `Apple clang 17.0.0` | 64.558 | 11.699 | `2178309` |
+| C++ | `Apple clang 17.0.0` | 336.508 | 11.743 | `2178309` |
+| Swift | `Swift 6.2.4` | 198.327 | 15.211 | `2178309` |
+| Go | `go1.26.1` | 125.929 | 13.723 | `2178309` |
+| Rust | `rustc 1.94.0` | 102.098 | 12.357 | `2178309` |
+| Zig | `zig 0.15.2` | 200.150 | 11.565 | `2178309` |
+| Julia | `Julia 1.12.5` | - | 8.608 | `2178309` |
+| Node | `Node v25.8.1` | - | 21.000 | `2178309` |
+| Bun | `Bun 1.3.9` | - | 11.511 | `2178309` |
+| Python | `Python 3.14.3` | - | 283.440 | `2178309` |
 
 ### Fib Tail
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| **Pluto (baseline)** | `pluto dev` | **90.036** | **16.993** | `285144350000` |
-| C | `Apple clang 17.0.0` | 67.669 | 3.961 | `285144350000` |
-| C++ | `Apple clang 17.0.0` | 337.795 | 3.916 | `285144350000` |
-| Swift | `Swift 6.2.4` | 224.364 | 5.960 | `285144350000` |
-| Go | `go1.26.1` | 124.700 | 6.550 | `285144350000` |
-| Rust | `rustc 1.94.0` | 110.434 | 4.256 | `285144350000` |
-| Zig | `zig 0.15.2` | 218.143 | 4.263 | `285144350000` |
-| Julia | `Julia 1.12.5` | - | 147.668 | `285144350000` |
-| Node | `Node v25.8.1` | - | 74.486 | `285144350000` |
-| Bun | `Bun 1.3.9` | - | 14.587 | `285144350000` |
-| Python | `Python 3.14.3` | - | 177.037 | `285144350000` |
+| **Pluto (baseline)** | `pluto dev` | **97.944** | **14.527** | `285144350000` |
+| C | `Apple clang 17.0.0` | 65.703 | 3.936 | `285144350000` |
+| C++ | `Apple clang 17.0.0` | 375.595 | 4.414 | `285144350000` |
+| Swift | `Swift 6.2.4` | 218.121 | 5.723 | `285144350000` |
+| Go | `go1.26.1` | 126.314 | 5.943 | `285144350000` |
+| Rust | `rustc 1.94.0` | 105.262 | 4.362 | `285144350000` |
+| Zig | `zig 0.15.2` | 209.938 | 4.134 | `285144350000` |
+| Julia | `Julia 1.12.5` | - | 3.101 | `285144350000` |
+| Node | `Node v25.8.1` | - | 14.216 | `285144350000` |
+| Bun | `Bun 1.3.9` | - | 6.944 | `285144350000` |
+| Python | `Python 3.14.3` | - | 156.252 | `285144350000` |
 
 ### Harmonic
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| **Pluto (baseline)** | `pluto dev` | **86.748** | **15.422** | `16.695311` |
-| C | `Apple clang 17.0.0` | 58.008 | 15.558 | `16.695311` |
-| C++ | `Apple clang 17.0.0` | 304.393 | 16.468 | `16.695311` |
-| Swift | `Swift 6.2.4` | 304.638 | 18.536 | `16.695311` |
-| Go | `go1.26.1` | 125.177 | 17.076 | `16.695311` |
-| Rust | `rustc 1.94.0` | 105.685 | 15.012 | `16.695311` |
-| Zig | `zig 0.15.2` | 374.575 | 18.509 | `16.695311` |
-| Julia | `Julia 1.12.5` | - | 280.125 | `16.695311` |
-| Node | `Node v25.8.1` | - | 77.162 | `16.695311` |
-| Bun | `Bun 1.3.9` | - | 24.300 | `16.695311` |
-| Python | `Python 3.14.3` | - | 766.900 | `16.695311` |
+| **Pluto (baseline)** | `pluto dev` | **92.423** | **14.395** | `16.695311` |
+| C | `Apple clang 17.0.0` | 60.813 | 13.876 | `16.695311` |
+| C++ | `Apple clang 17.0.0` | 341.386 | 13.801 | `16.695311` |
+| Swift | `Swift 6.2.4` | 326.089 | 14.881 | `16.695311` |
+| Go | `go1.26.1` | 126.149 | 14.772 | `16.695311` |
+| Rust | `rustc 1.94.0` | 106.040 | 13.720 | `16.695311` |
+| Zig | `zig 0.15.2` | 376.238 | 13.747 | `16.695311` |
+| Julia | `Julia 1.12.5` | - | 9.977 | `16.695311` |
+| Node | `Node v25.8.1` | - | 9.855 | `16.695311` |
+| Bun | `Bun 1.3.9` | - | 9.851 | `16.695311` |
+| Python | `Python 3.14.3` | - | 442.333 | `16.695311` |
 
 ## Benchmarks
 
 - `sum`
   Integer reduction benchmark.
-  Sums the natural numbers from `1` to `100,000,000`.
-  This stays within JavaScript's exact integer range without switching Node or Bun to `BigInt`.
-  Expected output: `5000000050000000`
+  Sums `(i * 3) % 17` for `i` from `1` to `20,000,000`.
+  This avoids closed-form constant folding in native compilers while staying within JavaScript's exact integer range.
+  Expected output: `160000000`
 
 - `fib`
   Naive recursive Fibonacci benchmark.
@@ -157,8 +159,9 @@ PLUTO_BIN=/path/to/pluto python3 scripts/benchmark.py
 - Zig is built with `zig build-exe -O ReleaseFast`.
 - Go uses the default optimized `go build` pipeline.
 - Julia runs with `julia --startup-file=no`.
-- The harness creates an isolated temp work directory for each sample.
+- The harness creates isolated temp work directories and copies each benchmark into them before running.
 - It copies the benchmark files into that directory, including Pluto support `.pt` files when present.
-- It performs one warm-up execution before each timed run.
-- Each timed run launches a fresh process, so runtime and JIT languages still include per-process startup work in the measured run time.
+- Native languages perform one warm-up execution before each timed run.
+- Julia, Node, Bun, and Python run inside a persistent worker process for each benchmark/language, with one warm-up call before the timed samples.
+- Native run time still includes process launch for the produced executable. Runtime-language run time is closer to steady-state execution inside the already-started interpreter or VM.
 - Output is checked against `expected.txt` for the benchmark.

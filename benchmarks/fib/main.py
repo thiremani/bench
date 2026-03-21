@@ -4,4 +4,9 @@ def fib(n: int) -> int:
     return fib(n - 1) + fib(n - 2)
 
 
-print(fib(32))
+def bench_output() -> str:
+    return str(fib(32))
+
+
+if __name__ == "__main__":
+    print(bench_output())

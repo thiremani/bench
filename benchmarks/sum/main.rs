@@ -1,9 +1,9 @@
 fn main() {
     let mut sum: u64 = 0;
-    let n: u64 = 100_000_000;
+    let n: u64 = 20_000_000;
 
     for i in 1..=n {
-        sum += i;
+        sum += (i * 3) % 17;
     }
 
     println!("{}", sum);

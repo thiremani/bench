@@ -5,8 +5,10 @@ function fib(n::UInt64)::UInt64
     return fib(n - 1) + fib(n - 2)
 end
 
-function main()
-    println(fib(UInt64(32)))
+function bench_output()
+    return string(fib(UInt64(32)))
 end
 
-main()
+if abspath(PROGRAM_FILE) == @__FILE__
+    println(bench_output())
+end

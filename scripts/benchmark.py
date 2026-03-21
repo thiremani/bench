@@ -80,6 +80,13 @@ LANGUAGE_TO_VERSION_CMD = {
     "bun": ["bun", "--version"],
     "python": [sys.executable, "--version"],
 }
+STEADY_STATE_LANGUAGES = {"julia", "node", "bun", "python"}
+STEADY_STATE_WORKERS = {
+    "python": REPO_ROOT / "scripts" / "runtime_worker.py",
+    "julia": REPO_ROOT / "scripts" / "runtime_worker.jl",
+    "node": REPO_ROOT / "scripts" / "runtime_worker.js",
+    "bun": REPO_ROOT / "scripts" / "runtime_worker.js",
+}
 
 
 @dataclass
@@ -165,7 +172,7 @@ def timed_run(cmd: list[str], cwd: Path) -> tuple[float, subprocess.CompletedPro
     return elapsed_ms, proc
 
 
-def prepare_workdir(base: str, language: str, repeat: int) -> Path:
+def prepare_workdir(base: str, language: str, repeat: str | int) -> Path:
     WORK_ROOT.mkdir(parents=True, exist_ok=True)
     workdir = Path(
         tempfile.mkdtemp(
@@ -283,6 +290,9 @@ def load_expected(case_dir: Path) -> str | None:
 
 
 def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result:
+    if source.language in STEADY_STATE_LANGUAGES:
+        return benchmark_steady_state_source(source, repeat, pluto_bin)
+
     compile_samples = []
     run_samples = []
     last_output = ""
@@ -309,6 +319,102 @@ def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result
         language=source.language,
         version=language_version(source.language, pluto_bin),
         compile_ms=statistics.median(compile_samples) if compile_samples else None,
+        run_ms=statistics.median(run_samples),
+        output=last_output,
+    )
+
+
+def worker_command(language: str, source_name: str) -> list[str]:
+    worker = STEADY_STATE_WORKERS[language]
+    if language == "python":
+        return [sys.executable, str(worker), source_name]
+    if language == "julia":
+        return ["julia", "--startup-file=no", str(worker), source_name]
+    if language == "node":
+        return ["node", str(worker), source_name]
+    if language == "bun":
+        return ["bun", str(worker), source_name]
+    raise ValueError(f"unsupported steady-state language: {language}")
+
+
+def start_worker(source: CaseSource, workdir: Path) -> subprocess.Popen[str]:
+    return subprocess.Popen(
+        worker_command(source.language, source.source_name),
+        cwd=workdir,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        bufsize=1,
+    )
+
+
+def stop_worker(proc: subprocess.Popen[str]) -> None:
+    if proc.poll() is None and proc.stdin is not None:
+        try:
+            proc.stdin.write("exit\n")
+            proc.stdin.flush()
+        except BrokenPipeError:
+            pass
+    try:
+        proc.communicate(timeout=5)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.communicate()
+
+
+def timed_worker_run(proc: subprocess.Popen[str]) -> tuple[float, str]:
+    if proc.stdin is None or proc.stdout is None:
+        raise RuntimeError("worker process pipes are not available")
+
+    start = time.perf_counter()
+    proc.stdin.write("run\n")
+    proc.stdin.flush()
+    line = proc.stdout.readline()
+    elapsed_ms = (time.perf_counter() - start) * 1000.0
+
+    if not line:
+        stderr = ""
+        if proc.stderr is not None:
+            stderr = proc.stderr.read().strip()
+        raise RuntimeError(
+            "worker exited unexpectedly"
+            + (f"\n{stderr}" if stderr else "")
+        )
+
+    status, _, payload = line.rstrip("\n").partition(" ")
+    if status != "OK":
+        raise RuntimeError(f"worker failed: {payload}")
+    return elapsed_ms, payload
+
+
+def benchmark_steady_state_source(
+    source: CaseSource, repeat: int, pluto_bin: Path
+) -> Result:
+    run_samples = []
+    last_output = ""
+    workdir = prepare_workdir(source.case, source.language, "steady")
+
+    try:
+        copy_case_files(source.case_dir, workdir)
+        worker = start_worker(source, workdir)
+        try:
+            # Warm up once in the same interpreter/runtime before timing.
+            timed_worker_run(worker)
+            for _ in range(repeat):
+                run_ms, output = timed_worker_run(worker)
+                run_samples.append(run_ms)
+                last_output = output
+        finally:
+            stop_worker(worker)
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+
+    return Result(
+        case=source.case,
+        language=source.language,
+        version=language_version(source.language, pluto_bin),
+        compile_ms=None,
         run_ms=statistics.median(run_samples),
         output=last_output,
     )
