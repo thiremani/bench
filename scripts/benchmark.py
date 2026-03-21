@@ -120,6 +120,7 @@ class Result:
 class CaseSource:
     case: str
     case_dir: Path
+    source_dir: Path
     language: str
     source_name: str
 
@@ -209,11 +210,9 @@ def prepare_workdir(base: str, language: str, repeat: str | int) -> Path:
     return workdir
 
 
-def copy_case_files(case_dir: Path, workdir: Path) -> None:
-    for path in case_dir.iterdir():
+def copy_case_files(source_dir: Path, workdir: Path) -> None:
+    for path in source_dir.iterdir():
         if not path.is_file():
-            continue
-        if path.name == "expected.txt":
             continue
         shutil.copy2(path, workdir / path.name)
 
@@ -575,7 +574,7 @@ def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result
     for idx in range(repeat):
         workdir = prepare_workdir(source.case, source.language, idx)
         try:
-            copy_case_files(source.case_dir, workdir)
+            copy_case_files(source.source_dir, workdir)
             compile_cmd, run_cmd = commands_for(source, workdir, pluto_bin)
             if compile_cmd is not None:
                 compile_ms, _ = timed_run(compile_cmd, workdir)
@@ -616,12 +615,14 @@ def sources_for_case(case: str) -> list[CaseSource]:
     sources = []
     for language in LANGUAGE_ORDER:
         source_name = LANGUAGE_TO_SOURCE[language]
-        source_path = case_dir / source_name
+        source_dir = case_dir / language
+        source_path = source_dir / source_name
         if source_path.exists():
             sources.append(
                 CaseSource(
                     case=case,
                     case_dir=case_dir,
+                    source_dir=source_dir,
                     language=language,
                     source_name=source_name,
                 )

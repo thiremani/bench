@@ -119,9 +119,11 @@ The charts are the quick view. Each benchmark uses its own linear scale, so bar 
   Computes the harmonic sum from `1` to `10,000,000`.
   Expected output: `16.695311`
 
-Each benchmark directory contains equivalent `main.*` implementations for the
-languages included in the suite, plus `expected.txt` and optional Pluto support
-files such as `support.pt`.
+Each benchmark directory keeps `expected.txt` at the case root and places each
+language implementation under its own subdirectory, for example
+`benchmarks/sum/go/main.go` or `benchmarks/fib/pluto/main.spt`. Pluto-specific
+support files such as `support.pt` live alongside the Pluto source in that
+benchmark's `pluto/` subdirectory.
 
 ## Running
 
