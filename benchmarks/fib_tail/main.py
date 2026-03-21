@@ -8,4 +8,10 @@ def fib(n: int) -> int:
     return fib_aux(n, 0, 1)
 
 
-print(fib(32))
+sum = 0
+repeats = 100_000
+
+for i in range(repeats):
+    sum += fib(32 + (i % 2))
+
+print(sum)

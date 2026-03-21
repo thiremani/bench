@@ -167,10 +167,12 @@ def timed_run(cmd: list[str], cwd: Path) -> tuple[float, subprocess.CompletedPro
 
 def prepare_workdir(base: str, language: str, repeat: int) -> Path:
     WORK_ROOT.mkdir(parents=True, exist_ok=True)
-    workdir = WORK_ROOT / f"{base}_{language}_{repeat}"
-    if workdir.exists():
-        shutil.rmtree(workdir)
-    workdir.mkdir(parents=True)
+    workdir = Path(
+        tempfile.mkdtemp(
+            prefix=f"{base}_{language}_{repeat}_",
+            dir=WORK_ROOT,
+        )
+    )
     if PT_MOD.exists():
         shutil.copy2(PT_MOD, workdir / PT_MOD.name)
     return workdir

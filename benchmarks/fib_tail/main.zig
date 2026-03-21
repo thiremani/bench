@@ -14,6 +14,14 @@ fn fib(n: u64) u64 {
 pub fn main() !void {
     var stdout_buffer: [1024]u8 = undefined;
     var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
-    try stdout_writer.interface.print("{}\n", .{fib(32)});
+    var sum: u64 = 0;
+    const repeats: u64 = 100_000;
+    var i: u64 = 0;
+
+    while (i < repeats) : (i += 1) {
+        sum += fib(32 + (i % 2));
+    }
+
+    try stdout_writer.interface.print("{}\n", .{sum});
     try stdout_writer.interface.flush();
 }

@@ -1,2 +1,4 @@
-res = Fib(32)
+i = 0:100000
+res = 0
+res = res + Fib(32 + i % 2)
 res

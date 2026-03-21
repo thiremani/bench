@@ -8,7 +8,14 @@ end
 fib(n::UInt64) = fib_aux(n, UInt64(0), UInt64(1))
 
 function main()
-    println(fib(UInt64(32)))
+    acc = UInt64(0)
+    repeats = UInt64(100_000)
+
+    for i in UInt64(0):(repeats - 1)
+        acc += fib(UInt64(32) + (i % UInt64(2)))
+    end
+
+    println(acc)
 end
 
 main()

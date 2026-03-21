@@ -10,5 +10,12 @@ fn fib(n: u64) -> u64 {
 }
 
 fn main() {
-    println!("{}", fib(32));
+    let mut sum: u64 = 0;
+    let repeats: u64 = 100_000;
+
+    for i in 0..repeats {
+        sum += fib(32 + (i % 2));
+    }
+
+    println!("{}", sum);
 }

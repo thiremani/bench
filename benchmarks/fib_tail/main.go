@@ -14,5 +14,12 @@ func fib(n uint64) uint64 {
 }
 
 func main() {
-	fmt.Println(fib(32))
+	var sum uint64
+	const repeats uint64 = 100000
+
+	for i := uint64(0); i < repeats; i++ {
+		sum += fib(32 + (i % 2))
+	}
+
+	fmt.Println(sum)
 }

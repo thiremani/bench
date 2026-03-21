@@ -13,6 +13,13 @@ static std::uint64_t fib(std::uint64_t n) {
 }
 
 int main() {
-    std::cout << fib(32) << "\n";
+    std::uint64_t sum = 0;
+    const std::uint64_t repeats = 100000;
+
+    for (std::uint64_t i = 0; i < repeats; ++i) {
+        sum += fib(32 + (i % 2));
+    }
+
+    std::cout << sum << "\n";
     return 0;
 }
