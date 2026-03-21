@@ -16,13 +16,13 @@ Tested on `2026-03-21 11:26:48 IST` with:
 - OS: macOS 26.3.1 (25D2128)
 - Command: `python3 scripts/benchmark.py --repeat 10`
 - Benchmark mode: median of 10 samples, with one warm-up execution before each timed run
-- Pluto rows are bolded for quick comparison
+- Pluto rows are marked as `Pluto (baseline)` for quick comparison
 
 ### Sum
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| **Pluto** | **`pluto dev`** | **96.947** | **2.662** | **`200000010000000`** |
+| **Pluto (baseline)** | `pluto dev` | **96.947** | **2.662** | `200000010000000` |
 | C | `Apple clang 17.0.0` | 63.688 | 2.414 | `200000010000000` |
 | C++ | `Apple clang 17.0.0` | 322.931 | 2.451 | `200000010000000` |
 | Swift | `Swift 6.2.4` | 196.662 | 13.315 | `200000010000000` |
@@ -38,7 +38,7 @@ Tested on `2026-03-21 11:26:48 IST` with:
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| **Pluto** | **`pluto dev`** | **95.055** | **30.067** | **`2178309`** |
+| **Pluto (baseline)** | `pluto dev` | **95.055** | **30.067** | `2178309` |
 | C | `Apple clang 17.0.0` | 65.561 | 11.620 | `2178309` |
 | C++ | `Apple clang 17.0.0` | 344.915 | 11.686 | `2178309` |
 | Swift | `Swift 6.2.4` | 197.456 | 15.001 | `2178309` |
@@ -54,7 +54,7 @@ Tested on `2026-03-21 11:26:48 IST` with:
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| **Pluto** | **`pluto dev`** | **98.781** | **2.401** | **`2178309`** |
+| **Pluto (baseline)** | `pluto dev` | **98.781** | **2.401** | `2178309` |
 | C | `Apple clang 17.0.0` | 70.346 | 2.682 | `2178309` |
 | C++ | `Apple clang 17.0.0` | 339.688 | 2.601 | `2178309` |
 | Swift | `Swift 6.2.4` | 193.444 | 3.433 | `2178309` |
@@ -70,7 +70,7 @@ Tested on `2026-03-21 11:26:48 IST` with:
 
 | Language | Version | Compile ms | Run ms | Output |
 |---|---|---:|---:|---|
-| **Pluto** | **`pluto dev`** | **94.995** | **15.964** | **`16.695311`** |
+| **Pluto (baseline)** | `pluto dev` | **94.995** | **15.964** | `16.695311` |
 | C | `Apple clang 17.0.0` | 61.426 | 15.278 | `16.695311` |
 | C++ | `Apple clang 17.0.0` | 310.583 | 15.897 | `16.695311` |
 | Swift | `Swift 6.2.4` | 297.806 | 19.086 | `16.695311` |
