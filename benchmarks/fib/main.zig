@@ -8,6 +8,8 @@ fn fib(n: u64) u64 {
 }
 
 pub fn main() !void {
-    const stdout = std.fs.File.stdout().deprecatedWriter();
-    try stdout.print("{}\n", .{fib(32)});
+    var stdout_buffer: [1024]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    try stdout_writer.interface.print("{}\n", .{fib(32)});
+    try stdout_writer.interface.flush();
 }

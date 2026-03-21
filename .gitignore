@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 *.o
 *.out
+**/.zig-cache/
+benchmarks/*/main
+benchmarks/*/*.exe

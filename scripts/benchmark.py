@@ -232,17 +232,20 @@ def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result
 
     for idx in range(repeat):
         workdir = prepare_workdir(source.case, source.language, idx)
-        copy_case_files(source.case_dir, workdir)
-        compile_cmd, run_cmd = commands_for(source, workdir, pluto_bin)
-        if compile_cmd is not None:
-            compile_ms, _ = timed_run(compile_cmd, workdir)
-            compile_samples.append(compile_ms)
+        try:
+            copy_case_files(source.case_dir, workdir)
+            compile_cmd, run_cmd = commands_for(source, workdir, pluto_bin)
+            if compile_cmd is not None:
+                compile_ms, _ = timed_run(compile_cmd, workdir)
+                compile_samples.append(compile_ms)
 
-        # Warm up one execution before timing to reduce one-off startup noise.
-        timed_run(run_cmd, workdir)
-        run_ms, run_proc = timed_run(run_cmd, workdir)
-        run_samples.append(run_ms)
-        last_output = run_proc.stdout.strip()
+            # Warm up one execution before timing to reduce one-off startup noise.
+            timed_run(run_cmd, workdir)
+            run_ms, run_proc = timed_run(run_cmd, workdir)
+            run_samples.append(run_ms)
+            last_output = run_proc.stdout.strip()
+        finally:
+            shutil.rmtree(workdir, ignore_errors=True)
 
     return Result(
         case=source.case,
@@ -327,7 +330,10 @@ def print_case(results: list[Result]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Time compile and execution for Pluto, C, C++, and Python sources."
+        description=(
+            "Time compile and execution for Pluto, C, C++, Go, Rust, Zig, "
+            "and Python sources."
+        )
     )
     parser.add_argument(
         "cases",
@@ -358,13 +364,17 @@ def main() -> int:
         print("No benchmark sources found.", file=sys.stderr)
         return 1
 
-    for case in cases:
-        results = benchmark_case(case, args.repeat, pluto_bin)
-        if not results:
-            print(f"Case: {case}")
-            print("No runnable sources found.\n")
-            continue
-        print_case(results)
+    shutil.rmtree(WORK_ROOT, ignore_errors=True)
+    try:
+        for case in cases:
+            results = benchmark_case(case, args.repeat, pluto_bin)
+            if not results:
+                print(f"Case: {case}")
+                print("No runnable sources found.\n")
+                continue
+            print_case(results)
+    finally:
+        shutil.rmtree(WORK_ROOT, ignore_errors=True)
 
     return 0
 
