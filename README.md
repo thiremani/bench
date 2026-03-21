@@ -14,7 +14,7 @@ Tested on `2026-03-21 10:54:47 IST` with:
 - CPU cores: 10
 - Memory: 16 GiB
 - OS: macOS 26.3.1 (25D2128)
-- Command: `python3 scripts/benchmark.py sum fib fib_tail harmonic --repeat 3`
+- Command: `python3 scripts/benchmark.py sum fib fib_tail harmonic --repeat 10`
 - Benchmark mode: median of 10 samples, with one warm-up execution before each timed run
 
 ### Sum
