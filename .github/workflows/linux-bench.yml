@@ -125,7 +125,7 @@ jobs:
           node --version
           bun --version
           julia --version
-          pluto/pluto --version
+          pluto/pluto -version
           opt --version | head -n 1
           llc --version | head -n 1
 
