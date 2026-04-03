@@ -318,7 +318,7 @@ def language_version(language: str, pluto_bin: Path) -> str:
         if not pluto_bin.exists():
             return "not found"
         proc = subprocess.run(
-            [str(pluto_bin), "--version"],
+            [str(pluto_bin), "-version"],
             capture_output=True,
             text=True,
             check=False,
