@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-03T22:06:21.133565+05:30",
+  "generated_at": "2026-04-04T00:14:31.277125+05:30",
   "repeat": 10,
   "pluto_bin": "/Users/tejas/Downloads/pluto/pluto",
   "platform": "macOS-26.4-arm64-arm-64bit-Mach-O",
@@ -11,64 +11,64 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 150.62168752774596,
-          "run_ms": 9.696499997517094,
+          "compile_ms": 137.6846875064075,
+          "run_ms": 8.642249478725716,
           "output": "160000000"
         },
         {
           "language": "c",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 67.56497951573692,
-          "run_ms": 9.679104492533952,
+          "compile_ms": 61.78920847014524,
+          "run_ms": 9.311791509389877,
           "output": "160000000"
         },
         {
           "language": "cpp",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 397.56370850955136,
-          "run_ms": 9.664729499490932,
+          "compile_ms": 373.2038335001562,
+          "run_ms": 9.376020490890369,
           "output": "160000000"
         },
         {
           "language": "swift",
           "version": "Swift 6.3",
-          "compile_ms": 243.6937085003592,
-          "run_ms": 23.008312506135553,
+          "compile_ms": 240.2176454779692,
+          "run_ms": 21.723937505157664,
           "output": "160000000"
         },
         {
           "language": "go",
           "version": "go1.26.1",
-          "compile_ms": 131.10604148823768,
-          "run_ms": 25.31806251499802,
+          "compile_ms": 122.144520515576,
+          "run_ms": 22.033292014384642,
           "output": "160000000"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 106.98208349640481,
-          "run_ms": 27.802937518572435,
+          "compile_ms": 97.16222903807648,
+          "run_ms": 23.778854025295004,
           "output": "160000000"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 243.9273750060238,
-          "run_ms": 17.17816651216708,
+          "compile_ms": 220.99808350321837,
+          "run_ms": 15.294333483325318,
           "output": "160000000"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 99.35060399584472,
+          "run_ms": 90.15758350142278,
           "output": "160000000"
         },
         {
           "language": "python",
           "version": "Python 3.14.3",
           "compile_ms": null,
-          "run_ms": 1779.1089579986874,
+          "run_ms": 1537.1750210179016,
           "output": "160000000"
         }
       ]
@@ -79,64 +79,64 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 144.7032500000205,
-          "run_ms": 32.214083010330796,
+          "compile_ms": 133.54468750185333,
+          "run_ms": 9.062770521268249,
           "output": "2178309"
         },
         {
           "language": "c",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 63.491249980870634,
-          "run_ms": 10.85460401372984,
+          "compile_ms": 60.356978967320174,
+          "run_ms": 10.378853476140648,
           "output": "2178309"
         },
         {
           "language": "cpp",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 388.85499999742024,
-          "run_ms": 10.99881250411272,
+          "compile_ms": 395.37827103049494,
+          "run_ms": 10.455729527166113,
           "output": "2178309"
         },
         {
           "language": "swift",
           "version": "Swift 6.3",
-          "compile_ms": 227.94143747887574,
-          "run_ms": 14.554166496964172,
+          "compile_ms": 213.73297949321568,
+          "run_ms": 13.275479490403086,
           "output": "2178309"
         },
         {
           "language": "go",
           "version": "go1.26.1",
-          "compile_ms": 129.98845902620815,
-          "run_ms": 12.903978989925236,
+          "compile_ms": 120.1167915132828,
+          "run_ms": 11.867875000461936,
           "output": "2178309"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 108.41066698776558,
-          "run_ms": 11.52385349269025,
+          "compile_ms": 98.87095852172934,
+          "run_ms": 10.413750016596168,
           "output": "2178309"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 236.33318749489263,
-          "run_ms": 11.230583011638373,
+          "compile_ms": 201.66275001247413,
+          "run_ms": 10.002354509197176,
           "output": "2178309"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 99.24491649144329,
+          "run_ms": 87.1144374832511,
           "output": "2178309"
         },
         {
           "language": "python",
           "version": "Python 3.14.3",
           "compile_ms": null,
-          "run_ms": 362.12493749917485,
+          "run_ms": 311.6498960007448,
           "output": "2178309"
         }
       ]
@@ -147,64 +147,64 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 148.1212715152651,
-          "run_ms": 134.82139600091614,
+          "compile_ms": 134.41570798750035,
+          "run_ms": 14.258771028835326,
           "output": "2851443500000"
         },
         {
           "language": "c",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 66.12929148832336,
-          "run_ms": 16.11458297702484,
+          "compile_ms": 59.1668959823437,
+          "run_ms": 14.323437499115244,
           "output": "2851443500000"
         },
         {
           "language": "cpp",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 387.1134374930989,
-          "run_ms": 16.206395492190495,
+          "compile_ms": 355.1766455057077,
+          "run_ms": 14.265333011280745,
           "output": "2851443500000"
         },
         {
           "language": "swift",
           "version": "Swift 6.3",
-          "compile_ms": 251.31639547180384,
-          "run_ms": 13.41681252233684,
+          "compile_ms": 225.751604011748,
+          "run_ms": 12.0719165133778,
           "output": "2851443500000"
         },
         {
           "language": "go",
           "version": "go1.26.1",
-          "compile_ms": 131.3249165250454,
-          "run_ms": 22.71183399716392,
+          "compile_ms": 119.49774998356588,
+          "run_ms": 20.58391648461111,
           "output": "2851443500000"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 108.28456250601448,
-          "run_ms": 16.623811970930547,
+          "compile_ms": 103.07902097702026,
+          "run_ms": 15.017020486993715,
           "output": "2851443500000"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 232.14229149743915,
-          "run_ms": 16.340062516974285,
+          "compile_ms": 208.5134375083726,
+          "run_ms": 14.725645509315655,
           "output": "2851443500000"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 239.7612710192334,
+          "run_ms": 207.0615000266116,
           "output": "2851443500000"
         },
         {
           "language": "python",
           "version": "Python 3.14.3",
           "compile_ms": null,
-          "run_ms": 1903.8290835160296,
+          "run_ms": 1641.0724580055103,
           "output": "2851443500000"
         }
       ]
@@ -215,64 +215,64 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 148.19345800788142,
-          "run_ms": 14.703146007377654,
+          "compile_ms": 134.3944375112187,
+          "run_ms": 13.07881300454028,
           "output": "16.695311"
         },
         {
           "language": "c",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 65.31154151889496,
-          "run_ms": 14.551228989148512,
+          "compile_ms": 60.46754150884226,
+          "run_ms": 13.149833510397002,
           "output": "16.695311"
         },
         {
           "language": "cpp",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 399.4185414921958,
-          "run_ms": 14.844124991213903,
+          "compile_ms": 359.3119585129898,
+          "run_ms": 13.046000007307157,
           "output": "16.695311"
         },
         {
           "language": "swift",
           "version": "Swift 6.3",
-          "compile_ms": 367.8944794810377,
-          "run_ms": 16.485166997881606,
+          "compile_ms": 333.62002100329846,
+          "run_ms": 14.710729010403156,
           "output": "16.695311"
         },
         {
           "language": "go",
           "version": "go1.26.1",
-          "compile_ms": 131.83552050031722,
-          "run_ms": 15.746041521197185,
+          "compile_ms": 119.85264599206857,
+          "run_ms": 13.97975001600571,
           "output": "16.695311"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 108.20877098012716,
-          "run_ms": 15.070687513798475,
+          "compile_ms": 102.82568747061305,
+          "run_ms": 13.20852097705938,
           "output": "16.695311"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 415.4326045245398,
-          "run_ms": 14.833833469310775,
+          "compile_ms": 380.8292085013818,
+          "run_ms": 13.292041490785778,
           "output": "16.695311"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 85.71847900748253,
+          "run_ms": 81.36020848178305,
           "output": "16.695311"
         },
         {
           "language": "python",
           "version": "Python 3.14.3",
           "compile_ms": null,
-          "run_ms": 910.4857084748801,
+          "run_ms": 754.5071255008224,
           "output": "16.695311"
         }
       ]
