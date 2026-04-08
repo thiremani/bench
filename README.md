@@ -42,8 +42,6 @@ Compile time overview:
   <img src="results/latest/compile-times.svg" alt="Compile time chart" />
 </picture>
 
-The charts are the quick view. Each benchmark uses its own linear scale, so bar lengths are comparable within a benchmark but not across benchmarks. The tables below are the exact reference.
-
 ## Pluto vs Python at a Glance
 
 <picture>

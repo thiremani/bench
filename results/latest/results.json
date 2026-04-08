@@ -4,6 +4,47 @@
   "pluto_bin": "/Users/tejas/Downloads/pluto/pluto",
   "platform": "macOS-26.4-arm64-arm-64bit-Mach-O",
   "machine": "arm64",
+  "metadata": {
+    "benchmark": {
+      "generator": "scripts/benchmark.py",
+      "process_model": "fresh-process",
+      "warmup_runs_per_sample": 1,
+      "time_unit": "ms"
+    },
+    "host": {
+      "platform": "macOS-26.4-arm64-arm-64bit-Mach-O",
+      "machine": "arm64",
+      "cpu_count": 10,
+      "python_version": "3.14.3",
+      "cpu_name": "Apple M1 Pro",
+      "total_memory_kb": 16777216
+    },
+    "bench": {
+      "repo_root": "/Users/tejas/Downloads/bench",
+      "git_commit": "8bc6576311d6fb4e9fed9868635a6aa6046aa7ae",
+      "git_branch": "codex/refresh-bench-snapshot",
+      "git_dirty": false
+    },
+    "pluto": {
+      "bin": "/Users/tejas/Downloads/pluto/pluto",
+      "version": "pluto dev",
+      "target_cpu": null,
+      "repo_root": "/Users/tejas/Downloads/pluto",
+      "git_commit": "86f1d02648c9f938a22090aa65bcd97973d30141",
+      "git_branch": "codex/direct-param-values",
+      "git_dirty": false
+    },
+    "memory_measurement": {
+      "enabled": true,
+      "collector": "/usr/bin/time -l",
+      "unit": "KiB"
+    },
+    "llvm_tools": {
+      "opt": "Homebrew LLVM version 22.1.2",
+      "llc": "Homebrew LLVM version 22.1.2",
+      "clang": "Homebrew clang version 22.1.2"
+    }
+  },
   "cases": [
     {
       "name": "sum",

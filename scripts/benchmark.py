@@ -369,6 +369,161 @@ def language_version(language: str, pluto_bin: Path) -> str:
     return normalize_version(language, first_line(text))
 
 
+def probe_first_line(cmd: list[str], cwd: Path | None = None) -> str | None:
+    executable = cmd[0]
+    if not Path(executable).exists() and shutil.which(executable) is None:
+        return None
+    try:
+        proc = subprocess.run(
+            cmd,
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return None
+    text = proc.stdout if proc.stdout.strip() else proc.stderr
+    line = first_line(text)
+    return line or None
+
+
+def find_git_repo_root(start: Path) -> Path | None:
+    current = start.resolve()
+    if current.is_file():
+        current = current.parent
+    for candidate in (current, *current.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return None
+
+
+def git_repo_metadata(start: Path) -> dict[str, str | bool | None] | None:
+    repo_root = find_git_repo_root(start)
+    if repo_root is None:
+        return None
+
+    commit = probe_first_line(["git", "-C", str(repo_root), "rev-parse", "HEAD"])
+    branch = probe_first_line(["git", "-C", str(repo_root), "branch", "--show-current"])
+    status = probe_first_line(["git", "-C", str(repo_root), "status", "--short"])
+    return {
+        "repo_root": str(repo_root),
+        "git_commit": commit,
+        "git_branch": branch,
+        "git_dirty": bool(status),
+    }
+
+
+def total_memory_kb() -> int | None:
+    if sys.platform == "darwin":
+        raw = probe_first_line(["sysctl", "-n", "hw.memsize"])
+        if raw and raw.isdigit():
+            return max(1, int(raw) // 1024)
+        return None
+
+    if sys.platform.startswith("linux"):
+        try:
+            meminfo = Path("/proc/meminfo").read_text(encoding="utf-8")
+        except OSError:
+            return None
+        match = re.search(r"^MemTotal:\s+(\d+)\s+kB$", meminfo, re.MULTILINE)
+        if match:
+            return int(match.group(1))
+    return None
+
+
+def host_metadata() -> dict[str, object]:
+    host = {
+        "platform": platform.platform(),
+        "machine": platform.machine(),
+        "cpu_count": os.cpu_count(),
+        "python_version": platform.python_version(),
+    }
+    cpu_name = (
+        probe_first_line(["sysctl", "-n", "machdep.cpu.brand_string"])
+        if sys.platform == "darwin"
+        else None
+    )
+    if not cpu_name and sys.platform.startswith("linux"):
+        try:
+            cpuinfo = Path("/proc/cpuinfo").read_text(encoding="utf-8")
+        except OSError:
+            cpuinfo = ""
+        match = re.search(r"^model name\s*:\s*(.+)$", cpuinfo, re.MULTILINE)
+        if match:
+            cpu_name = match.group(1).strip()
+    if not cpu_name:
+        cpu_name = platform.processor() or None
+    if cpu_name:
+        host["cpu_name"] = cpu_name
+    total_mem = total_memory_kb()
+    if total_mem is not None:
+        host["total_memory_kb"] = total_mem
+    return host
+
+
+def llvm_tool_metadata() -> dict[str, str]:
+    search_dirs = (
+        Path("/opt/homebrew/opt/llvm/bin"),
+        Path("/usr/local/opt/llvm/bin"),
+    )
+    tools = {
+        "opt": ["--version"],
+        "llc": ["--version"],
+        "clang": ["--version"],
+        "ld.lld": ["--version"],
+    }
+    metadata: dict[str, str] = {}
+    for name, args in tools.items():
+        tool_path = None
+        for search_dir in search_dirs:
+            candidate = search_dir / name
+            if candidate.exists():
+                tool_path = str(candidate)
+                break
+        if tool_path is None:
+            tool_path = shutil.which(name)
+        if tool_path is None:
+            continue
+        line = probe_first_line([tool_path, *args])
+        if line:
+            metadata[name] = line
+    return metadata
+
+
+def snapshot_metadata(pluto_bin: Path) -> dict[str, object]:
+    prefix = peak_memory_command_prefix()
+    pluto = {
+        "bin": str(pluto_bin),
+        "version": language_version("pluto", pluto_bin),
+        "target_cpu": os.environ.get("PLUTO_TARGET_CPU"),
+    }
+    pluto_repo = git_repo_metadata(pluto_bin)
+    if pluto_repo is not None:
+        pluto.update(pluto_repo)
+
+    metadata: dict[str, object] = {
+        "benchmark": {
+            "generator": str(Path(__file__).resolve().relative_to(REPO_ROOT)),
+            "process_model": "fresh-process",
+            "warmup_runs_per_sample": 1,
+            "time_unit": "ms",
+        },
+        "host": host_metadata(),
+        "bench": git_repo_metadata(REPO_ROOT),
+        "pluto": pluto,
+        "memory_measurement": {
+            "enabled": prefix is not None,
+            "collector": " ".join(prefix) if prefix else None,
+            "unit": "KiB",
+        },
+    }
+    llvm = llvm_tool_metadata()
+    if llvm:
+        metadata["llvm_tools"] = llvm
+    return metadata
+
+
 def load_expected(case_dir: Path) -> str | None:
     expected_file = case_dir / "expected.txt"
     if not expected_file.exists():
@@ -418,6 +573,7 @@ def format_metric(metric_name: str, value: float) -> str:
     if metric_name == "memory":
         return format_memory_kb(value)
     raise ValueError(f"unsupported metric: {metric_name}")
+
 
 def nice_tick_step(max_val: float, *, max_ticks: int = 6) -> float:
     if max_val <= 0:
@@ -722,6 +878,7 @@ def write_snapshot(
         "pluto_bin": str(pluto_bin),
         "platform": platform.platform(),
         "machine": platform.machine(),
+        "metadata": snapshot_metadata(pluto_bin),
         "cases": [
             {
                 "name": case,
