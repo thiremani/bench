@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-08T22:15:03.564632+05:30",
+  "generated_at": "2026-04-08T22:29:11.418123+05:30",
   "repeat": 10,
   "pluto_bin": "/Users/tejas/Downloads/pluto/pluto",
   "platform": "macOS-26.4-arm64-arm-64bit-Mach-O",
@@ -11,73 +11,73 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 145.27762500802055,
-          "run_ms": 9.127271012403071,
+          "compile_ms": 140.17631253227592,
+          "run_ms": 8.879562461515889,
           "peak_rss_kb": 1344,
           "output": "160000000"
         },
         {
           "language": "c",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 66.82516701403074,
-          "run_ms": 8.778083516517654,
+          "compile_ms": 62.56112549453974,
+          "run_ms": 8.83147949934937,
           "peak_rss_kb": 1328,
           "output": "160000000"
         },
         {
           "language": "cpp",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 392.6449579594191,
-          "run_ms": 9.226458496414125,
-          "peak_rss_kb": 1352,
+          "compile_ms": 384.16510450770147,
+          "run_ms": 9.07358349650167,
+          "peak_rss_kb": 1344,
           "output": "160000000"
         },
         {
           "language": "swift",
           "version": "Swift 6.3",
-          "compile_ms": 267.0669994840864,
-          "run_ms": 21.587083028862253,
+          "compile_ms": 226.11152051831596,
+          "run_ms": 20.68737498484552,
           "peak_rss_kb": 1840,
           "output": "160000000"
         },
         {
           "language": "go",
           "version": "go1.26.2",
-          "compile_ms": 150.7100620365236,
-          "run_ms": 23.138229007599875,
-          "peak_rss_kb": 3976,
+          "compile_ms": 126.02660452830605,
+          "run_ms": 22.942103998502716,
+          "peak_rss_kb": 3984,
           "output": "160000000"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 103.33083351724781,
-          "run_ms": 24.88345801248215,
+          "compile_ms": 107.24437498720363,
+          "run_ms": 24.695020983926952,
           "peak_rss_kb": 1520,
           "output": "160000000"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 211.71927050454542,
-          "run_ms": 14.768583525437862,
-          "peak_rss_kb": 1384,
+          "compile_ms": 215.67547897575423,
+          "run_ms": 15.336520998971537,
+          "peak_rss_kb": 1392,
           "output": "160000000"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 84.3129790155217,
-          "peak_rss_kb": 49664,
+          "run_ms": 89.82797901262529,
+          "peak_rss_kb": 49784,
           "output": "160000000"
         },
         {
           "language": "python",
           "version": "Python 3.14.3",
           "compile_ms": null,
-          "run_ms": 1517.708688013954,
-          "peak_rss_kb": 14848,
+          "run_ms": 1547.3504585097544,
+          "peak_rss_kb": 14904,
           "output": "160000000"
         }
       ]
@@ -88,56 +88,56 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 128.34718701196834,
-          "run_ms": 8.827749959891662,
-          "peak_rss_kb": 1344,
+          "compile_ms": 140.40022899280302,
+          "run_ms": 9.60350048262626,
+          "peak_rss_kb": 1352,
           "output": "2178309"
         },
         {
           "language": "c",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 60.8282920147758,
-          "run_ms": 9.954478999134153,
-          "peak_rss_kb": 1336,
+          "compile_ms": 67.90258348337375,
+          "run_ms": 10.22062503034249,
+          "peak_rss_kb": 1344,
           "output": "2178309"
         },
         {
           "language": "cpp",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 377.5694790238049,
-          "run_ms": 10.08429197827354,
+          "compile_ms": 387.60006247321144,
+          "run_ms": 10.223708493867889,
           "peak_rss_kb": 1360,
           "output": "2178309"
         },
         {
           "language": "swift",
           "version": "Swift 6.3",
-          "compile_ms": 218.30374948331155,
-          "run_ms": 13.692291511688381,
+          "compile_ms": 216.63502097362652,
+          "run_ms": 13.732625520788133,
           "peak_rss_kb": 1856,
           "output": "2178309"
         },
         {
           "language": "go",
           "version": "go1.26.2",
-          "compile_ms": 120.96174998441711,
-          "run_ms": 11.536854493897408,
+          "compile_ms": 128.6785420088563,
+          "run_ms": 12.12322898209095,
           "peak_rss_kb": 3952,
           "output": "2178309"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 103.95754151977599,
-          "run_ms": 10.704916523536667,
+          "compile_ms": 102.20324998954311,
+          "run_ms": 10.593771003186703,
           "peak_rss_kb": 1520,
           "output": "2178309"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 204.2444995022379,
-          "run_ms": 10.06212449283339,
+          "compile_ms": 212.7854580176063,
+          "run_ms": 10.6425414851401,
           "peak_rss_kb": 1392,
           "output": "2178309"
         },
@@ -145,15 +145,15 @@
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 98.57847951934673,
-          "peak_rss_kb": 49624,
+          "run_ms": 91.11797949299216,
+          "peak_rss_kb": 49744,
           "output": "2178309"
         },
         {
           "language": "python",
           "version": "Python 3.14.3",
           "compile_ms": null,
-          "run_ms": 320.02691650995985,
+          "run_ms": 315.80414550262503,
           "peak_rss_kb": 14920,
           "output": "2178309"
         }
@@ -165,73 +165,73 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 140.8215000119526,
-          "run_ms": 14.637604006566107,
+          "compile_ms": 142.35741648008116,
+          "run_ms": 14.842104515992105,
           "peak_rss_kb": 1352,
           "output": "2851443500000"
         },
         {
           "language": "c",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 62.030271015828475,
-          "run_ms": 14.72704199841246,
+          "compile_ms": 63.6340829951223,
+          "run_ms": 14.65470899711363,
           "peak_rss_kb": 1344,
           "output": "2851443500000"
         },
         {
           "language": "cpp",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 386.89687551232055,
-          "run_ms": 14.803562517045066,
+          "compile_ms": 389.26052098395303,
+          "run_ms": 14.962333516450599,
           "peak_rss_kb": 1360,
           "output": "2851443500000"
         },
         {
           "language": "swift",
           "version": "Swift 6.3",
-          "compile_ms": 239.31364601594396,
-          "run_ms": 13.054333510808647,
+          "compile_ms": 241.86193800414912,
+          "run_ms": 13.006583030801266,
           "peak_rss_kb": 1840,
           "output": "2851443500000"
         },
         {
           "language": "go",
           "version": "go1.26.2",
-          "compile_ms": 142.32202101266012,
-          "run_ms": 20.932458486640826,
-          "peak_rss_kb": 3976,
+          "compile_ms": 125.1951454905793,
+          "run_ms": 20.64883298589848,
+          "peak_rss_kb": 3928,
           "output": "2851443500000"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 113.78010449698195,
-          "run_ms": 15.426207974087447,
+          "compile_ms": 106.50824999902397,
+          "run_ms": 15.114937501493841,
           "peak_rss_kb": 1536,
           "output": "2851443500000"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 224.12466650712304,
-          "run_ms": 15.278416482033208,
-          "peak_rss_kb": 1384,
+          "compile_ms": 215.3477709798608,
+          "run_ms": 14.838104485534132,
+          "peak_rss_kb": 1392,
           "output": "2851443500000"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 222.5479790067766,
-          "peak_rss_kb": 50144,
+          "run_ms": 211.39616699656472,
+          "peak_rss_kb": 50200,
           "output": "2851443500000"
         },
         {
           "language": "python",
           "version": "Python 3.14.3",
           "compile_ms": null,
-          "run_ms": 1672.32172950753,
-          "peak_rss_kb": 14920,
+          "run_ms": 1646.925396489678,
+          "peak_rss_kb": 14904,
           "output": "2851443500000"
         }
       ]
@@ -242,73 +242,73 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 166.5824374940712,
-          "run_ms": 13.994583510793746,
-          "peak_rss_kb": 1352,
+          "compile_ms": 141.02093753172085,
+          "run_ms": 13.421146024484187,
+          "peak_rss_kb": 1344,
           "output": "16.695311"
         },
         {
           "language": "c",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 66.75887550227344,
-          "run_ms": 13.568250025855377,
+          "compile_ms": 64.44335400010459,
+          "run_ms": 13.444229494780302,
           "peak_rss_kb": 1344,
           "output": "16.695311"
         },
         {
           "language": "cpp",
           "version": "Apple clang 21.0.0",
-          "compile_ms": 435.8091455360409,
-          "run_ms": 13.485375005984679,
+          "compile_ms": 393.2785624929238,
+          "run_ms": 13.467916491208598,
           "peak_rss_kb": 1360,
           "output": "16.695311"
         },
         {
           "language": "swift",
           "version": "Swift 6.3",
-          "compile_ms": 434.7727710264735,
-          "run_ms": 16.09654151252471,
-          "peak_rss_kb": 5664,
+          "compile_ms": 347.9754794680048,
+          "run_ms": 15.69897952140309,
+          "peak_rss_kb": 5680,
           "output": "16.695311"
         },
         {
           "language": "go",
           "version": "go1.26.2",
-          "compile_ms": 132.79341702582315,
-          "run_ms": 14.68166647828184,
-          "peak_rss_kb": 4040,
+          "compile_ms": 127.60116648860276,
+          "run_ms": 14.41533351317048,
+          "peak_rss_kb": 3992,
           "output": "16.695311"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 107.88697900716215,
-          "run_ms": 13.41831247555092,
+          "compile_ms": 108.03237551590428,
+          "run_ms": 13.69368750602007,
           "peak_rss_kb": 1536,
           "output": "16.695311"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 379.32200051727705,
-          "run_ms": 13.359500007936731,
-          "peak_rss_kb": 1392,
+          "compile_ms": 381.67633398552425,
+          "run_ms": 13.751041988143697,
+          "peak_rss_kb": 1376,
           "output": "16.695311"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 75.50922897644341,
-          "peak_rss_kb": 50216,
+          "run_ms": 79.45241703419015,
+          "peak_rss_kb": 50344,
           "output": "16.695311"
         },
         {
           "language": "python",
           "version": "Python 3.14.3",
           "compile_ms": null,
-          "run_ms": 783.067688025767,
-          "peak_rss_kb": 14896,
+          "run_ms": 786.6269375081174,
+          "peak_rss_kb": 14936,
           "output": "16.695311"
         }
       ]
