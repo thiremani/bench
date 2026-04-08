@@ -145,10 +145,26 @@ jobs:
 
           snapshot = Path("results/linux-gha/results.json")
           data = json.loads(snapshot.read_text(encoding="utf-8"))
+          metadata = data.get("metadata", {})
           summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
 
           def compile_text(value):
               return "-" if value is None else f"{value:.3f}"
+
+          def short_commit(value):
+              return "unknown" if not value else value[:12]
+
+          def branch_label(repo):
+              if not repo:
+                  return "unknown"
+              branch = repo.get("git_branch") or "detached"
+              return f"{branch}{' dirty' if repo.get('git_dirty') else ''}"
+
+          def memory_text(value):
+              if value is None:
+                  return "unknown RAM"
+              gib = value / (1024.0 * 1024.0)
+              return f"{gib:.1f} GiB RAM"
 
           with summary.open("a", encoding="utf-8") as out:
               out.write("## Linux benchmark snapshot\n\n")
@@ -156,6 +172,39 @@ jobs:
               out.write(f"- Machine: `{data['machine']}`\n")
               out.write(f"- Repeat: `{data['repeat']}`\n")
               out.write(f"- Pluto binary: `{data['pluto_bin']}`\n\n")
+
+              host = metadata.get("host", {})
+              bench = metadata.get("bench", {})
+              pluto = metadata.get("pluto", {})
+              memory = metadata.get("memory_measurement", {})
+              llvm = metadata.get("llvm_tools", {})
+
+              out.write("### Provenance\n\n")
+              out.write(
+                  f"- Bench: `{branch_label(bench)}` @ `{short_commit(bench.get('git_commit'))}`\n"
+              )
+              out.write(
+                  f"- Pluto: `{pluto.get('version', 'unknown')}` on `{branch_label(pluto)}` @ "
+                  f"`{short_commit(pluto.get('git_commit'))}`\n"
+              )
+              out.write(
+                  f"- Host: `{host.get('cpu_name', host.get('machine', 'unknown host'))}` | "
+                  f"`{host.get('platform', data['platform'])}` | "
+                  f"`{host.get('cpu_count', '?')} cores` | "
+                  f"`{memory_text(host.get('total_memory_kb'))}` | "
+                  f"`Python {host.get('python_version', '?')}`\n"
+              )
+              if memory.get("enabled"):
+                  out.write(f"- Peak memory: `{memory.get('collector', 'enabled')}`\n")
+              else:
+                  out.write("- Peak memory: unavailable on this host\n")
+              if llvm:
+                  llvm_text = " | ".join(
+                      f"{name} {version}" if version else f"{name} unavailable"
+                      for name, version in llvm.items()
+                  )
+                  out.write(f"- LLVM: `{llvm_text}`\n")
+              out.write("\n")
 
               for case in data["cases"]:
                   out.write(f"### {case['name'].replace('_', ' ').title()}\n\n")

@@ -407,7 +407,6 @@ def git_repo_metadata(start: Path) -> dict[str, str | bool | None] | None:
     branch = probe_first_line(["git", "-C", str(repo_root), "branch", "--show-current"])
     status = probe_first_line(["git", "-C", str(repo_root), "status", "--short"])
     return {
-        "repo_root": str(repo_root),
         "git_commit": commit,
         "git_branch": branch,
         "git_dirty": bool(status),
@@ -462,9 +461,11 @@ def host_metadata() -> dict[str, object]:
     return host
 
 
-def llvm_tool_metadata() -> dict[str, str]:
+def llvm_tool_metadata() -> dict[str, str | None]:
     search_dirs = (
+        Path("/opt/homebrew/bin"),
         Path("/opt/homebrew/opt/llvm/bin"),
+        Path("/usr/local/bin"),
         Path("/usr/local/opt/llvm/bin"),
     )
     tools = {
@@ -473,7 +474,7 @@ def llvm_tool_metadata() -> dict[str, str]:
         "clang": ["--version"],
         "ld.lld": ["--version"],
     }
-    metadata: dict[str, str] = {}
+    metadata: dict[str, str | None] = {}
     for name, args in tools.items():
         tool_path = None
         for search_dir in search_dirs:
@@ -484,10 +485,9 @@ def llvm_tool_metadata() -> dict[str, str]:
         if tool_path is None:
             tool_path = shutil.which(name)
         if tool_path is None:
+            metadata[name] = None
             continue
-        line = probe_first_line([tool_path, *args])
-        if line:
-            metadata[name] = line
+        metadata[name] = probe_first_line([tool_path, *args])
     return metadata
 
 
@@ -519,9 +519,83 @@ def snapshot_metadata(pluto_bin: Path) -> dict[str, object]:
         },
     }
     llvm = llvm_tool_metadata()
-    if llvm:
-        metadata["llvm_tools"] = llvm
+    metadata["llvm_tools"] = llvm
     return metadata
+
+
+def short_commit(commit: str | None) -> str:
+    if not commit:
+        return "unknown"
+    return commit[:12]
+
+
+def branch_label(repo: dict[str, object] | None) -> str:
+    if not repo:
+        return "unknown"
+    branch = repo.get("git_branch") or "detached"
+    dirty = " dirty" if repo.get("git_dirty") else ""
+    return f"{branch}{dirty}"
+
+
+def format_total_memory_kb(value: int | None) -> str:
+    if value is None:
+        return "unknown RAM"
+    gib = value / (1024.0 * 1024.0)
+    if gib >= 100:
+        return f"{gib:.0f} GiB RAM"
+    return f"{gib:.1f} GiB RAM"
+
+
+def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
+    benchmark = metadata.get("benchmark", {})
+    host = metadata.get("host", {})
+    bench = metadata.get("bench", {})
+    pluto = metadata.get("pluto", {})
+    memory = metadata.get("memory_measurement", {})
+    llvm = metadata.get("llvm_tools", {})
+
+    host_bits = [
+        host.get("cpu_name") or host.get("machine") or "unknown host",
+        host.get("platform") or "unknown platform",
+    ]
+    if host.get("cpu_count") is not None:
+        host_bits.append(f"{host['cpu_count']} cores")
+    host_bits.append(format_total_memory_kb(host.get("total_memory_kb")))
+    if host.get("python_version"):
+        host_bits.append(f"Python {host['python_version']}")
+
+    lines = [
+        "Benchmark metadata:",
+        f"  Bench: {branch_label(bench)} @ {short_commit(bench.get('git_commit'))}",
+        (
+            f"  Pluto: {pluto.get('version') or 'unknown'} | "
+            f"{branch_label(pluto)} @ {short_commit(pluto.get('git_commit'))}"
+        ),
+        f"  Host: {' | '.join(str(bit) for bit in host_bits if bit)}",
+        (
+            "  Mode: "
+            f"{benchmark.get('process_model') or 'unknown'} | "
+            f"warm-up x{benchmark.get('warmup_runs_per_sample') or '?'} | "
+            f"units {benchmark.get('time_unit') or '?'}"
+        ),
+    ]
+    if memory.get("enabled"):
+        collector = memory.get("collector") or "unknown collector"
+        lines.append(f"  Peak Memory: enabled via {collector}")
+    else:
+        lines.append("  Peak Memory: unavailable on this host")
+    llvm_bits = [
+        f"{name} {version}" if version else f"{name} unavailable"
+        for name, version in llvm.items()
+    ]
+    if llvm_bits:
+        lines.append("  LLVM: " + " | ".join(llvm_bits))
+    return lines
+
+
+def print_metadata_summary(metadata: dict[str, object]) -> None:
+    print("\n".join(metadata_summary_lines(metadata)))
+    print()
 
 
 def load_expected(case_dir: Path) -> str | None:
@@ -1164,6 +1238,8 @@ def main() -> int:
         return 1
 
     measure_memory = peak_memory_command_prefix() is not None
+    metadata = snapshot_metadata(pluto_bin)
+    print_metadata_summary(metadata)
     shutil.rmtree(WORK_ROOT, ignore_errors=True)
     try:
         results_by_case: dict[str, list[Result]] = {}
@@ -1176,13 +1252,15 @@ def main() -> int:
                 continue
             print_case(results)
         if args.snapshot_dir:
+            snapshot_dir = Path(args.snapshot_dir).resolve()
             write_snapshot(
-                Path(args.snapshot_dir).resolve(),
+                snapshot_dir,
                 cases=cases,
                 results_by_case=results_by_case,
                 repeat=args.repeat,
                 pluto_bin=pluto_bin,
             )
+            print(f"Snapshot written: {snapshot_dir / 'results.json'}")
     finally:
         shutil.rmtree(WORK_ROOT, ignore_errors=True)
 
