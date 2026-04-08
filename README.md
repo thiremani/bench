@@ -31,8 +31,8 @@ Run time overview:
 Peak memory overview:
 
 <picture>
-  <source media="(max-width: 800px)" srcset="results/latest/peak-rss-mobile.svg" />
-  <img src="results/latest/peak-rss.svg" alt="Peak memory chart" />
+  <source media="(max-width: 800px)" srcset="results/latest/peak-memory-mobile.svg" />
+  <img src="results/latest/peak-memory.svg" alt="Peak memory chart" />
 </picture>
 
 Compile time overview:
@@ -197,7 +197,7 @@ PLUTO_BIN=/path/to/pluto python3 scripts/benchmark.py
 - Julia, Node, Bun, and Python are reported as runtime or JIT execution only, so their compile column is `-`.
 - Snapshot tables only include languages whose toolchains were available on the host where the snapshot was generated.
 - Peak Memory is collected automatically when the host supports `/usr/bin/time`.
-- Peak Memory is the median peak resident set size (RSS) across the untimed warm-up runs.
+- Peak Memory is the median peak resident set size across the untimed warm-up runs.
 - In plain terms, think of Peak Memory as the approximate RAM used by the benchmark process at its peak.
 - Pluto currently uses its own LLVM pipeline with `opt -O3`.
 - C and C++ are built with `-O3` for consistency with the native comparison.

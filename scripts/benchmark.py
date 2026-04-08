@@ -134,7 +134,7 @@ class Result:
     version: str
     compile_ms: float | None
     run_ms: float
-    peak_rss_kb: int | None
+    peak_memory_kb: int | None
     output: str
 
 
@@ -393,7 +393,7 @@ def format_ms(value: float) -> str:
     return f"{value:.2f} ms"
 
 
-def format_rss_kb(value: float) -> str:
+def format_memory_kb(value: float) -> str:
     mib = value / 1024.0
     if mib >= 100:
         return f"{mib:.0f} MiB"
@@ -408,7 +408,7 @@ def metric_value(result: Result, metric_name: str) -> float | None:
     if metric_name == "compile":
         return result.compile_ms
     if metric_name == "memory":
-        return float(result.peak_rss_kb) if result.peak_rss_kb is not None else None
+        return float(result.peak_memory_kb) if result.peak_memory_kb is not None else None
     raise ValueError(f"unsupported metric: {metric_name}")
 
 
@@ -416,10 +416,8 @@ def format_metric(metric_name: str, value: float) -> str:
     if metric_name in {"run", "compile"}:
         return format_ms(value)
     if metric_name == "memory":
-        return format_rss_kb(value)
+        return format_memory_kb(value)
     raise ValueError(f"unsupported metric: {metric_name}")
-
-
 
 def nice_tick_step(max_val: float, *, max_ticks: int = 6) -> float:
     if max_val <= 0:
@@ -461,7 +459,7 @@ def tick_values(metric_name: str, max_val: float) -> list[float]:
     raise ValueError(f"unsupported metric: {metric_name}")
 
 
-def peak_rss_command_prefix() -> list[str] | None:
+def peak_memory_command_prefix() -> list[str] | None:
     time_bin = "/usr/bin/time"
     if not Path(time_bin).exists():
         return None
@@ -472,7 +470,7 @@ def peak_rss_command_prefix() -> list[str] | None:
     return None
 
 
-def parse_peak_rss_kb(stderr_text: str) -> int | None:
+def parse_peak_memory_kb(stderr_text: str) -> int | None:
     linux_match = re.search(r"Maximum resident set size \(kbytes\):\s*(\d+)", stderr_text)
     if linux_match:
         return int(linux_match.group(1))
@@ -489,8 +487,8 @@ def parse_peak_rss_kb(stderr_text: str) -> int | None:
     return None
 
 
-def probe_peak_rss_kb(cmd: list[str], cwd: Path) -> int | None:
-    prefix = peak_rss_command_prefix()
+def probe_peak_memory_kb(cmd: list[str], cwd: Path) -> int | None:
+    prefix = peak_memory_command_prefix()
     if prefix is None:
         return None
     proc = subprocess.run(
@@ -511,7 +509,7 @@ def probe_peak_rss_kb(cmd: list[str], cwd: Path) -> int | None:
             f"command failed: {' '.join(prefix + cmd)}"
             + (f"\n{detail_text}" if detail_text else "")
         )
-    return parse_peak_rss_kb(proc.stderr)
+    return parse_peak_memory_kb(proc.stderr)
 
 
 def render_bar_chart(
@@ -733,7 +731,7 @@ def write_snapshot(
                         "version": result.version,
                         "compile_ms": result.compile_ms,
                         "run_ms": result.run_ms,
-                        "peak_rss_kb": result.peak_rss_kb,
+                        "peak_memory_kb": result.peak_memory_kb,
                         "output": result.output,
                     }
                     for result in results_by_case.get(case, [])
@@ -784,12 +782,12 @@ def write_snapshot(
         columns=1,
     )
     if any(
-        result.peak_rss_kb is not None
+        result.peak_memory_kb is not None
         for case_results in results_by_case.values()
         for result in case_results
     ):
         render_bar_chart(
-            snapshot_dir / "peak-rss.svg",
+            snapshot_dir / "peak-memory.svg",
             title="Peak Memory Use by Benchmark",
             subtitle="Approximate peak RAM used by each process, measured from the untimed warm-up run. Lower is better.",
             cases=cases,
@@ -798,7 +796,7 @@ def write_snapshot(
             columns=2,
         )
         render_bar_chart(
-            snapshot_dir / "peak-rss-mobile.svg",
+            snapshot_dir / "peak-memory-mobile.svg",
             title="Peak Memory Use by Benchmark",
             subtitle="Approximate peak RAM used by each process, measured from the untimed warm-up run. Lower is better.",
             cases=cases,
@@ -816,9 +814,9 @@ def benchmark_source(
 ) -> Result:
     compile_samples = []
     run_samples = []
-    rss_samples = []
+    memory_samples = []
     last_output = ""
-    rss_enabled = measure_memory
+    memory_enabled = measure_memory
 
     for idx in range(repeat):
         workdir = prepare_workdir(source.case, source.language, idx)
@@ -830,22 +828,22 @@ def benchmark_source(
                 compile_samples.append(compile_ms)
 
             # Warm up one execution before timing to reduce one-off startup noise.
-            if rss_enabled:
+            if memory_enabled:
                 try:
-                    peak_rss_kb = probe_peak_rss_kb(run_cmd, workdir)
+                    peak_memory_kb = probe_peak_memory_kb(run_cmd, workdir)
                 except RuntimeError as err:
                     # If the target command itself is healthy, keep the benchmark
-                    # running and simply drop RSS for this source. This avoids a
+                    # running and simply drop peak-memory sampling for this source. This avoids a
                     # flaky /usr/bin/time probe killing the whole suite.
                     timed_run(run_cmd, workdir)
                     print(
                         f"warning: peak memory probe disabled for {source.case}/{source.language}: {err}",
                         file=sys.stderr,
                     )
-                    rss_enabled = False
+                    memory_enabled = False
                 else:
-                    if peak_rss_kb is not None:
-                        rss_samples.append(peak_rss_kb)
+                    if peak_memory_kb is not None:
+                        memory_samples.append(peak_memory_kb)
             else:
                 timed_run(run_cmd, workdir)
             run_ms, run_proc = timed_run(run_cmd, workdir)
@@ -860,7 +858,7 @@ def benchmark_source(
         version=language_version(source.language, pluto_bin),
         compile_ms=statistics.median(compile_samples) if compile_samples else None,
         run_ms=statistics.median(run_samples),
-        peak_rss_kb=int(statistics.median(rss_samples)) if rss_samples else None,
+        peak_memory_kb=int(statistics.median(memory_samples)) if memory_samples else None,
         output=last_output,
     )
 
@@ -930,10 +928,10 @@ def print_case(results: list[Result]) -> None:
         return
 
     case = results[0].case
-    show_peak_rss = any(result.peak_rss_kb is not None for result in results)
+    show_peak_memory = any(result.peak_memory_kb is not None for result in results)
     print(f"Case: {case}")
     header = f"{'Language':<8} {'Version':<18} {'Compile ms':>12} {'Run ms':>12}"
-    if show_peak_rss:
+    if show_peak_memory:
         header += f" {'Peak Memory':>12}"
     print(header)
     for result in results:
@@ -944,8 +942,8 @@ def print_case(results: list[Result]) -> None:
             f"{compile_text:>12} "
             f"{result.run_ms:>12.3f}"
         )
-        if show_peak_rss:
-            peak_text = "-" if result.peak_rss_kb is None else format_rss_kb(result.peak_rss_kb)
+        if show_peak_memory:
+            peak_text = "-" if result.peak_memory_kb is None else format_memory_kb(result.peak_memory_kb)
             row += f" {peak_text:>12}"
         print(row)
 
@@ -1008,7 +1006,7 @@ def main() -> int:
         print("No benchmark sources found.", file=sys.stderr)
         return 1
 
-    measure_memory = peak_rss_command_prefix() is not None
+    measure_memory = peak_memory_command_prefix() is not None
     shutil.rmtree(WORK_ROOT, ignore_errors=True)
     try:
         results_by_case: dict[str, list[Result]] = {}
