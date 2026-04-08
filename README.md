@@ -51,7 +51,7 @@ The charts are the quick view. Each benchmark uses its own linear scale, so bar 
   <img src="assets/pluto-vs-python.svg" alt="Pluto vs Python code comparison" />
 </picture>
 
-- `sum`: Pluto source is `benchmarks/sum/pluto/main.spt`; Python source is `benchmarks/sum/python/main.py`.
+- `sum`: Pluto source is `benchmarks/sum/pluto/sum.spt`; Python source is `benchmarks/sum/python/main.py`.
 - `fib`: Pluto uses `benchmarks/fib/pluto/fib.pt` plus `benchmarks/fib/pluto/fib.spt`; Python uses `benchmarks/fib/python/main.py`.
 
 ## Result Tables

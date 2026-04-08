@@ -1,2 +1,1 @@
-res = Fib(32)
-res
+Fib(32)

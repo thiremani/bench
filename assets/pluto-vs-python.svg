@@ -9,7 +9,7 @@
 <rect x="48" y="142" width="530" height="280" rx="18" fill="#0f172a" />
 <rect x="622" y="142" width="530" height="280" rx="18" fill="#111827" />
 <text x="72" y="176" fill="#f8fafc" font-size="18" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto</text>
-<text x="72" y="198" fill="#94a3b8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">benchmarks/sum/pluto/main.spt</text>
+<text x="72" y="198" fill="#94a3b8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">benchmarks/sum/pluto/sum.spt</text>
 <text x="646" y="176" fill="#f8fafc" font-size="18" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python</text>
 <text x="646" y="198" fill="#94a3b8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">benchmarks/sum/python/main.py</text>
 
@@ -44,8 +44,7 @@
 </text>
 <text x="72" y="704" fill="#38bdf8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">fib.spt</text>
 <text x="72" y="730" xml:space="preserve" fill="#e2e8f0" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-  <tspan x="72" y="730" fill="#f59e0b">res</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#22c55e">Fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#38bdf8">32</tspan><tspan fill="#e2e8f0">)</tspan>
-  <tspan x="72" y="758" fill="#f59e0b">res</tspan>
+  <tspan x="72" y="730" fill="#22c55e">Fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#38bdf8">32</tspan><tspan fill="#e2e8f0">)</tspan>
 </text>
 
 <text x="646" y="582" xml:space="preserve" fill="#e2e8f0" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
