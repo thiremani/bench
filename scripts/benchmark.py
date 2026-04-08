@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 import argparse
 import datetime as dt
 import json
 import math
 import os
 import platform
+import re
 import shutil
 import statistics
 import subprocess
@@ -21,7 +24,11 @@ BENCHMARKS_DIR = REPO_ROOT / "benchmarks"
 DEFAULT_PLUTO = (REPO_ROOT / "../pluto/pluto").resolve()
 PT_MOD = REPO_ROOT / "pt.mod"
 WORK_ROOT = Path(tempfile.gettempdir()) / "pluto-bench"
+# Keep the benchmark tables and CLI output in the natural progression order.
 CASE_ORDER = ("sum", "fib", "fib_tail", "harmonic")
+# The chart grid uses a different order so the short-running loop cases share
+# the first row and the recursion-heavy cases share the second row.
+CASE_GRID_ORDER = ("sum", "harmonic", "fib", "fib_tail")
 CASE_LABELS = {
     "sum": "Sum",
     "fib": "Fib",
@@ -55,8 +62,22 @@ LANGUAGE_LABELS = {
     "bun": "Bun",
     "python": "Python",
 }
+GENERATED_CASE_FILE_SUFFIXES = {
+    ".o",
+    ".out",
+    ".exe",
+    ".pdb",
+    ".ilk",
+    ".obj",
+    ".a",
+    ".so",
+    ".dylib",
+    ".dll",
+    ".bc",
+    ".ll",
+    ".s",
+}
 LANGUAGE_TO_SOURCE = {
-    "pluto": "main.spt",
     "c": "main.c",
     "cpp": "main.cpp",
     "swift": "main.swift",
@@ -113,6 +134,7 @@ class Result:
     version: str
     compile_ms: float | None
     run_ms: float
+    peak_memory_kb: int | None
     output: str
 
 
@@ -129,6 +151,13 @@ def ordered_cases(cases: list[str] | set[str]) -> list[str]:
     seen = set(cases)
     ordered = [case for case in CASE_ORDER if case in seen]
     ordered.extend(sorted(case for case in seen if case not in set(CASE_ORDER)))
+    return ordered
+
+
+def ordered_grid_cases(cases: list[str] | set[str]) -> list[str]:
+    seen = set(cases)
+    ordered = [case for case in CASE_GRID_ORDER if case in seen]
+    ordered.extend(sorted(case for case in seen if case not in set(CASE_GRID_ORDER)))
     return ordered
 
 
@@ -214,6 +243,12 @@ def copy_case_files(source_dir: Path, workdir: Path) -> None:
     for path in source_dir.iterdir():
         if not path.is_file():
             continue
+        if path.suffix in GENERATED_CASE_FILE_SUFFIXES:
+            continue
+        # Extensionless executables such as stray local "main" binaries should
+        # not leak into temp workdirs and influence benchmark runs.
+        if not path.suffix and os.access(path, os.X_OK):
+            continue
         shutil.copy2(path, workdir / path.name)
 
 
@@ -248,7 +283,7 @@ def zig_compile_target_args() -> list[str]:
 def commands_for(
     source: CaseSource, workdir: Path, pluto_bin: Path
 ) -> tuple[list[str] | None, list[str]]:
-    stem = "main"
+    stem = Path(source.source_name).stem
     if source.language == "pluto":
         compile_cmd = [str(pluto_bin), source.source_name]
         run_cmd = [str(workdir / stem)]
@@ -334,6 +369,235 @@ def language_version(language: str, pluto_bin: Path) -> str:
     return normalize_version(language, first_line(text))
 
 
+def probe_first_line(cmd: list[str], cwd: Path | None = None) -> str | None:
+    executable = cmd[0]
+    if not Path(executable).exists() and shutil.which(executable) is None:
+        return None
+    try:
+        proc = subprocess.run(
+            cmd,
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return None
+    text = proc.stdout if proc.stdout.strip() else proc.stderr
+    line = first_line(text)
+    return line or None
+
+
+def find_git_repo_root(start: Path) -> Path | None:
+    current = start.resolve()
+    if current.is_file():
+        current = current.parent
+    for candidate in (current, *current.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return None
+
+
+def git_repo_metadata(start: Path) -> dict[str, str | bool | None] | None:
+    repo_root = find_git_repo_root(start)
+    if repo_root is None:
+        return None
+
+    commit = probe_first_line(["git", "-C", str(repo_root), "rev-parse", "HEAD"])
+    branch = probe_first_line(["git", "-C", str(repo_root), "branch", "--show-current"])
+    status = probe_first_line(["git", "-C", str(repo_root), "status", "--short"])
+    return {
+        "git_commit": commit,
+        "git_branch": branch,
+        "git_dirty": bool(status),
+    }
+
+
+def total_memory_kb() -> int | None:
+    if sys.platform == "darwin":
+        raw = probe_first_line(["sysctl", "-n", "hw.memsize"])
+        if raw and raw.isdigit():
+            return max(1, int(raw) // 1024)
+        return None
+
+    if sys.platform.startswith("linux"):
+        try:
+            meminfo = Path("/proc/meminfo").read_text(encoding="utf-8")
+        except OSError:
+            return None
+        match = re.search(r"^MemTotal:\s+(\d+)\s+kB$", meminfo, re.MULTILINE)
+        if match:
+            return int(match.group(1))
+    return None
+
+
+def host_metadata() -> dict[str, object]:
+    host = {
+        "platform": platform.platform(),
+        "machine": platform.machine(),
+        "cpu_count": os.cpu_count(),
+        "python_version": platform.python_version(),
+    }
+    cpu_name = (
+        probe_first_line(["sysctl", "-n", "machdep.cpu.brand_string"])
+        if sys.platform == "darwin"
+        else None
+    )
+    if not cpu_name and sys.platform.startswith("linux"):
+        try:
+            cpuinfo = Path("/proc/cpuinfo").read_text(encoding="utf-8")
+        except OSError:
+            cpuinfo = ""
+        match = re.search(r"^model name\s*:\s*(.+)$", cpuinfo, re.MULTILINE)
+        if match:
+            cpu_name = match.group(1).strip()
+    if not cpu_name:
+        cpu_name = platform.processor() or None
+    if cpu_name:
+        host["cpu_name"] = cpu_name
+    total_mem = total_memory_kb()
+    if total_mem is not None:
+        host["total_memory_kb"] = total_mem
+    return host
+
+
+def llvm_tool_metadata() -> dict[str, str | None]:
+    search_dirs = (
+        Path("/opt/homebrew/bin"),
+        Path("/opt/homebrew/opt/llvm/bin"),
+        Path("/usr/local/bin"),
+        Path("/usr/local/opt/llvm/bin"),
+    )
+    tools = {
+        "opt": ["--version"],
+        "llc": ["--version"],
+        "clang": ["--version"],
+        "ld.lld": ["--version"],
+    }
+    metadata: dict[str, str | None] = {}
+    for name, args in tools.items():
+        tool_path = None
+        for search_dir in search_dirs:
+            candidate = search_dir / name
+            if candidate.exists():
+                tool_path = str(candidate)
+                break
+        if tool_path is None:
+            tool_path = shutil.which(name)
+        if tool_path is None:
+            metadata[name] = None
+            continue
+        metadata[name] = probe_first_line([tool_path, *args])
+    return metadata
+
+
+def snapshot_metadata(pluto_bin: Path) -> dict[str, object]:
+    prefix = peak_memory_command_prefix()
+    pluto = {
+        "bin": str(pluto_bin),
+        "version": language_version("pluto", pluto_bin),
+        "target_cpu": os.environ.get("PLUTO_TARGET_CPU"),
+    }
+    pluto_repo = git_repo_metadata(pluto_bin)
+    if pluto_repo is not None:
+        pluto.update(pluto_repo)
+
+    metadata: dict[str, object] = {
+        "benchmark": {
+            "generator": str(Path(__file__).resolve().relative_to(REPO_ROOT)),
+            "process_model": "fresh-process",
+            "warmup_runs_per_sample": 1,
+            "time_unit": "ms",
+        },
+        "host": host_metadata(),
+        "bench": git_repo_metadata(REPO_ROOT),
+        "pluto": pluto,
+        "memory_measurement": {
+            "enabled": prefix is not None,
+            "collector": " ".join(prefix) if prefix else None,
+            "unit": "KiB",
+        },
+    }
+    llvm = llvm_tool_metadata()
+    metadata["llvm_tools"] = llvm
+    return metadata
+
+
+def short_commit(commit: str | None) -> str:
+    if not commit:
+        return "unknown"
+    return commit[:12]
+
+
+def branch_label(repo: dict[str, object] | None) -> str:
+    if not repo:
+        return "unknown"
+    branch = repo.get("git_branch") or "detached"
+    dirty = " dirty" if repo.get("git_dirty") else ""
+    return f"{branch}{dirty}"
+
+
+def format_total_memory_kb(value: int | None) -> str:
+    if value is None:
+        return "unknown RAM"
+    gib = value / (1024.0 * 1024.0)
+    if gib >= 100:
+        return f"{gib:.0f} GiB RAM"
+    return f"{gib:.1f} GiB RAM"
+
+
+def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
+    benchmark = metadata.get("benchmark", {})
+    host = metadata.get("host", {})
+    bench = metadata.get("bench", {})
+    pluto = metadata.get("pluto", {})
+    memory = metadata.get("memory_measurement", {})
+    llvm = metadata.get("llvm_tools", {})
+
+    host_bits = [
+        host.get("cpu_name") or host.get("machine") or "unknown host",
+        host.get("platform") or "unknown platform",
+    ]
+    if host.get("cpu_count") is not None:
+        host_bits.append(f"{host['cpu_count']} cores")
+    host_bits.append(format_total_memory_kb(host.get("total_memory_kb")))
+    if host.get("python_version"):
+        host_bits.append(f"Python {host['python_version']}")
+
+    lines = [
+        "Benchmark metadata:",
+        f"  Bench: {branch_label(bench)} @ {short_commit(bench.get('git_commit'))}",
+        (
+            f"  Pluto: {pluto.get('version') or 'unknown'} | "
+            f"{branch_label(pluto)} @ {short_commit(pluto.get('git_commit'))}"
+        ),
+        f"  Host: {' | '.join(str(bit) for bit in host_bits if bit)}",
+        (
+            "  Mode: "
+            f"{benchmark.get('process_model') or 'unknown'} | "
+            f"warm-up x{benchmark.get('warmup_runs_per_sample') or '?'} | "
+            f"units {benchmark.get('time_unit') or '?'}"
+        ),
+    ]
+    if memory.get("enabled"):
+        collector = memory.get("collector") or "unknown collector"
+        lines.append(f"  Peak Memory: enabled via {collector}")
+    else:
+        lines.append("  Peak Memory: unavailable on this host")
+    llvm_bits = [
+        f"{name} {version}" if version else f"{name} unavailable"
+        for name, version in llvm.items()
+    ]
+    if llvm_bits:
+        lines.append("  LLVM: " + " | ".join(llvm_bits))
+    return lines
+
+
+def print_metadata_summary(metadata: dict[str, object]) -> None:
+    print("\n".join(metadata_summary_lines(metadata)))
+    print()
+
+
 def load_expected(case_dir: Path) -> str | None:
     expected_file = case_dir / "expected.txt"
     if not expected_file.exists():
@@ -358,16 +622,124 @@ def format_ms(value: float) -> str:
     return f"{value:.2f} ms"
 
 
+def format_memory_kb(value: float) -> str:
+    mib = value / 1024.0
+    if mib >= 100:
+        return f"{mib:.0f} MiB"
+    if mib >= 10:
+        return f"{mib:.1f} MiB"
+    return f"{mib:.2f} MiB"
+
+
+def metric_value(result: Result, metric_name: str) -> float | None:
+    if metric_name == "run":
+        return result.run_ms
+    if metric_name == "compile":
+        return result.compile_ms
+    if metric_name == "memory":
+        return float(result.peak_memory_kb) if result.peak_memory_kb is not None else None
+    raise ValueError(f"unsupported metric: {metric_name}")
+
+
+def format_metric(metric_name: str, value: float) -> str:
+    if metric_name in {"run", "compile"}:
+        return format_ms(value)
+    if metric_name == "memory":
+        return format_memory_kb(value)
+    raise ValueError(f"unsupported metric: {metric_name}")
+
+
+def nice_tick_step(max_val: float, *, max_ticks: int = 6) -> float:
+    if max_val <= 0:
+        return 1.0
+    raw_step = max_val / max(1, max_ticks - 1)
+    magnitude = 10 ** math.floor(math.log10(raw_step))
+    residual = raw_step / magnitude
+    if residual <= 1:
+        nice = 1
+    elif residual <= 2:
+        nice = 2
+    elif residual <= 5:
+        nice = 5
+    else:
+        nice = 10
+    return float(nice * magnitude)
+
 
 def compile_tick_values(max_val: float) -> list[float]:
-    if max_val <= 100:
-        step = 20
-    elif max_val <= 250:
-        step = 50
-    else:
-        step = 100
-    limit = int(math.ceil(max_val / step) * step)
-    return [float(tick) for tick in range(0, limit + step, step)]
+    step = nice_tick_step(max_val)
+    limit = math.ceil(max_val / step) * step
+    tick_count = int(round(limit / step))
+    return [step * idx for idx in range(tick_count + 1)]
+
+
+def memory_tick_values(max_val: float) -> list[float]:
+    max_mib = max_val / 1024.0
+    step_mib = nice_tick_step(max_mib)
+    limit_mib = math.ceil(max_mib / step_mib) * step_mib
+    tick_count = int(round(limit_mib / step_mib))
+    return [step_mib * idx * 1024 for idx in range(tick_count + 1)]
+
+
+def tick_values(metric_name: str, max_val: float) -> list[float]:
+    if metric_name in {"run", "compile"}:
+        return compile_tick_values(max_val)
+    if metric_name == "memory":
+        return memory_tick_values(max_val)
+    raise ValueError(f"unsupported metric: {metric_name}")
+
+
+def peak_memory_command_prefix() -> list[str] | None:
+    time_bin = "/usr/bin/time"
+    if not Path(time_bin).exists():
+        return None
+    if sys.platform == "darwin":
+        return [time_bin, "-l"]
+    if sys.platform.startswith("linux"):
+        return [time_bin, "-v"]
+    return None
+
+
+def parse_peak_memory_kb(stderr_text: str) -> int | None:
+    linux_match = re.search(r"Maximum resident set size \(kbytes\):\s*(\d+)", stderr_text)
+    if linux_match:
+        return int(linux_match.group(1))
+
+    darwin_match = re.search(r"^\s*(\d+)\s+maximum resident set size", stderr_text, re.MULTILINE)
+    if darwin_match:
+        # BSD time -l reports this field in bytes; normalize to KiB so Linux and
+        # macOS snapshots use the same stored unit.
+        return max(1, int(darwin_match.group(1)) // 1024)
+
+    footprint_match = re.search(r"^\s*(\d+)\s+peak memory footprint", stderr_text, re.MULTILINE)
+    if footprint_match:
+        return max(1, int(footprint_match.group(1)) // 1024)
+    return None
+
+
+def probe_peak_memory_kb(cmd: list[str], cwd: Path) -> int | None:
+    prefix = peak_memory_command_prefix()
+    if prefix is None:
+        return None
+    proc = subprocess.run(
+        prefix + cmd,
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if proc.returncode != 0:
+        details = []
+        if proc.stdout.strip():
+            details.append(proc.stdout.strip())
+        if proc.stderr.strip():
+            details.append(proc.stderr.strip())
+        detail_text = "\n".join(details)
+        raise RuntimeError(
+            f"command failed: {' '.join(prefix + cmd)}"
+            + (f"\n{detail_text}" if detail_text else "")
+        )
+    return parse_peak_memory_kb(proc.stderr)
 
 
 def render_bar_chart(
@@ -378,6 +750,7 @@ def render_bar_chart(
     cases: list[str],
     results_by_case: dict[str, list[Result]],
     metric_name: str,
+    columns: int | None = None,
 ) -> None:
     font = (
         'font-family="ui-sans-serif, system-ui, -apple-system, '
@@ -387,10 +760,10 @@ def render_bar_chart(
     # Collect per-case entries sorted by value (fastest first).
     case_data: list[tuple[str, list[tuple[str, float]]]] = []
     all_values: list[float] = []
-    for case in cases:
+    for case in ordered_grid_cases(cases):
         entries: list[tuple[str, float]] = []
         for result in results_by_case.get(case, []):
-            value = result.run_ms if metric_name == "run" else result.compile_ms
+            value = metric_value(result, metric_name)
             if value is not None:
                 entries.append((result.language, value))
                 all_values.append(value)
@@ -404,30 +777,44 @@ def render_bar_chart(
     if not all_values:
         return
 
-    # Layout constants.
-    label_w = 80
-    bar_max = 580
-    svg_width = 920
-    header_h = 100
-    bar_h = 24
-    pluto_bar_h = 28
-    bar_gap = 6
-    case_title_h = 34
-    case_gap = 24
+    default_columns = 1 if len(case_data) == 1 else 2
+    columns = max(1, min(columns or default_columns, len(case_data)))
+    svg_width = 760 if columns == 1 else 1320
+    outer_pad_x = 32
+    gutter_x = 28
+    gutter_y = 28
+    header_h = 96
     footer_h = 36
+    panel_w = int((svg_width - (outer_pad_x * 2) - (gutter_x * (columns - 1))) / columns)
+    panel_pad_x = 18
+    panel_pad_top = 18
+    panel_pad_bottom = 18
+    label_w = 68
+    value_pad = 86
+    bar_max = panel_w - (panel_pad_x * 2) - label_w - value_pad
+    bar_h = 20
+    pluto_bar_h = 24
+    bar_gap = 6
+    pluto_gap = 10
+    title_h = 30
+    axis_h = 18
 
-    # Calculate SVG height from content.
-    content_h = 0
+    panel_heights: list[int] = []
     for _, entries in case_data:
-        if not entries:
-            continue
-        content_h += case_title_h + case_gap
+        bars_h = 0
         for lang, _ in entries:
-            h = pluto_bar_h if lang == "pluto" else bar_h
-            content_h += h + bar_gap
+            bars_h += (pluto_bar_h if lang == "pluto" else bar_h) + bar_gap
             if lang == "pluto":
-                content_h += 12
-    svg_height = header_h + content_h + footer_h
+                bars_h += pluto_gap
+        panel_heights.append(panel_pad_top + title_h + axis_h + bars_h + panel_pad_bottom)
+
+    row_heights: list[int] = []
+    for row_idx in range(0, len(panel_heights), columns):
+        row_heights.append(max(panel_heights[row_idx:row_idx + columns]))
+
+    svg_height = header_h + footer_h + sum(row_heights)
+    if row_heights:
+        svg_height += gutter_y * (len(row_heights) - 1)
 
     lines: list[str] = []
     lines.append(
@@ -447,91 +834,101 @@ def render_bar_chart(
         f'{font}>{svg_escape(subtitle)}</text>'
     )
 
-    # Render each case as a group of horizontal bars with per-case scaling.
-    y = header_h
-    for case, entries in case_data:
-        if not entries:
-            continue
+    row_y = header_h
+    row_idx = 0
+    for idx, (case, entries) in enumerate(case_data):
+        if idx and idx % columns == 0:
+            row_y += row_heights[row_idx] + gutter_y
+            row_idx += 1
+
+        col_idx = idx % columns
+        panel_x = outer_pad_x + (col_idx * (panel_w + gutter_x))
+        panel_y = row_y
+        panel_h = panel_heights[idx]
+        chart_left = panel_x + panel_pad_x + label_w
+        chart_right = panel_x + panel_w - panel_pad_x
+        label_x = chart_left - 10
+        title_x = panel_x + panel_pad_x
+        title_y = panel_y + panel_pad_top + 14
+        grid_top = panel_y + panel_pad_top + title_h + axis_h
+
+        lines.append(
+            f'<rect x="{panel_x}" y="{panel_y}" width="{panel_w}" height="{panel_h}" '
+            f'rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />'
+        )
 
         # Per-case axis range (linear).
         case_max_val = max(v for _, v in entries)
         raw_max = case_max_val * 1.08 if case_max_val else 1.0
-        case_ticks = compile_tick_values(raw_max)
+        case_ticks = tick_values(metric_name, raw_max)
         case_axis_max = max(case_ticks)
 
-        # Case title.
         case_label = CASE_LABELS.get(case, case.replace("_", " ").title())
         lines.append(
-            f'<text x="16" y="{y + 20}" fill="#0f172a" font-size="15" '
+            f'<text x="{title_x}" y="{title_y}" fill="#0f172a" font-size="16" '
             f'font-weight="700" {font}>{svg_escape(case_label)}</text>'
         )
 
-        # Per-case gridlines (inline, spanning the bars of this case).
         case_bars_h = 0
         for lang, _ in entries:
-            h = pluto_bar_h if lang == "pluto" else bar_h
-            case_bars_h += h + bar_gap
+            case_bars_h += (pluto_bar_h if lang == "pluto" else bar_h) + bar_gap
             if lang == "pluto":
-                case_bars_h += 12
-        grid_top = y + case_title_h
+                case_bars_h += pluto_gap
         grid_bottom = grid_top + case_bars_h
+
         for tick in case_ticks:
-            tx = label_w + (tick / case_axis_max) * bar_max
+            tx = chart_left + (tick / case_axis_max) * bar_max
             lines.append(
                 f'<line x1="{tx:.1f}" y1="{grid_top}" x2="{tx:.1f}" '
                 f'y2="{grid_bottom}" stroke="#e2e8f0" stroke-width="1" />'
             )
             lines.append(
                 f'<text x="{tx:.1f}" y="{grid_top - 6}" text-anchor="middle" '
-                f'fill="#cbd5e1" font-size="10" {font}>'
-                f'{svg_escape(format_ms(tick))}</text>'
+                f'fill="#94a3b8" font-size="10" {font}>'
+                f'{svg_escape(format_metric(metric_name, tick))}</text>'
             )
 
-        y += case_title_h
-
+        bar_y = grid_top
         for language, value in entries:
             is_pluto = language == "pluto"
             color = LANGUAGE_COLORS[language]
             bw = max((value / case_axis_max) * bar_max, 2)
             current_bar_h = pluto_bar_h if is_pluto else bar_h
-            bar_y = y
             text_y = bar_y + current_bar_h / 2 + 4.5
 
-            # Language label.
-            weight = '700' if is_pluto else '400'
+            weight = "700" if is_pluto else "400"
             lines.append(
-                f'<text x="{label_w - 10}" y="{text_y:.1f}" text-anchor="end" '
+                f'<text x="{label_x}" y="{text_y:.1f}" text-anchor="end" '
                 f'fill="#0f172a" font-size="13" font-weight="{weight}" '
                 f'{font}>{svg_escape(LANGUAGE_LABELS[language])}</text>'
             )
 
-            # Bar.
             opacity = "1.0" if is_pluto else "0.82"
-            border = (
-                f' stroke="{color}" stroke-width="1.5"' if is_pluto else ""
-            )
+            border = f' stroke="{color}" stroke-width="1.5"' if is_pluto else ""
             lines.append(
-                f'<rect x="{label_w}" y="{bar_y}" width="{bw:.1f}" '
+                f'<rect x="{chart_left}" y="{bar_y}" width="{bw:.1f}" '
                 f'height="{current_bar_h}" rx="4" fill="{color}" '
                 f'fill-opacity="{opacity}"{border} />'
             )
 
-            # Value label.
-            val_x = label_w + bw + 8
+            value_text = format_metric(metric_name, value)
+            value_x = chart_left + bw + 8
+            value_anchor = "start"
+            if value_x + (len(value_text) * 7) > chart_right:
+                value_x = chart_right
+                value_anchor = "end"
             lines.append(
-                f'<text x="{val_x:.1f}" y="{text_y:.1f}" fill="#334155" '
-                f'font-size="12" {font}>{format_ms(value)}</text>'
+                f'<text x="{value_x:.1f}" y="{text_y:.1f}" text-anchor="{value_anchor}" '
+                f'fill="#334155" font-size="12" {font}>{value_text}</text>'
             )
 
-
-            y += current_bar_h + bar_gap
+            bar_y += current_bar_h + bar_gap
             if is_pluto:
-                y += 12  # Extra spacing after Pluto baseline.
-        y += case_gap
+                bar_y += pluto_gap
 
     # Footer.
     lines.append(
-        f'<text x="{label_w + bar_max / 2:.1f}" y="{svg_height - 12}" '
+        f'<text x="{svg_width / 2:.1f}" y="{svg_height - 12}" '
         f'text-anchor="middle" fill="#94a3b8" font-size="12" {font}>'
         f'Lower is better</text>'
     )
@@ -555,6 +952,7 @@ def write_snapshot(
         "pluto_bin": str(pluto_bin),
         "platform": platform.platform(),
         "machine": platform.machine(),
+        "metadata": snapshot_metadata(pluto_bin),
         "cases": [
             {
                 "name": case,
@@ -564,6 +962,7 @@ def write_snapshot(
                         "version": result.version,
                         "compile_ms": result.compile_ms,
                         "run_ms": result.run_ms,
+                        "peak_memory_kb": result.peak_memory_kb,
                         "output": result.output,
                     }
                     for result in results_by_case.get(case, [])
@@ -584,6 +983,16 @@ def write_snapshot(
         cases=cases,
         results_by_case=results_by_case,
         metric_name="run",
+        columns=2,
+    )
+    render_bar_chart(
+        snapshot_dir / "run-times-mobile.svg",
+        title="Run Time Median by Benchmark",
+        subtitle="Each benchmark uses its own linear scale. Pluto pinned as baseline, rest sorted fastest-first.",
+        cases=cases,
+        results_by_case=results_by_case,
+        metric_name="run",
+        columns=1,
     )
     render_bar_chart(
         snapshot_dir / "compile-times.svg",
@@ -592,13 +1001,53 @@ def write_snapshot(
         cases=cases,
         results_by_case=results_by_case,
         metric_name="compile",
+        columns=2,
     )
+    render_bar_chart(
+        snapshot_dir / "compile-times-mobile.svg",
+        title="Compile Time Median by Benchmark",
+        subtitle="Native languages only. Pluto includes frontend plus LLVM opt, llc, and link.",
+        cases=cases,
+        results_by_case=results_by_case,
+        metric_name="compile",
+        columns=1,
+    )
+    if any(
+        result.peak_memory_kb is not None
+        for case_results in results_by_case.values()
+        for result in case_results
+    ):
+        render_bar_chart(
+            snapshot_dir / "peak-memory.svg",
+            title="Peak Memory Use by Benchmark",
+            subtitle="Approximate peak RAM used by each process, measured from the untimed warm-up run. Lower is better.",
+            cases=cases,
+            results_by_case=results_by_case,
+            metric_name="memory",
+            columns=2,
+        )
+        render_bar_chart(
+            snapshot_dir / "peak-memory-mobile.svg",
+            title="Peak Memory Use by Benchmark",
+            subtitle="Approximate peak RAM used by each process, measured from the untimed warm-up run. Lower is better.",
+            cases=cases,
+            results_by_case=results_by_case,
+            metric_name="memory",
+            columns=1,
+        )
 
 
-def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result:
+def benchmark_source(
+    source: CaseSource,
+    repeat: int,
+    pluto_bin: Path,
+    measure_memory: bool,
+) -> Result:
     compile_samples = []
     run_samples = []
+    memory_samples = []
     last_output = ""
+    memory_enabled = measure_memory
 
     for idx in range(repeat):
         workdir = prepare_workdir(source.case, source.language, idx)
@@ -610,7 +1059,24 @@ def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result
                 compile_samples.append(compile_ms)
 
             # Warm up one execution before timing to reduce one-off startup noise.
-            timed_run(run_cmd, workdir)
+            if memory_enabled:
+                try:
+                    peak_memory_kb = probe_peak_memory_kb(run_cmd, workdir)
+                except RuntimeError as err:
+                    # If the target command itself is healthy, keep the benchmark
+                    # running and simply drop peak-memory sampling for this source. This avoids a
+                    # flaky /usr/bin/time probe killing the whole suite.
+                    timed_run(run_cmd, workdir)
+                    print(
+                        f"warning: peak memory probe disabled for {source.case}/{source.language}: {err}",
+                        file=sys.stderr,
+                    )
+                    memory_enabled = False
+                else:
+                    if peak_memory_kb is not None:
+                        memory_samples.append(peak_memory_kb)
+            else:
+                timed_run(run_cmd, workdir)
             run_ms, run_proc = timed_run(run_cmd, workdir)
             run_samples.append(run_ms)
             last_output = run_proc.stdout.strip()
@@ -623,6 +1089,7 @@ def benchmark_source(source: CaseSource, repeat: int, pluto_bin: Path) -> Result
         version=language_version(source.language, pluto_bin),
         compile_ms=statistics.median(compile_samples) if compile_samples else None,
         run_ms=statistics.median(run_samples),
+        peak_memory_kb=int(statistics.median(memory_samples)) if memory_samples else None,
         output=last_output,
     )
 
@@ -639,11 +1106,25 @@ def discover_cases(selected: list[str] | None) -> list[str]:
     return ordered_cases(cases)
 
 
+def pluto_source_name(case: str, case_dir: Path) -> str | None:
+    pluto_dir = case_dir / "pluto"
+    candidates = [f"{case}.spt", "main.spt"]
+    for candidate in candidates:
+        if (pluto_dir / candidate).exists():
+            return candidate
+    return None
+
+
 def sources_for_case(case: str) -> list[CaseSource]:
     case_dir = BENCHMARKS_DIR / case
     sources = []
     for language in LANGUAGE_ORDER:
-        source_name = LANGUAGE_TO_SOURCE[language]
+        if language == "pluto":
+            source_name = pluto_source_name(case, case_dir)
+            if source_name is None:
+                continue
+        else:
+            source_name = LANGUAGE_TO_SOURCE[language]
         source_dir = case_dir / language
         source_path = source_dir / source_name
         if source_path.exists():
@@ -659,12 +1140,17 @@ def sources_for_case(case: str) -> list[CaseSource]:
     return sources
 
 
-def benchmark_case(case: str, repeat: int, pluto_bin: Path) -> list[Result]:
+def benchmark_case(
+    case: str,
+    repeat: int,
+    pluto_bin: Path,
+    measure_memory: bool,
+) -> list[Result]:
     results = []
     for source in sources_for_case(case):
         if not language_available(source.language, pluto_bin):
             continue
-        results.append(benchmark_source(source, repeat, pluto_bin))
+        results.append(benchmark_source(source, repeat, pluto_bin, measure_memory))
     return sorted(results, key=lambda result: LANGUAGE_ORDER.index(result.language))
 
 
@@ -673,16 +1159,24 @@ def print_case(results: list[Result]) -> None:
         return
 
     case = results[0].case
+    show_peak_memory = any(result.peak_memory_kb is not None for result in results)
     print(f"Case: {case}")
-    print(f"{'Language':<8} {'Version':<18} {'Compile ms':>12} {'Run ms':>12}")
+    header = f"{'Language':<8} {'Version':<18} {'Compile ms':>12} {'Run ms':>12}"
+    if show_peak_memory:
+        header += f" {'Peak Memory':>12}"
+    print(header)
     for result in results:
         compile_text = "-" if result.compile_ms is None else f"{result.compile_ms:>.3f}"
-        print(
+        row = (
             f"{LANGUAGE_LABELS[result.language]:<8} "
             f"{result.version[:18]:<18} "
             f"{compile_text:>12} "
             f"{result.run_ms:>12.3f}"
         )
+        if show_peak_memory:
+            peak_text = "-" if result.peak_memory_kb is None else format_memory_kb(result.peak_memory_kb)
+            row += f" {peak_text:>12}"
+        print(row)
 
     outputs = {result.output for result in results}
     expected = load_expected(BENCHMARKS_DIR / case)
@@ -743,11 +1237,14 @@ def main() -> int:
         print("No benchmark sources found.", file=sys.stderr)
         return 1
 
+    measure_memory = peak_memory_command_prefix() is not None
+    metadata = snapshot_metadata(pluto_bin)
+    print_metadata_summary(metadata)
     shutil.rmtree(WORK_ROOT, ignore_errors=True)
     try:
         results_by_case: dict[str, list[Result]] = {}
         for case in cases:
-            results = benchmark_case(case, args.repeat, pluto_bin)
+            results = benchmark_case(case, args.repeat, pluto_bin, measure_memory)
             results_by_case[case] = results
             if not results:
                 print(f"Case: {case}")
@@ -755,13 +1252,15 @@ def main() -> int:
                 continue
             print_case(results)
         if args.snapshot_dir:
+            snapshot_dir = Path(args.snapshot_dir).resolve()
             write_snapshot(
-                Path(args.snapshot_dir).resolve(),
+                snapshot_dir,
                 cases=cases,
                 results_by_case=results_by_case,
                 repeat=args.repeat,
                 pluto_bin=pluto_bin,
             )
+            print(f"Snapshot written: {snapshot_dir / 'results.json'}")
     finally:
         shutil.rmtree(WORK_ROOT, ignore_errors=True)
 

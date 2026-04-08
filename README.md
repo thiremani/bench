@@ -8,7 +8,7 @@ them in each language, checks output parity, and reports timings.
 
 ## Latest Results
 
-Tested on `2026-04-03 22:06:21 UTC+05:30` with:
+Tested on `2026-04-08 22:29:11 UTC+05:30` with:
 
 - Machine: Apple M1 Pro
 - CPU cores: 10
@@ -23,69 +23,92 @@ Tested on `2026-04-03 22:06:21 UTC+05:30` with:
 
 Run time overview:
 
-![Run time chart](results/latest/run-times.svg)
+<picture>
+  <source media="(max-width: 800px)" srcset="results/latest/run-times-mobile.svg" />
+  <img src="results/latest/run-times.svg" alt="Run time chart" />
+</picture>
+
+Peak memory overview:
+
+<picture>
+  <source media="(max-width: 800px)" srcset="results/latest/peak-memory-mobile.svg" />
+  <img src="results/latest/peak-memory.svg" alt="Peak memory chart" />
+</picture>
 
 Compile time overview:
 
-![Compile time chart](results/latest/compile-times.svg)
+<picture>
+  <source media="(max-width: 800px)" srcset="results/latest/compile-times-mobile.svg" />
+  <img src="results/latest/compile-times.svg" alt="Compile time chart" />
+</picture>
 
-The charts are the quick view. Each benchmark uses its own linear scale, so bar lengths are comparable within a benchmark but not across benchmarks. The tables below are the exact reference.
+## Pluto vs Python at a Glance
+
+<picture>
+  <source media="(max-width: 800px)" srcset="assets/pluto-vs-python-mobile.svg" />
+  <img src="assets/pluto-vs-python.svg" alt="Pluto vs Python code comparison" />
+</picture>
+
+- `sum`: Pluto source is `benchmarks/sum/pluto/sum.spt`; Python source is `benchmarks/sum/python/main.py`.
+- `fib`: Pluto uses `benchmarks/fib/pluto/fib.pt` plus `benchmarks/fib/pluto/fib.spt`; Python uses `benchmarks/fib/python/main.py`.
+
+## Result Tables
 
 ### Sum
 
-| Language | Version | Compile ms | Run ms | Output |
-| --- | --- | ---: | ---: | --- |
-| **Pluto (baseline)** | `pluto dev` | **137.685** | **8.642** | `160000000` |
-| C | `Apple clang 21.0.0` | 61.789 | 9.312 | `160000000` |
-| C++ | `Apple clang 21.0.0` | 373.204 | 9.376 | `160000000` |
-| Swift | `Swift 6.3` | 240.218 | 21.724 | `160000000` |
-| Go | `go1.26.1` | 122.145 | 22.033 | `160000000` |
-| Rust | `rustc 1.94.1` | 97.162 | 23.779 | `160000000` |
-| Zig | `zig 0.15.2` | 220.998 | 15.294 | `160000000` |
-| Node | `Node v25.9.0` | - | 90.158 | `160000000` |
-| Python | `Python 3.14.3` | - | 1537.175 | `160000000` |
+| Language | Version | Compile ms | Run ms | Peak Memory | Output |
+| --- | --- | ---: | ---: | ---: | --- |
+| **Pluto (baseline)** | `pluto dev` | **140.176** | **8.880** | **1.31 MiB** | `160000000` |
+| C | `Apple clang 21.0.0` | 62.561 | 8.831 | 1.30 MiB | `160000000` |
+| C++ | `Apple clang 21.0.0` | 384.165 | 9.074 | 1.31 MiB | `160000000` |
+| Swift | `Swift 6.3` | 226.112 | 20.687 | 1.80 MiB | `160000000` |
+| Go | `go1.26.2` | 126.027 | 22.942 | 3.89 MiB | `160000000` |
+| Rust | `rustc 1.94.1` | 107.244 | 24.695 | 1.48 MiB | `160000000` |
+| Zig | `zig 0.15.2` | 215.675 | 15.337 | 1.36 MiB | `160000000` |
+| Node | `Node v25.9.0` | - | 89.828 | 48.62 MiB | `160000000` |
+| Python | `Python 3.14.3` | - | 1547.350 | 14.55 MiB | `160000000` |
 
 ### Fib
 
-| Language | Version | Compile ms | Run ms | Output |
-| --- | --- | ---: | ---: | --- |
-| **Pluto (baseline)** | `pluto dev` | **133.545** | **9.063** | `2178309` |
-| C | `Apple clang 21.0.0` | 60.357 | 10.379 | `2178309` |
-| C++ | `Apple clang 21.0.0` | 395.378 | 10.456 | `2178309` |
-| Swift | `Swift 6.3` | 213.733 | 13.275 | `2178309` |
-| Go | `go1.26.1` | 120.117 | 11.868 | `2178309` |
-| Rust | `rustc 1.94.1` | 98.871 | 10.414 | `2178309` |
-| Zig | `zig 0.15.2` | 201.663 | 10.002 | `2178309` |
-| Node | `Node v25.9.0` | - | 87.114 | `2178309` |
-| Python | `Python 3.14.3` | - | 311.650 | `2178309` |
+| Language | Version | Compile ms | Run ms | Peak Memory | Output |
+| --- | --- | ---: | ---: | ---: | --- |
+| **Pluto (baseline)** | `pluto dev` | **140.400** | **9.604** | **1.32 MiB** | `2178309` |
+| C | `Apple clang 21.0.0` | 67.903 | 10.221 | 1.31 MiB | `2178309` |
+| C++ | `Apple clang 21.0.0` | 387.600 | 10.224 | 1.33 MiB | `2178309` |
+| Swift | `Swift 6.3` | 216.635 | 13.733 | 1.81 MiB | `2178309` |
+| Go | `go1.26.2` | 128.679 | 12.123 | 3.86 MiB | `2178309` |
+| Rust | `rustc 1.94.1` | 102.203 | 10.594 | 1.48 MiB | `2178309` |
+| Zig | `zig 0.15.2` | 212.785 | 10.643 | 1.36 MiB | `2178309` |
+| Node | `Node v25.9.0` | - | 91.118 | 48.58 MiB | `2178309` |
+| Python | `Python 3.14.3` | - | 315.804 | 14.57 MiB | `2178309` |
 
 ### Fib Tail
 
-| Language | Version | Compile ms | Run ms | Output |
-| --- | --- | ---: | ---: | --- |
-| **Pluto (baseline)** | `pluto dev` | **134.416** | **14.259** | `2851443500000` |
-| C | `Apple clang 21.0.0` | 59.167 | 14.323 | `2851443500000` |
-| C++ | `Apple clang 21.0.0` | 355.177 | 14.265 | `2851443500000` |
-| Swift | `Swift 6.3` | 225.752 | 12.072 | `2851443500000` |
-| Go | `go1.26.1` | 119.498 | 20.584 | `2851443500000` |
-| Rust | `rustc 1.94.1` | 103.079 | 15.017 | `2851443500000` |
-| Zig | `zig 0.15.2` | 208.513 | 14.726 | `2851443500000` |
-| Node | `Node v25.9.0` | - | 207.062 | `2851443500000` |
-| Python | `Python 3.14.3` | - | 1641.072 | `2851443500000` |
+| Language | Version | Compile ms | Run ms | Peak Memory | Output |
+| --- | --- | ---: | ---: | ---: | --- |
+| **Pluto (baseline)** | `pluto dev` | **142.357** | **14.842** | **1.32 MiB** | `2851443500000` |
+| C | `Apple clang 21.0.0` | 63.634 | 14.655 | 1.31 MiB | `2851443500000` |
+| C++ | `Apple clang 21.0.0` | 389.261 | 14.962 | 1.33 MiB | `2851443500000` |
+| Swift | `Swift 6.3` | 241.862 | 13.007 | 1.80 MiB | `2851443500000` |
+| Go | `go1.26.2` | 125.195 | 20.649 | 3.84 MiB | `2851443500000` |
+| Rust | `rustc 1.94.1` | 106.508 | 15.115 | 1.50 MiB | `2851443500000` |
+| Zig | `zig 0.15.2` | 215.348 | 14.838 | 1.36 MiB | `2851443500000` |
+| Node | `Node v25.9.0` | - | 211.396 | 49.02 MiB | `2851443500000` |
+| Python | `Python 3.14.3` | - | 1646.925 | 14.55 MiB | `2851443500000` |
 
 ### Harmonic
 
-| Language | Version | Compile ms | Run ms | Output |
-| --- | --- | ---: | ---: | --- |
-| **Pluto (baseline)** | `pluto dev` | **134.394** | **13.079** | `16.695311` |
-| C | `Apple clang 21.0.0` | 60.468 | 13.150 | `16.695311` |
-| C++ | `Apple clang 21.0.0` | 359.312 | 13.046 | `16.695311` |
-| Swift | `Swift 6.3` | 333.620 | 14.711 | `16.695311` |
-| Go | `go1.26.1` | 119.853 | 13.980 | `16.695311` |
-| Rust | `rustc 1.94.1` | 102.826 | 13.209 | `16.695311` |
-| Zig | `zig 0.15.2` | 380.829 | 13.292 | `16.695311` |
-| Node | `Node v25.9.0` | - | 81.360 | `16.695311` |
-| Python | `Python 3.14.3` | - | 754.507 | `16.695311` |
+| Language | Version | Compile ms | Run ms | Peak Memory | Output |
+| --- | --- | ---: | ---: | ---: | --- |
+| **Pluto (baseline)** | `pluto dev` | **141.021** | **13.421** | **1.31 MiB** | `16.695311` |
+| C | `Apple clang 21.0.0` | 64.443 | 13.444 | 1.31 MiB | `16.695311` |
+| C++ | `Apple clang 21.0.0` | 393.279 | 13.468 | 1.33 MiB | `16.695311` |
+| Swift | `Swift 6.3` | 347.975 | 15.699 | 5.55 MiB | `16.695311` |
+| Go | `go1.26.2` | 127.601 | 14.415 | 3.90 MiB | `16.695311` |
+| Rust | `rustc 1.94.1` | 108.032 | 13.694 | 1.50 MiB | `16.695311` |
+| Zig | `zig 0.15.2` | 381.676 | 13.751 | 1.34 MiB | `16.695311` |
+| Node | `Node v25.9.0` | - | 79.452 | 49.16 MiB | `16.695311` |
+| Python | `Python 3.14.3` | - | 786.627 | 14.59 MiB | `16.695311` |
 
 ## Benchmarks
 
@@ -113,8 +136,8 @@ The charts are the quick view. Each benchmark uses its own linear scale, so bar 
 
 Each benchmark directory keeps `expected.txt` at the case root and places each
 language implementation under its own subdirectory, for example
-`benchmarks/sum/go/main.go` or `benchmarks/fib/pluto/main.spt`. Pluto-specific
-support files such as `support.pt` live alongside the Pluto source in that
+`benchmarks/sum/go/main.go` or `benchmarks/fib/pluto/fib.spt`. Pluto-specific
+template files such as `fib.pt` live alongside the Pluto script in that
 benchmark's `pluto/` subdirectory.
 
 ## Running
@@ -124,6 +147,8 @@ Run the full suite:
 ```sh
 python3 scripts/benchmark.py
 ```
+
+The harness is compatible with Python 3.9+.
 
 GitHub Actions also runs the suite on `ubuntu-24.04`. That workflow checks out
 `pluto`, builds it with LLVM 21, runs the same harness, and uploads a separate
@@ -168,6 +193,10 @@ PLUTO_BIN=/path/to/pluto python3 scripts/benchmark.py
 
 - Pluto, C, C++, Swift, Go, Rust, and Zig report native compile time and execution time separately.
 - Julia, Node, Bun, and Python are reported as runtime or JIT execution only, so their compile column is `-`.
+- Snapshot tables only include languages whose toolchains were available on the host where the snapshot was generated.
+- Peak Memory is collected automatically when the host supports `/usr/bin/time`.
+- Peak Memory is the median peak resident set size across the untimed warm-up runs.
+- In plain terms, think of Peak Memory as the approximate RAM used by the benchmark process at its peak.
 - Pluto currently uses its own LLVM pipeline with `opt -O3`.
 - C and C++ are built with `-O3` for consistency with the native comparison.
 - Swift is built with `swiftc -O`.
