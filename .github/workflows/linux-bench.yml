@@ -82,6 +82,7 @@ jobs:
 
       - name: Set LLVM environment
         run: |
+          echo "LLVM_BIN_DIR=/usr/lib/llvm-21/bin" >> "$GITHUB_ENV"
           echo "CGO_CFLAGS=-I/usr/lib/llvm-21/include" >> "$GITHUB_ENV"
           echo "CGO_LDFLAGS=-L/usr/lib/llvm-21/lib" >> "$GITHUB_ENV"
           echo "LD_LIBRARY_PATH=/usr/lib/llvm-21/lib" >> "$GITHUB_ENV"
@@ -108,6 +109,12 @@ jobs:
           tar xf "${ZIG_ARCHIVE}"
           echo "${PWD}/zig-x86_64-linux-${ZIG_VERSION}" >> "$GITHUB_PATH"
 
+      - name: Reassert LLVM 21 toolchain precedence
+        run: |
+          # Swift ships its own clang/lld; keep the benchmark and Pluto build on
+          # the same LLVM toolchain we installed above.
+          echo "$LLVM_BIN_DIR" >> "$GITHUB_PATH"
+
       - name: Build Pluto
         working-directory: pluto
         run: go build -o pluto
@@ -126,7 +133,13 @@ jobs:
           bun --version
           julia --version
           pluto/pluto -version
+          which clang
+          clang --version | head -n 1
+          which ld.lld
+          ld.lld --version | head -n 1
+          which opt
           opt --version | head -n 1
+          which llc
           llc --version | head -n 1
 
       - name: Run Linux benchmark suite
@@ -177,6 +190,7 @@ jobs:
               bench = metadata.get("bench", {})
               pluto = metadata.get("pluto", {})
               memory = metadata.get("memory_measurement", {})
+              target_policy = metadata.get("target_policy", {})
               llvm = metadata.get("llvm_tools", {})
 
               out.write("### Provenance\n\n")
@@ -198,6 +212,10 @@ jobs:
                   out.write(f"- Peak memory: `{memory.get('collector', 'enabled')}`\n")
               else:
                   out.write("- Peak memory: unavailable on this host\n")
+              if target_policy:
+                  out.write(
+                      f"- Target policy: `{target_policy.get('mode', 'unknown')}`\n"
+                  )
               if llvm:
                   llvm_text = " | ".join(
                       f"{name} {version}" if version else f"{name} unavailable"

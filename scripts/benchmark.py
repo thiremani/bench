@@ -24,6 +24,7 @@ BENCHMARKS_DIR = REPO_ROOT / "benchmarks"
 DEFAULT_PLUTO = (REPO_ROOT / "../pluto/pluto").resolve()
 PT_MOD = REPO_ROOT / "pt.mod"
 WORK_ROOT = Path(tempfile.gettempdir()) / "pluto-bench"
+TARGET_POLICY_MODE = "host-native-where-supported"
 # Keep the benchmark tables and CLI output in the natural progression order.
 CASE_ORDER = ("sum", "fib", "fib_tail", "harmonic")
 # The chart grid uses a different order so the short-running loop cases share
@@ -139,6 +140,12 @@ class Result:
 
 
 @dataclass(frozen=True)
+class CommandSpec:
+    cmd: list[str]
+    env: dict[str, str] | None = None
+
+
+@dataclass(frozen=True)
 class CaseSource:
     case: str
     case_dir: Path
@@ -163,6 +170,148 @@ def ordered_grid_cases(cases: list[str] | set[str]) -> list[str]:
 
 def first_line(text: str) -> str:
     return text.strip().splitlines()[0] if text.strip() else ""
+
+
+def normalized_machine() -> str:
+    machine = platform.machine().lower()
+    return {
+        "amd64": "x86_64",
+        "arm64": "aarch64",
+    }.get(machine, machine)
+
+
+def pluto_compile_env() -> dict[str, str]:
+    return {"PLUTO_TARGET_CPU": "native"}
+
+
+def c_family_target_args() -> list[str]:
+    machine = normalized_machine()
+    if machine == "x86_64":
+        return ["-march=native"]
+    if machine == "aarch64":
+        return ["-mcpu=native"]
+    return []
+
+
+def rust_target_args() -> list[str]:
+    machine = normalized_machine()
+    if machine in {"x86_64", "aarch64"}:
+        return ["-C", "target-cpu=native"]
+    return []
+
+
+def swift_target_args() -> list[str]:
+    machine = normalized_machine()
+    if machine in {"x86_64", "aarch64"}:
+        return ["-target-cpu", "native"]
+    return []
+
+
+def host_cpu_flags() -> set[str]:
+    machine = normalized_machine()
+    if machine != "x86_64":
+        return set()
+
+    if sys.platform.startswith("linux"):
+        try:
+            cpuinfo = Path("/proc/cpuinfo").read_text(encoding="utf-8")
+        except OSError:
+            return set()
+        match = re.search(r"^flags\s*:\s*(.+)$", cpuinfo, re.MULTILINE)
+        return {flag.lower().replace(".", "_") for flag in match.group(1).split()} if match else set()
+
+    if sys.platform == "darwin":
+        keys = (
+            "machdep.cpu.features",
+            "machdep.cpu.leaf7_features",
+        )
+        flags: set[str] = set()
+        for key in keys:
+            raw = probe_first_line(["sysctl", "-n", key])
+            if not raw:
+                continue
+            flags.update(flag.lower().replace(".", "_") for flag in raw.split())
+        return flags
+
+    return set()
+
+
+def go_amd64_level() -> str | None:
+    flags = host_cpu_flags()
+    if not flags:
+        return None
+
+    level = "v1"
+    if {
+        "cx16",
+        "lahf_lm",
+        "popcnt",
+        "sse3",
+        "ssse3",
+        "sse4_1",
+        "sse4_2",
+    }.issubset(flags):
+        level = "v2"
+    if {
+        "avx",
+        "avx2",
+        "bmi1",
+        "bmi2",
+        "f16c",
+        "fma",
+        "movbe",
+        "osxsave",
+    }.issubset(flags) and ("lzcnt" in flags or "abm" in flags):
+        level = "v3"
+    if {
+        "avx512f",
+        "avx512dq",
+        "avx512cd",
+        "avx512bw",
+        "avx512vl",
+    }.issubset(flags):
+        level = "v4"
+    return level
+
+
+def go_compile_env() -> dict[str, str]:
+    machine = normalized_machine()
+    if machine == "x86_64":
+        level = go_amd64_level()
+        if level is not None:
+            return {"GOAMD64": level}
+    return {}
+
+
+def target_policy_metadata() -> dict[str, object]:
+    go_env = go_compile_env()
+    return {
+        "mode": TARGET_POLICY_MODE,
+        "machine": normalized_machine(),
+        "pluto": {
+            "env": pluto_compile_env(),
+        },
+        "c": {
+            "flags": c_family_target_args(),
+        },
+        "cpp": {
+            "flags": c_family_target_args(),
+        },
+        "swift": {
+            "flags": swift_target_args(),
+        },
+        "go": {
+            "env": go_env,
+            "mode": "native" if go_env else "default",
+            "reason": None if go_env else "no portable host-native override configured",
+        },
+        "rust": {
+            "flags": rust_target_args(),
+        },
+        "zig": {
+            "flags": zig_compile_target_args(),
+        },
+    }
 
 
 def normalize_version(language: str, raw: str) -> str:
@@ -202,11 +351,13 @@ def normalize_version(language: str, raw: str) -> str:
     return raw
 
 
-def timed_run(cmd: list[str], cwd: Path) -> tuple[float, subprocess.CompletedProcess[str]]:
+def timed_run(spec: CommandSpec, cwd: Path) -> tuple[float, subprocess.CompletedProcess[str]]:
+    env = None if spec.env is None else {**os.environ, **spec.env}
     start = time.perf_counter()
     proc = subprocess.run(
-        cmd,
+        spec.cmd,
         cwd=cwd,
+        env=env,
         capture_output=True,
         text=True,
         check=False,
@@ -220,7 +371,7 @@ def timed_run(cmd: list[str], cwd: Path) -> tuple[float, subprocess.CompletedPro
             details.append(proc.stderr.strip())
         detail_text = "\n".join(details)
         raise RuntimeError(
-            f"command failed: {' '.join(cmd)}"
+            f"command failed: {' '.join(spec.cmd)}"
             + (f"\n{detail_text}" if detail_text else "")
         )
     return elapsed_ms, proc
@@ -253,11 +404,7 @@ def copy_case_files(source_dir: Path, workdir: Path) -> None:
 
 
 def zig_compile_target_args() -> list[str]:
-    machine = platform.machine().lower()
-    machine = {
-        "amd64": "x86_64",
-        "arm64": "aarch64",
-    }.get(machine, machine)
+    machine = normalized_machine()
 
     if sys.platform.startswith("linux"):
         triple = {
@@ -273,58 +420,72 @@ def zig_compile_target_args() -> list[str]:
         triple = None
 
     if triple is None:
-        return []
+        return ["-mcpu", "native"]
 
-    # Keep Zig on a generic baseline target so its codegen is comparable with
-    # the other native compilers in the suite.
-    return ["-target", triple, "-mcpu", "baseline"]
+    return ["-target", triple, "-mcpu", "native"]
 
 
 def commands_for(
     source: CaseSource, workdir: Path, pluto_bin: Path
-) -> tuple[list[str] | None, list[str]]:
+) -> tuple[CommandSpec | None, CommandSpec]:
     stem = Path(source.source_name).stem
     if source.language == "pluto":
-        compile_cmd = [str(pluto_bin), source.source_name]
-        run_cmd = [str(workdir / stem)]
+        compile_cmd = CommandSpec(
+            [str(pluto_bin), source.source_name],
+            env=pluto_compile_env(),
+        )
+        run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "c":
-        compile_cmd = ["cc", "-O3", source.source_name, "-o", stem]
-        run_cmd = [str(workdir / stem)]
+        compile_cmd = CommandSpec(
+            ["cc", "-O3", *c_family_target_args(), source.source_name, "-o", stem],
+        )
+        run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "cpp":
-        compile_cmd = ["c++", "-O3", source.source_name, "-o", stem]
-        run_cmd = [str(workdir / stem)]
+        compile_cmd = CommandSpec(
+            ["c++", "-O3", *c_family_target_args(), source.source_name, "-o", stem],
+        )
+        run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "swift":
-        compile_cmd = ["swiftc", "-O", source.source_name, "-o", stem]
-        run_cmd = [str(workdir / stem)]
+        compile_cmd = CommandSpec(
+            ["swiftc", "-O", *swift_target_args(), source.source_name, "-o", stem],
+        )
+        run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "go":
-        compile_cmd = ["go", "build", "-trimpath", "-o", stem, source.source_name]
-        run_cmd = [str(workdir / stem)]
+        compile_cmd = CommandSpec(
+            ["go", "build", "-trimpath", "-o", stem, source.source_name],
+            env=go_compile_env(),
+        )
+        run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "rust":
-        compile_cmd = ["rustc", "-C", "opt-level=3", source.source_name, "-o", stem]
-        run_cmd = [str(workdir / stem)]
+        compile_cmd = CommandSpec(
+            ["rustc", "-C", "opt-level=3", *rust_target_args(), source.source_name, "-o", stem],
+        )
+        run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "zig":
-        compile_cmd = [
-            "zig",
-            "build-exe",
-            "-O",
-            "ReleaseFast",
-            *zig_compile_target_args(),
-            f"-femit-bin={workdir / stem}",
-            source.source_name,
-        ]
-        run_cmd = [str(workdir / stem)]
+        compile_cmd = CommandSpec(
+            [
+                "zig",
+                "build-exe",
+                "-O",
+                "ReleaseFast",
+                *zig_compile_target_args(),
+                f"-femit-bin={workdir / stem}",
+                source.source_name,
+            ],
+        )
+        run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "julia":
         compile_cmd = None
-        run_cmd = ["julia", "--startup-file=no", source.source_name]
+        run_cmd = CommandSpec(["julia", "--startup-file=no", source.source_name])
     elif source.language == "node":
         compile_cmd = None
-        run_cmd = ["node", source.source_name]
+        run_cmd = CommandSpec(["node", source.source_name])
     elif source.language == "bun":
         compile_cmd = None
-        run_cmd = ["bun", source.source_name]
+        run_cmd = CommandSpec(["bun", source.source_name])
     elif source.language == "python":
         compile_cmd = None
-        run_cmd = [sys.executable, source.source_name]
+        run_cmd = CommandSpec([sys.executable, source.source_name])
     else:
         raise ValueError(f"unsupported language: {source.language}")
     return compile_cmd, run_cmd
@@ -493,10 +654,11 @@ def llvm_tool_metadata() -> dict[str, str | None]:
 
 def snapshot_metadata(pluto_bin: Path) -> dict[str, object]:
     prefix = peak_memory_command_prefix()
+    target_policy = target_policy_metadata()
     pluto = {
         "bin": str(pluto_bin),
         "version": language_version("pluto", pluto_bin),
-        "target_cpu": os.environ.get("PLUTO_TARGET_CPU"),
+        "target_cpu": target_policy["pluto"]["env"]["PLUTO_TARGET_CPU"],
     }
     pluto_repo = git_repo_metadata(pluto_bin)
     if pluto_repo is not None:
@@ -517,6 +679,7 @@ def snapshot_metadata(pluto_bin: Path) -> dict[str, object]:
             "collector": " ".join(prefix) if prefix else None,
             "unit": "KiB",
         },
+        "target_policy": target_policy,
     }
     llvm = llvm_tool_metadata()
     metadata["llvm_tools"] = llvm
@@ -552,6 +715,7 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
     bench = metadata.get("bench", {})
     pluto = metadata.get("pluto", {})
     memory = metadata.get("memory_measurement", {})
+    target_policy = metadata.get("target_policy", {})
     llvm = metadata.get("llvm_tools", {})
 
     host_bits = [
@@ -584,6 +748,11 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
         lines.append(f"  Peak Memory: enabled via {collector}")
     else:
         lines.append("  Peak Memory: unavailable on this host")
+    if target_policy:
+        lines.append(
+            "  Target Policy: "
+            + str(target_policy.get("mode") or "unknown")
+        )
     llvm_bits = [
         f"{name} {version}" if version else f"{name} unavailable"
         for name, version in llvm.items()
@@ -717,13 +886,15 @@ def parse_peak_memory_kb(stderr_text: str) -> int | None:
     return None
 
 
-def probe_peak_memory_kb(cmd: list[str], cwd: Path) -> int | None:
+def probe_peak_memory_kb(spec: CommandSpec, cwd: Path) -> int | None:
     prefix = peak_memory_command_prefix()
     if prefix is None:
         return None
+    env = None if spec.env is None else {**os.environ, **spec.env}
     proc = subprocess.run(
-        prefix + cmd,
+        prefix + spec.cmd,
         cwd=cwd,
+        env=env,
         capture_output=True,
         text=True,
         check=False,
@@ -736,7 +907,7 @@ def probe_peak_memory_kb(cmd: list[str], cwd: Path) -> int | None:
             details.append(proc.stderr.strip())
         detail_text = "\n".join(details)
         raise RuntimeError(
-            f"command failed: {' '.join(prefix + cmd)}"
+            f"command failed: {' '.join(prefix + spec.cmd)}"
             + (f"\n{detail_text}" if detail_text else "")
         )
     return parse_peak_memory_kb(proc.stderr)
@@ -979,7 +1150,7 @@ def write_snapshot(
     render_bar_chart(
         snapshot_dir / "run-times.svg",
         title="Run Time Median by Benchmark",
-        subtitle="Each benchmark uses its own linear scale. Pluto pinned as baseline, rest sorted fastest-first.",
+        subtitle="Each benchmark uses its own linear scale. Pluto pinned first, rest sorted fastest-first.",
         cases=cases,
         results_by_case=results_by_case,
         metric_name="run",
@@ -988,7 +1159,7 @@ def write_snapshot(
     render_bar_chart(
         snapshot_dir / "run-times-mobile.svg",
         title="Run Time Median by Benchmark",
-        subtitle="Each benchmark uses its own linear scale. Pluto pinned as baseline, rest sorted fastest-first.",
+        subtitle="Each benchmark uses its own linear scale. Pluto pinned first, rest sorted fastest-first.",
         cases=cases,
         results_by_case=results_by_case,
         metric_name="run",
@@ -1053,20 +1224,20 @@ def benchmark_source(
         workdir = prepare_workdir(source.case, source.language, idx)
         try:
             copy_case_files(source.source_dir, workdir)
-            compile_cmd, run_cmd = commands_for(source, workdir, pluto_bin)
-            if compile_cmd is not None:
-                compile_ms, _ = timed_run(compile_cmd, workdir)
+            compile_spec, run_spec = commands_for(source, workdir, pluto_bin)
+            if compile_spec is not None:
+                compile_ms, _ = timed_run(compile_spec, workdir)
                 compile_samples.append(compile_ms)
 
             # Warm up one execution before timing to reduce one-off startup noise.
             if memory_enabled:
                 try:
-                    peak_memory_kb = probe_peak_memory_kb(run_cmd, workdir)
+                    peak_memory_kb = probe_peak_memory_kb(run_spec, workdir)
                 except RuntimeError as err:
                     # If the target command itself is healthy, keep the benchmark
                     # running and simply drop peak-memory sampling for this source. This avoids a
                     # flaky /usr/bin/time probe killing the whole suite.
-                    timed_run(run_cmd, workdir)
+                    timed_run(run_spec, workdir)
                     print(
                         f"warning: peak memory probe disabled for {source.case}/{source.language}: {err}",
                         file=sys.stderr,
@@ -1076,8 +1247,8 @@ def benchmark_source(
                     if peak_memory_kb is not None:
                         memory_samples.append(peak_memory_kb)
             else:
-                timed_run(run_cmd, workdir)
-            run_ms, run_proc = timed_run(run_cmd, workdir)
+                timed_run(run_spec, workdir)
+            run_ms, run_proc = timed_run(run_spec, workdir)
             run_samples.append(run_ms)
             last_output = run_proc.stdout.strip()
         finally:
