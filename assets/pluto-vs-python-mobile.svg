@@ -12,7 +12,7 @@
 <text x="48" y="214" xml:space="preserve" fill="#e2e8f0" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
   <tspan x="48" y="214" fill="#f59e0b">i</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">1:20000001</tspan>
   <tspan x="48" y="244" fill="#f59e0b">sum</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">0</tspan>
-  <tspan x="48" y="274" fill="#f59e0b">sum</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#f59e0b">sum</tspan><tspan fill="#e2e8f0"> + ((</tspan><tspan fill="#f59e0b">i</tspan><tspan fill="#e2e8f0"> * </tspan><tspan fill="#38bdf8">3</tspan><tspan fill="#e2e8f0">) % </tspan><tspan fill="#38bdf8">17</tspan><tspan fill="#e2e8f0">)</tspan>
+  <tspan x="48" y="274" fill="#f59e0b">sum</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#f59e0b">sum</tspan><tspan fill="#e2e8f0"> + (</tspan><tspan fill="#f59e0b">i</tspan><tspan fill="#e2e8f0"> * </tspan><tspan fill="#38bdf8">3</tspan><tspan fill="#e2e8f0">) % </tspan><tspan fill="#38bdf8">17</tspan>
 </text>
 
 <rect x="28" y="314" width="704" height="196" rx="18" fill="#111827" />

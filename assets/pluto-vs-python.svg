@@ -16,7 +16,7 @@
 <text x="72" y="242" xml:space="preserve" fill="#e2e8f0" font-size="22" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
   <tspan x="72" y="242" fill="#f59e0b">i</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">1:20000001</tspan>
   <tspan x="72" y="276" fill="#f59e0b">sum</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">0</tspan>
-  <tspan x="72" y="310" fill="#f59e0b">sum</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#f59e0b">sum</tspan><tspan fill="#e2e8f0"> + ((</tspan><tspan fill="#f59e0b">i</tspan><tspan fill="#e2e8f0"> * </tspan><tspan fill="#38bdf8">3</tspan><tspan fill="#e2e8f0">) % </tspan><tspan fill="#38bdf8">17</tspan><tspan fill="#e2e8f0">)</tspan>
+  <tspan x="72" y="310" fill="#f59e0b">sum</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#f59e0b">sum</tspan><tspan fill="#e2e8f0"> + (</tspan><tspan fill="#f59e0b">i</tspan><tspan fill="#e2e8f0"> * </tspan><tspan fill="#38bdf8">3</tspan><tspan fill="#e2e8f0">) % </tspan><tspan fill="#38bdf8">17</tspan>
   <tspan x="72" y="344" fill="#f59e0b">sum</tspan>
 </text>
 
