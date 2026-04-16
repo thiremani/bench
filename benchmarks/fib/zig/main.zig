@@ -7,9 +7,11 @@ fn fib(n: u64) u64 {
     return fib(n - 1) + fib(n - 2);
 }
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
     var stdout_buffer: [1024]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
-    try stdout_writer.interface.print("{}\n", .{fib(32)});
-    try stdout_writer.interface.flush();
+    var stdout_writer = std.Io.File.stdout().writer(io, &stdout_buffer);
+    const stdout = &stdout_writer.interface;
+    try stdout.print("{}\n", .{fib(32)});
+    try stdout.flush();
 }

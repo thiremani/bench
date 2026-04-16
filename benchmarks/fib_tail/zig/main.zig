@@ -11,9 +11,11 @@ fn fib(n: u64) u64 {
     return fibAux(n, 0, 1);
 }
 
-pub fn main() !void {
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
     var stdout_buffer: [1024]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    var stdout_writer = std.Io.File.stdout().writer(io, &stdout_buffer);
+    const stdout = &stdout_writer.interface;
     var sum: u64 = 0;
     const repeats: u64 = 1_000_000;
     var i: u64 = 0;
@@ -22,6 +24,6 @@ pub fn main() !void {
         sum += fib(32 + (i % 2));
     }
 
-    try stdout_writer.interface.print("{}\n", .{sum});
-    try stdout_writer.interface.flush();
+    try stdout.print("{}\n", .{sum});
+    try stdout.flush();
 }
