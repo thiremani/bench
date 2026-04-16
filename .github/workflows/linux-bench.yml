@@ -144,7 +144,7 @@ jobs:
 
       - name: Run Linux benchmark suite
         run: |
-          python3 scripts/benchmark.py \
+          python3 -u scripts/benchmark.py \
             --repeat 10 \
             --pluto pluto/pluto \
             --snapshot-dir results/linux-gha
