@@ -22,6 +22,15 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 BENCHMARKS_DIR = REPO_ROOT / "benchmarks"
 DEFAULT_PLUTO = (REPO_ROOT / "../pluto/pluto").resolve()
+DEFAULT_ZIG = (REPO_ROOT / ".toolchains/zig-aarch64-macos-0.15.2/zig").resolve()
+DEFAULT_CC_CANDIDATES = (
+    Path("/opt/homebrew/opt/llvm/bin/clang"),
+    Path("/usr/local/opt/llvm/bin/clang"),
+)
+DEFAULT_CXX_CANDIDATES = (
+    Path("/opt/homebrew/opt/llvm/bin/clang++"),
+    Path("/usr/local/opt/llvm/bin/clang++"),
+)
 PT_MOD = REPO_ROOT / "pt.mod"
 WORK_ROOT = Path(tempfile.gettempdir()) / "pluto-bench"
 TARGET_POLICY_MODE = "host-native-where-supported"
@@ -113,6 +122,14 @@ LANGUAGE_TO_VERSION_CMD = {
     "bun": ["bun", "--version"],
     "python": [sys.executable, "--version"],
 }
+PYTHON_NUMPY_VERSION_CMD = [
+    sys.executable,
+    "-c",
+    (
+        "import platform; import numpy as np; "
+        "print(f'Python {platform.python_version()} + NumPy {np.__version__}')"
+    ),
+]
 LANGUAGE_COLORS = {
     "pluto": "#c2410c",
     "c": "#2563eb",
@@ -323,6 +340,14 @@ def normalize_version(language: str, raw: str) -> str:
         parts = raw.split()
         if len(parts) >= 4:
             return f"Apple clang {parts[3]}"
+    if language in {"c", "cpp"} and raw.startswith("Homebrew clang version "):
+        parts = raw.split()
+        if len(parts) >= 4:
+            return f"Homebrew clang {parts[3]}"
+    if language in {"c", "cpp"} and raw.startswith("clang version "):
+        parts = raw.split()
+        if len(parts) >= 3:
+            return f"clang {parts[2]}"
     if language == "swift":
         marker = "Swift version "
         idx = raw.find(marker)
@@ -426,7 +451,12 @@ def zig_compile_target_args() -> list[str]:
 
 
 def commands_for(
-    source: CaseSource, workdir: Path, pluto_bin: Path
+    source: CaseSource,
+    workdir: Path,
+    pluto_bin: Path,
+    zig_bin: Path,
+    cc_bin: Path,
+    cxx_bin: Path,
 ) -> tuple[CommandSpec | None, CommandSpec]:
     stem = Path(source.source_name).stem
     if source.language == "pluto":
@@ -437,12 +467,12 @@ def commands_for(
         run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "c":
         compile_cmd = CommandSpec(
-            ["cc", "-O3", *c_family_target_args(), source.source_name, "-o", stem],
+            [str(cc_bin), "-O3", *c_family_target_args(), source.source_name, "-o", stem],
         )
         run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "cpp":
         compile_cmd = CommandSpec(
-            ["c++", "-O3", *c_family_target_args(), source.source_name, "-o", stem],
+            [str(cxx_bin), "-O3", *c_family_target_args(), source.source_name, "-o", stem],
         )
         run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "swift":
@@ -464,7 +494,7 @@ def commands_for(
     elif source.language == "zig":
         compile_cmd = CommandSpec(
             [
-                "zig",
+                str(zig_bin),
                 "build-exe",
                 "-O",
                 "ReleaseFast",
@@ -498,9 +528,44 @@ def resolve_pluto(path_arg: str | None) -> Path:
     return DEFAULT_PLUTO
 
 
-def language_available(language: str, pluto_bin: Path) -> bool:
+def resolve_zig(path_arg: str | None) -> Path:
+    raw_path = path_arg or os.environ.get("ZIG_BIN")
+    if raw_path:
+        return Path(raw_path).expanduser().resolve()
+    if DEFAULT_ZIG.exists():
+        return DEFAULT_ZIG
+    found = shutil.which("zig")
+    return Path(found).resolve() if found else DEFAULT_ZIG
+
+
+def resolve_compiler(path_arg: str | None, env_name: str, candidates: tuple[Path, ...], fallback: str) -> Path:
+    raw_path = path_arg or os.environ.get(env_name)
+    if raw_path:
+        return Path(raw_path).expanduser()
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    found = shutil.which(fallback)
+    return Path(found) if found else candidates[0]
+
+
+def resolve_cc(path_arg: str | None) -> Path:
+    return resolve_compiler(path_arg, "CC_BIN", DEFAULT_CC_CANDIDATES, "cc")
+
+
+def resolve_cxx(path_arg: str | None) -> Path:
+    return resolve_compiler(path_arg, "CXX_BIN", DEFAULT_CXX_CANDIDATES, "c++")
+
+
+def language_available(language: str, pluto_bin: Path, zig_bin: Path, cc_bin: Path, cxx_bin: Path) -> bool:
     if language == "pluto":
         return pluto_bin.exists()
+    if language == "c":
+        return cc_bin.exists()
+    if language == "cpp":
+        return cxx_bin.exists()
+    if language == "zig":
+        return zig_bin.exists()
     if language == "python":
         return True
     tool = LANGUAGE_TO_TOOL.get(language)
@@ -509,7 +574,7 @@ def language_available(language: str, pluto_bin: Path) -> bool:
     return shutil.which(tool) is not None
 
 
-def language_version(language: str, pluto_bin: Path) -> str:
+def language_version(language: str, pluto_bin: Path, zig_bin: Path, cc_bin: Path, cxx_bin: Path) -> str:
     if language == "pluto":
         if not pluto_bin.exists():
             return "not found"
@@ -521,6 +586,24 @@ def language_version(language: str, pluto_bin: Path) -> str:
         )
         text = proc.stdout if proc.stdout.strip() else proc.stderr
         return normalize_version(language, first_line(text))
+    if language == "c":
+        if not cc_bin.exists():
+            return "not found"
+        proc = subprocess.run([str(cc_bin), "--version"], capture_output=True, text=True, check=False)
+        text = proc.stdout if proc.stdout.strip() else proc.stderr
+        return normalize_version(language, first_line(text))
+    if language == "cpp":
+        if not cxx_bin.exists():
+            return "not found"
+        proc = subprocess.run([str(cxx_bin), "--version"], capture_output=True, text=True, check=False)
+        text = proc.stdout if proc.stdout.strip() else proc.stderr
+        return normalize_version(language, first_line(text))
+    if language == "zig":
+        if not zig_bin.exists():
+            return "not found"
+        proc = subprocess.run([str(zig_bin), "version"], capture_output=True, text=True, check=False)
+        text = proc.stdout if proc.stdout.strip() else proc.stderr
+        return normalize_version(language, first_line(text))
 
     cmd = LANGUAGE_TO_VERSION_CMD.get(language)
     if cmd is None:
@@ -528,6 +611,41 @@ def language_version(language: str, pluto_bin: Path) -> str:
     proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
     text = proc.stdout if proc.stdout.strip() else proc.stderr
     return normalize_version(language, first_line(text))
+
+
+def source_uses_numpy(source: CaseSource) -> bool:
+    if source.language != "python":
+        return False
+    try:
+        text = (source.source_dir / source.source_name).read_text(encoding="utf-8")
+    except OSError:
+        return False
+    return "import numpy" in text or "from numpy" in text
+
+
+def source_available(source: CaseSource, pluto_bin: Path, zig_bin: Path, cc_bin: Path, cxx_bin: Path) -> bool:
+    if source.language != "python" or not source_uses_numpy(source):
+        return language_available(source.language, pluto_bin, zig_bin, cc_bin, cxx_bin)
+    proc = subprocess.run(
+        [sys.executable, "-c", "import numpy"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return proc.returncode == 0
+
+
+def source_version(source: CaseSource, pluto_bin: Path, zig_bin: Path, cc_bin: Path, cxx_bin: Path) -> str:
+    if source.language != "python" or not source_uses_numpy(source):
+        return language_version(source.language, pluto_bin, zig_bin, cc_bin, cxx_bin)
+    proc = subprocess.run(
+        PYTHON_NUMPY_VERSION_CMD,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    text = proc.stdout if proc.stdout.strip() else proc.stderr
+    return first_line(text) or "unknown"
 
 
 def probe_first_line(cmd: list[str], cwd: Path | None = None) -> str | None:
@@ -652,12 +770,12 @@ def llvm_tool_metadata() -> dict[str, str | None]:
     return metadata
 
 
-def snapshot_metadata(pluto_bin: Path) -> dict[str, object]:
+def snapshot_metadata(pluto_bin: Path, zig_bin: Path, cc_bin: Path, cxx_bin: Path) -> dict[str, object]:
     prefix = peak_memory_command_prefix()
     target_policy = target_policy_metadata()
     pluto = {
         "bin": str(pluto_bin),
-        "version": language_version("pluto", pluto_bin),
+        "version": language_version("pluto", pluto_bin, zig_bin, cc_bin, cxx_bin),
         "target_cpu": target_policy["pluto"]["env"]["PLUTO_TARGET_CPU"],
     }
     pluto_repo = git_repo_metadata(pluto_bin)
@@ -674,6 +792,18 @@ def snapshot_metadata(pluto_bin: Path) -> dict[str, object]:
         "host": host_metadata(),
         "bench": git_repo_metadata(REPO_ROOT),
         "pluto": pluto,
+        "c": {
+            "bin": str(cc_bin),
+            "version": language_version("c", pluto_bin, zig_bin, cc_bin, cxx_bin),
+        },
+        "cpp": {
+            "bin": str(cxx_bin),
+            "version": language_version("cpp", pluto_bin, zig_bin, cc_bin, cxx_bin),
+        },
+        "zig": {
+            "bin": str(zig_bin),
+            "version": language_version("zig", pluto_bin, zig_bin, cc_bin, cxx_bin),
+        },
         "memory_measurement": {
             "enabled": prefix is not None,
             "collector": " ".join(prefix) if prefix else None,
@@ -810,6 +940,12 @@ def metric_value(result: Result, metric_name: str) -> float | None:
     raise ValueError(f"unsupported metric: {metric_name}")
 
 
+def display_label(result: Result) -> str:
+    if result.language == "python" and "NumPy" in result.version:
+        return "Python (with NumPy)"
+    return LANGUAGE_LABELS[result.language]
+
+
 def format_metric(metric_name: str, value: float) -> str:
     if metric_name in {"run", "compile"}:
         return format_ms(value)
@@ -929,19 +1065,19 @@ def render_bar_chart(
     )
 
     # Collect per-case entries sorted by value (fastest first).
-    case_data: list[tuple[str, list[tuple[str, float]]]] = []
+    case_data: list[tuple[str, list[tuple[Result, float]]]] = []
     all_values: list[float] = []
     for case in ordered_grid_cases(cases):
-        entries: list[tuple[str, float]] = []
+        entries: list[tuple[Result, float]] = []
         for result in results_by_case.get(case, []):
             value = metric_value(result, metric_name)
             if value is not None:
-                entries.append((result.language, value))
+                entries.append((result, value))
                 all_values.append(value)
         # Pin Pluto at the top, then sort the rest by value.
-        pluto_entries = [e for e in entries if e[0] == "pluto"]
+        pluto_entries = [e for e in entries if e[0].language == "pluto"]
         other_entries = sorted(
-            (e for e in entries if e[0] != "pluto"), key=lambda e: e[1],
+            (e for e in entries if e[0].language != "pluto"), key=lambda e: e[1],
         )
         case_data.append((case, pluto_entries + other_entries))
 
@@ -960,7 +1096,12 @@ def render_bar_chart(
     panel_pad_x = 18
     panel_pad_top = 18
     panel_pad_bottom = 18
-    label_w = 68
+    longest_label = max(
+        len(display_label(result))
+        for _, entries in case_data
+        for result, _ in entries
+    )
+    label_w = max(68, longest_label * 7 + 12)
     value_pad = 86
     bar_max = panel_w - (panel_pad_x * 2) - label_w - value_pad
     bar_h = 20
@@ -1041,9 +1182,9 @@ def render_bar_chart(
         )
 
         case_bars_h = 0
-        for lang, _ in entries:
-            case_bars_h += (pluto_bar_h if lang == "pluto" else bar_h) + bar_gap
-            if lang == "pluto":
+        for result, _ in entries:
+            case_bars_h += (pluto_bar_h if result.language == "pluto" else bar_h) + bar_gap
+            if result.language == "pluto":
                 case_bars_h += pluto_gap
         grid_bottom = grid_top + case_bars_h
 
@@ -1060,9 +1201,9 @@ def render_bar_chart(
             )
 
         bar_y = grid_top
-        for language, value in entries:
-            is_pluto = language == "pluto"
-            color = LANGUAGE_COLORS[language]
+        for result, value in entries:
+            is_pluto = result.language == "pluto"
+            color = LANGUAGE_COLORS[result.language]
             bw = max((value / case_axis_max) * bar_max, 2)
             current_bar_h = pluto_bar_h if is_pluto else bar_h
             text_y = bar_y + current_bar_h / 2 + 4.5
@@ -1071,7 +1212,7 @@ def render_bar_chart(
             lines.append(
                 f'<text x="{label_x}" y="{text_y:.1f}" text-anchor="end" '
                 f'fill="#0f172a" font-size="13" font-weight="{weight}" '
-                f'{font}>{svg_escape(LANGUAGE_LABELS[language])}</text>'
+                f'{font}>{svg_escape(display_label(result))}</text>'
             )
 
             opacity = "1.0" if is_pluto else "0.82"
@@ -1114,6 +1255,9 @@ def write_snapshot(
     results_by_case: dict[str, list[Result]],
     repeat: int,
     pluto_bin: Path,
+    zig_bin: Path,
+    cc_bin: Path,
+    cxx_bin: Path,
 ) -> None:
     snapshot_dir.mkdir(parents=True, exist_ok=True)
     generated_at = dt.datetime.now().astimezone().isoformat()
@@ -1123,7 +1267,7 @@ def write_snapshot(
         "pluto_bin": str(pluto_bin),
         "platform": platform.platform(),
         "machine": platform.machine(),
-        "metadata": snapshot_metadata(pluto_bin),
+        "metadata": snapshot_metadata(pluto_bin, zig_bin, cc_bin, cxx_bin),
         "cases": [
             {
                 "name": case,
@@ -1212,6 +1356,9 @@ def benchmark_source(
     source: CaseSource,
     repeat: int,
     pluto_bin: Path,
+    zig_bin: Path,
+    cc_bin: Path,
+    cxx_bin: Path,
     measure_memory: bool,
 ) -> Result:
     compile_samples = []
@@ -1224,7 +1371,7 @@ def benchmark_source(
         workdir = prepare_workdir(source.case, source.language, idx)
         try:
             copy_case_files(source.source_dir, workdir)
-            compile_spec, run_spec = commands_for(source, workdir, pluto_bin)
+            compile_spec, run_spec = commands_for(source, workdir, pluto_bin, zig_bin, cc_bin, cxx_bin)
             if compile_spec is not None:
                 compile_ms, _ = timed_run(compile_spec, workdir)
                 compile_samples.append(compile_ms)
@@ -1257,7 +1404,7 @@ def benchmark_source(
     return Result(
         case=source.case,
         language=source.language,
-        version=language_version(source.language, pluto_bin),
+        version=source_version(source, pluto_bin, zig_bin, cc_bin, cxx_bin),
         compile_ms=statistics.median(compile_samples) if compile_samples else None,
         run_ms=statistics.median(run_samples),
         peak_memory_kb=int(statistics.median(memory_samples)) if memory_samples else None,
@@ -1315,13 +1462,16 @@ def benchmark_case(
     case: str,
     repeat: int,
     pluto_bin: Path,
+    zig_bin: Path,
+    cc_bin: Path,
+    cxx_bin: Path,
     measure_memory: bool,
 ) -> list[Result]:
     results = []
     for source in sources_for_case(case):
-        if not language_available(source.language, pluto_bin):
+        if not source_available(source, pluto_bin, zig_bin, cc_bin, cxx_bin):
             continue
-        results.append(benchmark_source(source, repeat, pluto_bin, measure_memory))
+        results.append(benchmark_source(source, repeat, pluto_bin, zig_bin, cc_bin, cxx_bin, measure_memory))
     return sorted(results, key=lambda result: LANGUAGE_ORDER.index(result.language))
 
 
@@ -1332,14 +1482,14 @@ def print_case(results: list[Result]) -> None:
     case = results[0].case
     show_peak_memory = any(result.peak_memory_kb is not None for result in results)
     print(f"Case: {case}")
-    header = f"{'Language':<8} {'Version':<18} {'Compile ms':>12} {'Run ms':>12}"
+    header = f"{'Language':<20} {'Version':<18} {'Compile ms':>12} {'Run ms':>12}"
     if show_peak_memory:
         header += f" {'Peak Memory':>12}"
     print(header)
     for result in results:
         compile_text = "-" if result.compile_ms is None else f"{result.compile_ms:>.3f}"
         row = (
-            f"{LANGUAGE_LABELS[result.language]:<8} "
+            f"{display_label(result)[:20]:<20} "
             f"{result.version[:18]:<18} "
             f"{compile_text:>12} "
             f"{result.run_ms:>12.3f}"
@@ -1388,6 +1538,18 @@ def main() -> int:
         help="Path to the Pluto compiler binary. Defaults to ../pluto/pluto or $PLUTO_BIN.",
     )
     parser.add_argument(
+        "--zig",
+        help="Path to the Zig compiler binary. Defaults to .toolchains/zig-aarch64-macos-0.15.2/zig, `zig` on PATH, or $ZIG_BIN.",
+    )
+    parser.add_argument(
+        "--cc",
+        help="Path to the C compiler binary. Defaults to Homebrew LLVM clang, `cc` on PATH, or $CC_BIN.",
+    )
+    parser.add_argument(
+        "--cxx",
+        help="Path to the C++ compiler binary. Defaults to Homebrew LLVM clang++, `c++` on PATH, or $CXX_BIN.",
+    )
+    parser.add_argument(
         "--snapshot-dir",
         help=(
             "Optional directory for writing a machine-readable results snapshot plus "
@@ -1400,8 +1562,17 @@ def main() -> int:
         raise SystemExit("--repeat must be at least 1")
 
     pluto_bin = resolve_pluto(args.pluto)
+    zig_bin = resolve_zig(args.zig)
+    cc_bin = resolve_cc(args.cc)
+    cxx_bin = resolve_cxx(args.cxx)
     if not pluto_bin.exists():
         print(f"warning: Pluto compiler not found at {pluto_bin}", file=sys.stderr)
+    if not zig_bin.exists():
+        print(f"warning: Zig compiler not found at {zig_bin}", file=sys.stderr)
+    if not cc_bin.exists():
+        print(f"warning: C compiler not found at {cc_bin}", file=sys.stderr)
+    if not cxx_bin.exists():
+        print(f"warning: C++ compiler not found at {cxx_bin}", file=sys.stderr)
 
     cases = discover_cases(args.cases)
     if not cases:
@@ -1409,13 +1580,13 @@ def main() -> int:
         return 1
 
     measure_memory = peak_memory_command_prefix() is not None
-    metadata = snapshot_metadata(pluto_bin)
+    metadata = snapshot_metadata(pluto_bin, zig_bin, cc_bin, cxx_bin)
     print_metadata_summary(metadata)
     shutil.rmtree(WORK_ROOT, ignore_errors=True)
     try:
         results_by_case: dict[str, list[Result]] = {}
         for case in cases:
-            results = benchmark_case(case, args.repeat, pluto_bin, measure_memory)
+            results = benchmark_case(case, args.repeat, pluto_bin, zig_bin, cc_bin, cxx_bin, measure_memory)
             results_by_case[case] = results
             if not results:
                 print(f"Case: {case}")
@@ -1430,6 +1601,9 @@ def main() -> int:
                 results_by_case=results_by_case,
                 repeat=args.repeat,
                 pluto_bin=pluto_bin,
+                zig_bin=zig_bin,
+                cc_bin=cc_bin,
+                cxx_bin=cxx_bin,
             )
             print(f"Snapshot written: {snapshot_dir / 'results.json'}")
     finally:

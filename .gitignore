@@ -23,6 +23,7 @@ benchmarks/**/*.s
 **/.zig-cache/
 **/zig-out/
 **/target/
+.toolchains/
 
 # Local benchmark snapshots
 results/local-*/

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="1420" viewBox="0 0 760 1420" role="img" aria-labelledby="title desc">
 <title id="title">Pluto vs Python at a glance mobile</title>
-<desc id="desc">Stacked mobile-friendly source snippets for the sum and fib benchmarks in Pluto and Python.</desc>
+<desc id="desc">Stacked mobile-friendly source snippets for the sum and fib benchmarks in Pluto and Python, with NumPy backing the Python sum case.</desc>
 <rect width="760" height="1420" fill="#f8fafc" />
 <text x="28" y="42" fill="#0f172a" font-size="24" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto vs Python at a Glance</text>
 <text x="28" y="66" fill="#475569" font-size="14" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Mobile layout: each benchmark stacks Pluto above Python for easier reading.</text>
@@ -18,11 +18,12 @@
 <rect x="28" y="314" width="704" height="196" rx="18" fill="#111827" />
 <text x="48" y="344" fill="#f8fafc" font-size="16" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python</text>
 <text x="48" y="364" fill="#94a3b8" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">benchmarks/sum/python/main.py</text>
-<text x="48" y="404" xml:space="preserve" fill="#e2e8f0" font-size="19" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-  <tspan x="48" y="404" fill="#f59e0b">total</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">0</tspan>
-  <tspan x="48" y="434" fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">20_000_000</tspan>
-  <tspan x="48" y="474" fill="#c084fc">for</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#f59e0b">i</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#c084fc">in</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#22c55e">range</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> + </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0">):</tspan>
-  <tspan x="78" y="504" fill="#f59e0b">total</tspan><tspan fill="#e2e8f0"> += (</tspan><tspan fill="#f59e0b">i</tspan><tspan fill="#e2e8f0"> * </tspan><tspan fill="#38bdf8">3</tspan><tspan fill="#e2e8f0">) % </tspan><tspan fill="#38bdf8">17</tspan>
+<text x="48" y="402" xml:space="preserve" fill="#e2e8f0" font-size="15" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+  <tspan x="48" y="402">import numpy as np</tspan>
+  <tspan x="48" y="426">chunk = 1_000_000</tspan>
+  <tspan x="48" y="452">for start in range(1, N + 1, chunk):</tspan>
+  <tspan x="72" y="478">values = np.arange(start, end, dtype=np.int32)</tspan>
+  <tspan x="72" y="502">values *= 3; values %= 17</tspan>
 </text>
 
 <text x="28" y="560" fill="#0f172a" font-size="18" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Fib</text>
