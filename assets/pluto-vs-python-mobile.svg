@@ -16,14 +16,16 @@
 </text>
 
 <rect x="28" y="314" width="704" height="196" rx="18" fill="#111827" />
-<text x="48" y="344" fill="#f8fafc" font-size="16" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python</text>
+<text x="48" y="344" fill="#f8fafc" font-size="16" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python + NumPy</text>
 <text x="48" y="364" fill="#94a3b8" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">benchmarks/sum/python/main.py</text>
-<text x="48" y="402" xml:space="preserve" fill="#e2e8f0" font-size="15" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-  <tspan x="48" y="402">import numpy as np</tspan>
-  <tspan x="48" y="426">chunk = 1_000_000</tspan>
-  <tspan x="48" y="452">for start in range(1, N + 1, chunk):</tspan>
-  <tspan x="72" y="478">values = np.arange(start, end, dtype=np.int32)</tspan>
-  <tspan x="72" y="502">values *= 3; values %= 17</tspan>
+<text x="48" y="392" xml:space="preserve" fill="#e2e8f0" font-size="14" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+  <tspan x="48" y="392">import numpy as np</tspan>
+  <tspan x="48" y="412">CHUNK_SIZE = 1_000_000</tspan>
+  <tspan x="48" y="432">N = 20_000_001</tspan>
+  <tspan x="48" y="452">for start in range(1, N, CHUNK_SIZE):</tspan>
+  <tspan x="72" y="472">end = min(start + CHUNK_SIZE, N)</tspan>
+  <tspan x="72" y="492">values = np.arange(start, end,</tspan>
+  <tspan x="108" y="512">dtype=np.int32)</tspan>
 </text>
 
 <text x="28" y="560" fill="#0f172a" font-size="18" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Fib</text>

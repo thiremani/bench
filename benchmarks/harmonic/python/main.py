@@ -2,13 +2,13 @@ import numpy as np
 
 
 CHUNK_SIZE = 1_000_000
-N = 10_000_000
+N = 10_000_001
 
 
 total = 0.0
 
-for start in range(1, N + 1, CHUNK_SIZE):
-    end = min(start + CHUNK_SIZE, N + 1)
+for start in range(1, N, CHUNK_SIZE):
+    end = min(start + CHUNK_SIZE, N)
     values = np.arange(start, end, dtype=np.float64)
     np.reciprocal(values, out=values)
     total += float(values.sum(dtype=np.float64))

@@ -16,11 +16,9 @@ Tested on `2026-04-18 20:34:58 UTC+05:30` with:
 - CPU cores: 10
 - Memory: 16 GiB
 - OS: macOS 26.4.1 (25E253)
-- Command: `python3 scripts/benchmark.py --repeat 10 --snapshot-dir results/latest --zig /Users/tejas/Downloads/bench/.toolchains/zig-aarch64-macos-0.15.2/zig`
+- Command: `python3 scripts/benchmark.py --repeat 10 --snapshot-dir results/latest`
 - Benchmark mode: median of 10 samples
 - All languages are timed as fresh processes
-- Other open apps were closed before the run
-- C/C++ compiler in this snapshot: Homebrew LLVM `clang` / `clang++` 22.1.3
 - Compiled languages use host-native CPU tuning where the toolchain exposes it
 - Pluto rows are bolded for quick comparison
 
@@ -161,10 +159,10 @@ Run the full suite:
 python3 scripts/benchmark.py
 ```
 
-If you want to pin a Zig binary explicitly:
+Regenerate the checked-in charts and snapshot:
 
 ```sh
-python3 scripts/benchmark.py --zig /path/to/zig-0.15.2/zig
+python3 scripts/benchmark.py --repeat 10 --snapshot-dir results/latest
 ```
 
 The harness is compatible with Python 3.9+.
@@ -174,62 +172,25 @@ GitHub Actions also runs the suite on `ubuntu-24.04`. That workflow checks out
 snapshot artifact under `results/linux-gha` semantics. It does not overwrite the
 checked-in `results/latest` macOS snapshot.
 
-Regenerate the checked-in charts and snapshot:
-
-```sh
-python3 scripts/benchmark.py --repeat 10 --snapshot-dir results/latest --zig /path/to/zig-0.15.2/zig
-```
-
 Run a single benchmark:
 
 ```sh
-python3 scripts/benchmark.py sum --zig /path/to/zig-0.15.2/zig
-python3 scripts/benchmark.py fib --zig /path/to/zig-0.15.2/zig
-python3 scripts/benchmark.py fib_tail --zig /path/to/zig-0.15.2/zig
-python3 scripts/benchmark.py harmonic --zig /path/to/zig-0.15.2/zig
+python3 scripts/benchmark.py sum
+python3 scripts/benchmark.py fib
+python3 scripts/benchmark.py fib_tail
+python3 scripts/benchmark.py harmonic
 ```
 
-By default the harness looks for Pluto at `../pluto/pluto`, which matches:
-
-```text
-/Users/tejas/Downloads/bench
-/Users/tejas/Downloads/pluto/pluto
-```
-
-If your Pluto binary is elsewhere, override it with:
+Override tool locations when needed with `--pluto`, `--zig`, `--cc`, and `--cxx`
+or the matching environment variables `PLUTO_BIN`, `ZIG_BIN`, `CC_BIN`, and
+`CXX_BIN`.
 
 ```sh
-python3 scripts/benchmark.py --pluto /path/to/pluto
-```
-
-or:
-
-```sh
-PLUTO_BIN=/path/to/pluto python3 scripts/benchmark.py
-```
-
-If your Zig binary is elsewhere, override it with:
-
-```sh
-python3 scripts/benchmark.py --zig /path/to/zig
-```
-
-or:
-
-```sh
-ZIG_BIN=/path/to/zig python3 scripts/benchmark.py
-```
-
-If you want to override the C and C++ compilers explicitly:
-
-```sh
-python3 scripts/benchmark.py --cc /opt/homebrew/opt/llvm/bin/clang --cxx /opt/homebrew/opt/llvm/bin/clang++
-```
-
-or:
-
-```sh
-CC_BIN=/opt/homebrew/opt/llvm/bin/clang CXX_BIN=/opt/homebrew/opt/llvm/bin/clang++ python3 scripts/benchmark.py
+python3 scripts/benchmark.py \
+  --pluto /path/to/pluto \
+  --zig /path/to/zig \
+  --cc /path/to/clang \
+  --cxx /path/to/clang++
 ```
 
 ## Measurement Notes
@@ -238,22 +199,13 @@ CC_BIN=/opt/homebrew/opt/llvm/bin/clang CXX_BIN=/opt/homebrew/opt/llvm/bin/clang
 - Julia, Node, Bun, and Python are reported as runtime or JIT execution only, so their compile column is `-`.
 - Python uses NumPy-backed implementations for `sum` and `harmonic`, and plain Python for `fib` and `fib_tail`.
 - Snapshot tables only include languages whose toolchains were available on the host where the snapshot was generated.
-- Peak Memory is collected automatically when the host supports `/usr/bin/time`.
-- Peak Memory is the median peak resident set size across the untimed warm-up runs.
-- In plain terms, think of Peak Memory as the approximate RAM used by the benchmark process at its peak.
+- Peak Memory is collected automatically when the host supports `/usr/bin/time`; it is the median peak resident set size from the warm-up runs.
 - Pluto currently uses its own LLVM pipeline with `opt -O3`.
 - Pluto is compiled with `PLUTO_TARGET_CPU=native`.
-- In this snapshot, C and C++ are built with Homebrew LLVM `clang` / `clang++`, `-O3`, and host-native CPU tuning.
-- Swift is built with `swiftc -O -target-cpu native`.
-- Rust is built with `rustc -C opt-level=3 -C target-cpu=native`.
-- Zig is built with `zig build-exe -O ReleaseFast -mcpu native`.
-- This snapshot pins Zig to `0.15.2` via `--zig /path/to/zig-0.15.2/zig`.
-- Go uses the default optimized `go build` pipeline plus host-specific tuning when the
-  toolchain exposes a native override, such as `GOAMD64` on `x86_64`.
+- Compiled languages use their standard optimized modes plus host-native CPU tuning where supported.
+- C and C++ use `-O3`, Swift uses `-O`, Rust uses `-C opt-level=3`, and Zig uses `-O ReleaseFast`.
 - Julia runs with `julia --startup-file=no`.
-- The harness creates isolated temp work directories and copies each benchmark into them before running.
-- It copies the benchmark files into that directory, including Pluto support `.pt` files when present.
-- Every timed sample launches a fresh process, so the published `run_ms` numbers are end-to-end wall-clock timings.
+- The harness creates isolated temp work directories, copies benchmark files into them, and launches a fresh process for every timed sample.
 - One warm-up execution runs before each timed sample.
 - Short runtime cases such as `sum` and `harmonic` still include non-trivial process-startup noise, so treat small differences there with caution.
 - Output is checked against `expected.txt` for the benchmark.
