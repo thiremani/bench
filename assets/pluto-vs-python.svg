@@ -1,13 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="840" viewBox="0 0 1200 840" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="940" viewBox="0 0 1200 940" role="img" aria-labelledby="title desc">
 <title id="title">Pluto vs Python at a glance</title>
 <desc id="desc">Side by side source snippets for the sum and fib benchmarks in Pluto and Python, with NumPy backing the Python sum case.</desc>
-<rect width="1200" height="840" fill="#f8fafc" />
+<rect width="1200" height="940" fill="#f8fafc" />
 <text x="48" y="48" fill="#0f172a" font-size="30" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto vs Python at a Glance</text>
 <text x="48" y="74" fill="#475569" font-size="15" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">The same benchmark ideas, shown side by side so Pluto's template plus script model is visible at a glance.</text>
 
 <text x="48" y="122" fill="#0f172a" font-size="20" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Sum</text>
-<rect x="48" y="142" width="530" height="280" rx="18" fill="#0f172a" />
-<rect x="622" y="142" width="530" height="280" rx="18" fill="#111827" />
+<rect x="48" y="142" width="530" height="380" rx="18" fill="#0f172a" />
+<rect x="622" y="142" width="530" height="380" rx="18" fill="#111827" />
 <text x="72" y="176" fill="#f8fafc" font-size="18" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto</text>
 <text x="72" y="198" fill="#94a3b8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">benchmarks/sum/pluto/sum.spt</text>
 <text x="646" y="176" fill="#f8fafc" font-size="18" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python + NumPy</text>
@@ -20,44 +20,44 @@
   <tspan x="72" y="344" fill="#f59e0b">sum</tspan>
 </text>
 
-<text x="646" y="228" xml:space="preserve" fill="#e2e8f0" font-size="15" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+<text x="646" y="228" xml:space="preserve" fill="#e2e8f0" font-size="18" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
   <tspan x="646" y="228" fill="#c084fc">import</tspan><tspan fill="#e2e8f0"> numpy </tspan><tspan fill="#c084fc">as</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#f59e0b">np</tspan>
-  <tspan x="646" y="244" fill="#f59e0b">CHUNK_SIZE</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">1_000_000</tspan>
-  <tspan x="646" y="260" fill="#f59e0b">N</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">20_000_001</tspan>
-  <tspan x="646" y="276" fill="#f59e0b">total</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">0</tspan>
-  <tspan x="646" y="292" fill="#c084fc">for</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#f59e0b">start</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#c084fc">in</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#22c55e">range</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">N</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">CHUNK_SIZE</tspan><tspan fill="#e2e8f0">):</tspan>
-  <tspan x="664" y="308" fill="#f59e0b">end</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#22c55e">min</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">start</tspan><tspan fill="#e2e8f0"> + </tspan><tspan fill="#f59e0b">CHUNK_SIZE</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">N</tspan><tspan fill="#e2e8f0">)</tspan>
-  <tspan x="664" y="324" fill="#f59e0b">values</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#f59e0b">np</tspan><tspan fill="#e2e8f0">.</tspan><tspan fill="#22c55e">arange</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">start</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">end</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">dtype</tspan><tspan fill="#e2e8f0">=</tspan><tspan fill="#f59e0b">np</tspan><tspan fill="#e2e8f0">.</tspan><tspan fill="#38bdf8">int32</tspan><tspan fill="#e2e8f0">)</tspan>
-  <tspan x="664" y="340" fill="#f59e0b">values</tspan><tspan fill="#e2e8f0"> *= </tspan><tspan fill="#38bdf8">3</tspan>
-  <tspan x="664" y="356" fill="#f59e0b">values</tspan><tspan fill="#e2e8f0"> %= </tspan><tspan fill="#38bdf8">17</tspan>
-  <tspan x="664" y="372" fill="#f59e0b">total</tspan><tspan fill="#e2e8f0"> += </tspan><tspan fill="#22c55e">int</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">values</tspan><tspan fill="#e2e8f0">.</tspan><tspan fill="#22c55e">sum</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">dtype</tspan><tspan fill="#e2e8f0">=</tspan><tspan fill="#f59e0b">np</tspan><tspan fill="#e2e8f0">.</tspan><tspan fill="#38bdf8">int64</tspan><tspan fill="#e2e8f0">))</tspan>
-  <tspan x="646" y="388" fill="#22c55e">print</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">total</tspan><tspan fill="#e2e8f0">)</tspan>
+  <tspan x="646" y="254" fill="#f59e0b">CHUNK_SIZE</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">1_000_000</tspan>
+  <tspan x="646" y="280" fill="#f59e0b">N</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">20_000_001</tspan>
+  <tspan x="646" y="306" fill="#f59e0b">total</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#38bdf8">0</tspan>
+  <tspan x="646" y="332" fill="#c084fc">for</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#f59e0b">start</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#c084fc">in</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#22c55e">range</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">N</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">CHUNK_SIZE</tspan><tspan fill="#e2e8f0">):</tspan>
+  <tspan x="668" y="358" fill="#f59e0b">end</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#22c55e">min</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">start</tspan><tspan fill="#e2e8f0"> + </tspan><tspan fill="#f59e0b">CHUNK_SIZE</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">N</tspan><tspan fill="#e2e8f0">)</tspan>
+  <tspan x="668" y="384" fill="#f59e0b">values</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#f59e0b">np</tspan><tspan fill="#e2e8f0">.</tspan><tspan fill="#22c55e">arange</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">start</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">end</tspan><tspan fill="#e2e8f0">, </tspan><tspan fill="#f59e0b">dtype</tspan><tspan fill="#e2e8f0">=</tspan><tspan fill="#f59e0b">np</tspan><tspan fill="#e2e8f0">.</tspan><tspan fill="#38bdf8">int32</tspan><tspan fill="#e2e8f0">)</tspan>
+  <tspan x="668" y="410" fill="#f59e0b">values</tspan><tspan fill="#e2e8f0"> *= </tspan><tspan fill="#38bdf8">3</tspan>
+  <tspan x="668" y="436" fill="#f59e0b">values</tspan><tspan fill="#e2e8f0"> %= </tspan><tspan fill="#38bdf8">17</tspan>
+  <tspan x="668" y="462" fill="#f59e0b">total</tspan><tspan fill="#e2e8f0"> += </tspan><tspan fill="#22c55e">int</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">values</tspan><tspan fill="#e2e8f0">.</tspan><tspan fill="#22c55e">sum</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">dtype</tspan><tspan fill="#e2e8f0">=</tspan><tspan fill="#f59e0b">np</tspan><tspan fill="#e2e8f0">.</tspan><tspan fill="#38bdf8">int64</tspan><tspan fill="#e2e8f0">))</tspan>
+  <tspan x="646" y="496" fill="#22c55e">print</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">total</tspan><tspan fill="#e2e8f0">)</tspan>
 </text>
 
-<text x="48" y="458" fill="#0f172a" font-size="20" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Fib</text>
-<rect x="48" y="478" width="530" height="294" rx="18" fill="#0f172a" />
-<rect x="622" y="478" width="530" height="294" rx="18" fill="#111827" />
-<text x="72" y="512" fill="#f8fafc" font-size="18" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto</text>
-<text x="72" y="534" fill="#94a3b8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">benchmarks/fib/pluto/fib.pt + fib.spt</text>
-<text x="646" y="512" fill="#f8fafc" font-size="18" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python</text>
-<text x="646" y="534" fill="#94a3b8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">benchmarks/fib/python/main.py</text>
+<text x="48" y="558" fill="#0f172a" font-size="20" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Fib</text>
+<rect x="48" y="578" width="530" height="294" rx="18" fill="#0f172a" />
+<rect x="622" y="578" width="530" height="294" rx="18" fill="#111827" />
+<text x="72" y="612" fill="#f8fafc" font-size="18" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto</text>
+<text x="72" y="634" fill="#94a3b8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">benchmarks/fib/pluto/fib.pt + fib.spt</text>
+<text x="646" y="612" fill="#f8fafc" font-size="18" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python</text>
+<text x="646" y="634" fill="#94a3b8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">benchmarks/fib/python/main.py</text>
 
-<text x="72" y="574" fill="#38bdf8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">fib.pt</text>
-<text x="72" y="604" xml:space="preserve" fill="#e2e8f0" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-  <tspan x="72" y="604" fill="#f59e0b">y</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#22c55e">Fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0">)</tspan>
-  <tspan x="92" y="634" fill="#f59e0b">y</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> &lt;= </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#f59e0b">n</tspan>
-  <tspan x="92" y="664" fill="#f59e0b">y</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> &gt; </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#22c55e">Fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> - </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0">) + </tspan><tspan fill="#22c55e">Fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> - </tspan><tspan fill="#38bdf8">2</tspan><tspan fill="#e2e8f0">)</tspan>
+<text x="72" y="674" fill="#38bdf8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">fib.pt</text>
+<text x="72" y="704" xml:space="preserve" fill="#e2e8f0" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+  <tspan x="72" y="704" fill="#f59e0b">y</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#22c55e">Fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0">)</tspan>
+  <tspan x="92" y="734" fill="#f59e0b">y</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> &lt;= </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#f59e0b">n</tspan>
+  <tspan x="92" y="764" fill="#f59e0b">y</tspan><tspan fill="#e2e8f0"> = </tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> &gt; </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#22c55e">Fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> - </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0">) + </tspan><tspan fill="#22c55e">Fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> - </tspan><tspan fill="#38bdf8">2</tspan><tspan fill="#e2e8f0">)</tspan>
 </text>
-<text x="72" y="704" fill="#38bdf8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">fib.spt</text>
-<text x="72" y="730" xml:space="preserve" fill="#e2e8f0" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-  <tspan x="72" y="730" fill="#22c55e">Fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#38bdf8">32</tspan><tspan fill="#e2e8f0">)</tspan>
+<text x="72" y="804" fill="#38bdf8" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">fib.spt</text>
+<text x="72" y="830" xml:space="preserve" fill="#e2e8f0" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+  <tspan x="72" y="830" fill="#22c55e">Fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#38bdf8">32</tspan><tspan fill="#e2e8f0">)</tspan>
 </text>
 
-<text x="646" y="582" xml:space="preserve" fill="#e2e8f0" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
-  <tspan x="646" y="582" fill="#c084fc">def</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#22c55e">fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0">: int) -&gt; int:</tspan>
-  <tspan x="678" y="614" fill="#c084fc">if</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> &lt;= </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0">:</tspan>
-  <tspan x="710" y="646" fill="#c084fc">return</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#f59e0b">n</tspan>
-  <tspan x="678" y="694" fill="#c084fc">return</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#22c55e">fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> - </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0">) + </tspan><tspan fill="#22c55e">fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> - </tspan><tspan fill="#38bdf8">2</tspan><tspan fill="#e2e8f0">)</tspan>
-  <tspan x="646" y="742" fill="#22c55e">print</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#22c55e">fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#38bdf8">32</tspan><tspan fill="#e2e8f0">))</tspan>
+<text x="646" y="682" xml:space="preserve" fill="#e2e8f0" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
+  <tspan x="646" y="682" fill="#c084fc">def</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#22c55e">fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0">: int) -&gt; int:</tspan>
+  <tspan x="678" y="714" fill="#c084fc">if</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> &lt;= </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0">:</tspan>
+  <tspan x="710" y="746" fill="#c084fc">return</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#f59e0b">n</tspan>
+  <tspan x="678" y="794" fill="#c084fc">return</tspan><tspan fill="#e2e8f0"> </tspan><tspan fill="#22c55e">fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> - </tspan><tspan fill="#38bdf8">1</tspan><tspan fill="#e2e8f0">) + </tspan><tspan fill="#22c55e">fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#f59e0b">n</tspan><tspan fill="#e2e8f0"> - </tspan><tspan fill="#38bdf8">2</tspan><tspan fill="#e2e8f0">)</tspan>
+  <tspan x="646" y="842" fill="#22c55e">print</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#22c55e">fib</tspan><tspan fill="#e2e8f0">(</tspan><tspan fill="#38bdf8">32</tspan><tspan fill="#e2e8f0">))</tspan>
 </text>
 </svg>
