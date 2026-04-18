@@ -49,6 +49,11 @@ jobs:
         with:
           version: "1.12.5"
 
+      - name: Install Python benchmark deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-numpy
+
       - name: Install LLVM 21
         run: |
           wget https://apt.llvm.org/llvm.sh
@@ -122,6 +127,7 @@ jobs:
       - name: Verify toolchain
         run: |
           python3 --version
+          python3 -c "import numpy as np; print(f'NumPy {np.__version__}')"
           cc --version | head -n 1
           c++ --version | head -n 1
           swift --version
