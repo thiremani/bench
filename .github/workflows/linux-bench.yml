@@ -51,8 +51,7 @@ jobs:
 
       - name: Install Python benchmark deps
         run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-numpy
+          python3 -m pip install --break-system-packages --user numpy==2.4.4
 
       - name: Install LLVM 21
         run: |
