@@ -1477,8 +1477,13 @@ def print_case(results: list[Result]) -> None:
     case = results[0].case
     show_peak_memory = any(result.peak_memory_kb is not None for result in results)
     language_width = max(len("Language"), *(len(display_label(result)) for result in results))
+    version_width = max(len("Version"), *(len(result.version) for result in results))
     print(f"Case: {case}")
-    header = f"{'Language':<{language_width}} {'Compile ms':>12} {'Run ms':>12}"
+    header = (
+        f"{'Language':<{language_width}} "
+        f"{'Version':<{version_width}} "
+        f"{'Compile ms':>12} {'Run ms':>12}"
+    )
     if show_peak_memory:
         header += f" {'Peak Memory':>12}"
     print(header)
@@ -1486,6 +1491,7 @@ def print_case(results: list[Result]) -> None:
         compile_text = "-" if result.compile_ms is None else f"{result.compile_ms:>.3f}"
         row = (
             f"{display_label(result):<{language_width}} "
+            f"{result.version:<{version_width}} "
             f"{compile_text:>12} "
             f"{result.run_ms:>12.3f}"
         )
