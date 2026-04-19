@@ -62,8 +62,8 @@ Compile time overview:
 | Language | Version | Compile ms | Run ms | Peak Memory | Output |
 | --- | --- | ---: | ---: | ---: | --- |
 | **Pluto** | `pluto dev` | **126.486** | **8.274** | **1.3 MiB** | `160000000` |
-| C | `Homebrew clang v22.1.3` | 117.682 | 8.228 | 1.3 MiB | `160000000` |
-| C++ | `Homebrew clang v22.1.3` | 120.253 | 8.339 | 1.3 MiB | `160000000` |
+| C | `Homebrew clang 22.1.3` | 117.682 | 8.228 | 1.3 MiB | `160000000` |
+| C++ | `Homebrew clang 22.1.3` | 120.253 | 8.339 | 1.3 MiB | `160000000` |
 | Swift | `Swift 6.3.1` | 209.303 | 19.761 | 1.8 MiB | `160000000` |
 | Go | `go1.26.2` | 116.447 | 21.764 | 4.1 MiB | `160000000` |
 | Rust | `rustc 1.94.1` | 92.345 | 23.744 | 1.5 MiB | `160000000` |
@@ -78,8 +78,8 @@ Compile time overview:
 | Language | Version | Compile ms | Run ms | Peak Memory | Output |
 | --- | --- | ---: | ---: | ---: | --- |
 | **Pluto** | `pluto dev` | **125.821** | **8.704** | **1.3 MiB** | `2178309` |
-| C | `Homebrew clang v22.1.3` | 115.235 | 9.527 | 1.3 MiB | `2178309` |
-| C++ | `Homebrew clang v22.1.3` | 117.109 | 9.457 | 1.3 MiB | `2178309` |
+| C | `Homebrew clang 22.1.3` | 115.235 | 9.527 | 1.3 MiB | `2178309` |
+| C++ | `Homebrew clang 22.1.3` | 117.109 | 9.457 | 1.3 MiB | `2178309` |
 | Swift | `Swift 6.3.1` | 195.381 | 12.506 | 1.8 MiB | `2178309` |
 | Go | `go1.26.2` | 114.281 | 11.255 | 4.0 MiB | `2178309` |
 | Rust | `rustc 1.94.1` | 89.322 | 9.829 | 1.5 MiB | `2178309` |
@@ -94,8 +94,8 @@ Compile time overview:
 | Language | Version | Compile ms | Run ms | Peak Memory | Output |
 | --- | --- | ---: | ---: | ---: | --- |
 | **Pluto** | `pluto dev` | **126.922** | **13.952** | **1.3 MiB** | `2851443500000` |
-| C | `Homebrew clang v22.1.3` | 116.196 | 13.952 | 1.3 MiB | `2851443500000` |
-| C++ | `Homebrew clang v22.1.3` | 116.523 | 13.967 | 1.3 MiB | `2851443500000` |
+| C | `Homebrew clang 22.1.3` | 116.196 | 13.952 | 1.3 MiB | `2851443500000` |
+| C++ | `Homebrew clang 22.1.3` | 116.523 | 13.967 | 1.3 MiB | `2851443500000` |
 | Swift | `Swift 6.3.1` | 216.717 | 11.596 | 1.8 MiB | `2851443500000` |
 | Go | `go1.26.2` | 114.438 | 19.688 | 4.1 MiB | `2851443500000` |
 | Rust | `rustc 1.94.1` | 94.062 | 15.389 | 1.5 MiB | `2851443500000` |
@@ -110,8 +110,8 @@ Compile time overview:
 | Language | Version | Compile ms | Run ms | Peak Memory | Output |
 | --- | --- | ---: | ---: | ---: | --- |
 | **Pluto** | `pluto dev` | **125.450** | **12.571** | **1.3 MiB** | `16.695311` |
-| C | `Homebrew clang v22.1.3` | 117.286 | 12.579 | 1.3 MiB | `16.695311` |
-| C++ | `Homebrew clang v22.1.3` | 117.860 | 12.584 | 1.3 MiB | `16.695311` |
+| C | `Homebrew clang 22.1.3` | 117.286 | 12.579 | 1.3 MiB | `16.695311` |
+| C++ | `Homebrew clang 22.1.3` | 117.860 | 12.584 | 1.3 MiB | `16.695311` |
 | Swift | `Swift 6.3.1` | 310.408 | 14.139 | 5.6 MiB | `16.695311` |
 | Go | `go1.26.2` | 114.752 | 13.754 | 4.1 MiB | `16.695311` |
 | Rust | `rustc 1.94.1` | 92.396 | 12.878 | 1.5 MiB | `16.695311` |

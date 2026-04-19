@@ -339,10 +339,10 @@ def normalize_version(language: str, raw: str) -> str:
     if language in {"c", "cpp"}:
         distro_match = re.match(r"^(Apple|Homebrew|Ubuntu)\s+clang version\s+(\S+)", raw)
         if distro_match:
-            return f"{distro_match.group(1)} clang v{distro_match.group(2)}"
+            return f"{distro_match.group(1)} clang {distro_match.group(2)}"
         clang_match = re.match(r"^clang version\s+(\S+)", raw)
         if clang_match:
-            return f"clang v{clang_match.group(1)}"
+            return f"clang {clang_match.group(1)}"
     if language == "swift":
         marker = "Swift version "
         idx = raw.find(marker)
