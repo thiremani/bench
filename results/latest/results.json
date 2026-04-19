@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-18T22:53:37.308514+05:30",
+  "generated_at": "2026-04-19T07:38:31.524441+05:30",
   "repeat": 10,
   "pluto_bin": "/Users/tejas/Downloads/pluto/pluto",
   "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
@@ -20,7 +20,7 @@
       "total_memory_kb": 16777216
     },
     "bench": {
-      "git_commit": "449808eece3be0b6949760fe37fadd650913bef4",
+      "git_commit": "67cfe4f1c33dc444cdf1ef550728866c1b159313",
       "git_branch": "main",
       "git_dirty": true
     },
@@ -34,11 +34,11 @@
     },
     "c": {
       "bin": "/opt/homebrew/opt/llvm/bin/clang",
-      "version": "Homebrew clang 22.1.3"
+      "version": "Homebrew clang v22.1.3"
     },
     "cpp": {
       "bin": "/opt/homebrew/opt/llvm/bin/clang++",
-      "version": "Homebrew clang 22.1.3"
+      "version": "Homebrew clang v22.1.3"
     },
     "zig": {
       "bin": "/Users/tejas/Downloads/bench/.toolchains/zig-aarch64-macos-0.15.2/zig",
@@ -107,56 +107,56 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 132.41908300551586,
-          "run_ms": 8.719166013179347,
+          "compile_ms": 125.67866701283492,
+          "run_ms": 8.215917012421414,
           "peak_memory_kb": 1360,
           "output": "160000000"
         },
         {
           "language": "c",
-          "version": "Homebrew clang 22.1.3",
-          "compile_ms": 124.13956251111813,
-          "run_ms": 8.656458521727473,
+          "version": "Homebrew clang v22.1.3",
+          "compile_ms": 117.91614547837526,
+          "run_ms": 8.236833527917042,
           "peak_memory_kb": 1360,
           "output": "160000000"
         },
         {
           "language": "cpp",
-          "version": "Homebrew clang 22.1.3",
-          "compile_ms": 405.39291698951274,
-          "run_ms": 8.645541471196339,
+          "version": "Homebrew clang v22.1.3",
+          "compile_ms": 119.06352097867057,
+          "run_ms": 8.259958500275388,
           "peak_memory_kb": 1360,
           "output": "160000000"
         },
         {
           "language": "swift",
           "version": "Swift 6.3.1",
-          "compile_ms": 219.41893751500174,
-          "run_ms": 20.816270989598706,
+          "compile_ms": 208.72968799085356,
+          "run_ms": 19.820562010863796,
           "peak_memory_kb": 1872,
           "output": "160000000"
         },
         {
           "language": "go",
           "version": "go1.26.2",
-          "compile_ms": 121.15427100798115,
-          "run_ms": 23.006083007203415,
-          "peak_memory_kb": 4144,
+          "compile_ms": 115.28329199063592,
+          "run_ms": 21.82910399278626,
+          "peak_memory_kb": 4152,
           "output": "160000000"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 97.42060452117585,
-          "run_ms": 25.161521014524624,
+          "compile_ms": 92.87931249127723,
+          "run_ms": 23.84324950980954,
           "peak_memory_kb": 1536,
           "output": "160000000"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 219.76514550624415,
-          "run_ms": 15.259290987160057,
+          "compile_ms": 209.79227049974725,
+          "run_ms": 14.752958493772894,
           "peak_memory_kb": 1392,
           "output": "160000000"
         },
@@ -164,23 +164,23 @@
           "language": "julia",
           "version": "Julia 1.12.5",
           "compile_ms": null,
-          "run_ms": 152.62656199047342,
-          "peak_memory_kb": 231376,
+          "run_ms": 139.07243753783405,
+          "peak_memory_kb": 231352,
           "output": "160000000"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 89.51277102460153,
-          "peak_memory_kb": 50096,
+          "run_ms": 86.83714549988508,
+          "peak_memory_kb": 49992,
           "output": "160000000"
         },
         {
           "language": "bun",
           "version": "Bun 1.3.9",
           "compile_ms": null,
-          "run_ms": 35.68147952319123,
+          "run_ms": 33.02570799132809,
           "peak_memory_kb": 27672,
           "output": "160000000"
         },
@@ -188,8 +188,8 @@
           "language": "python",
           "version": "Python 3.14.4 + NumPy 2.4.4",
           "compile_ms": null,
-          "run_ms": 135.23904199246317,
-          "peak_memory_kb": 36728,
+          "run_ms": 127.26443752762862,
+          "peak_memory_kb": 36736,
           "output": "160000000"
         }
       ]
@@ -200,56 +200,56 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 132.92970799375325,
-          "run_ms": 9.156687970971689,
+          "compile_ms": 125.48956202226691,
+          "run_ms": 8.70227100676857,
           "peak_memory_kb": 1360,
           "output": "2178309"
         },
         {
           "language": "c",
-          "version": "Homebrew clang 22.1.3",
-          "compile_ms": 122.52252051257528,
-          "run_ms": 9.845041495282203,
+          "version": "Homebrew clang v22.1.3",
+          "compile_ms": 114.75747899385169,
+          "run_ms": 9.376562520628795,
           "peak_memory_kb": 1360,
           "output": "2178309"
         },
         {
           "language": "cpp",
-          "version": "Homebrew clang 22.1.3",
-          "compile_ms": 404.03533351491205,
-          "run_ms": 9.896395466057584,
+          "version": "Homebrew clang v22.1.3",
+          "compile_ms": 116.30552101996727,
+          "run_ms": 9.560832986608148,
           "peak_memory_kb": 1376,
           "output": "2178309"
         },
         {
           "language": "swift",
           "version": "Swift 6.3.1",
-          "compile_ms": 208.9890624920372,
-          "run_ms": 13.365041493671015,
+          "compile_ms": 194.35585351311602,
+          "run_ms": 12.688500486547127,
           "peak_memory_kb": 1856,
           "output": "2178309"
         },
         {
           "language": "go",
           "version": "go1.26.2",
-          "compile_ms": 120.1175210007932,
-          "run_ms": 11.58531301189214,
-          "peak_memory_kb": 4176,
+          "compile_ms": 114.3360625137575,
+          "run_ms": 11.1068545083981,
+          "peak_memory_kb": 4128,
           "output": "2178309"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 95.42464549303986,
-          "run_ms": 10.340417007682845,
+          "compile_ms": 90.49177099950612,
+          "run_ms": 9.855666488874704,
           "peak_memory_kb": 1536,
           "output": "2178309"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 215.92414550832473,
-          "run_ms": 10.214749985607341,
+          "compile_ms": 203.99695803644136,
+          "run_ms": 9.846187516814098,
           "peak_memory_kb": 1408,
           "output": "2178309"
         },
@@ -257,32 +257,32 @@
           "language": "julia",
           "version": "Julia 1.12.5",
           "compile_ms": null,
-          "run_ms": 150.643854518421,
-          "peak_memory_kb": 231328,
+          "run_ms": 139.1625414835289,
+          "peak_memory_kb": 230880,
           "output": "2178309"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 90.33058347995393,
-          "peak_memory_kb": 50024,
+          "run_ms": 86.58162553911097,
+          "peak_memory_kb": 49936,
           "output": "2178309"
         },
         {
           "language": "bun",
           "version": "Bun 1.3.9",
           "compile_ms": null,
-          "run_ms": 24.782666499959305,
-          "peak_memory_kb": 26664,
+          "run_ms": 24.01402100804262,
+          "peak_memory_kb": 26576,
           "output": "2178309"
         },
         {
           "language": "python",
           "version": "Python 3.14.4",
           "compile_ms": null,
-          "run_ms": 280.9451039938722,
-          "peak_memory_kb": 14800,
+          "run_ms": 262.98089599004015,
+          "peak_memory_kb": 14784,
           "output": "2178309"
         }
       ]
@@ -293,89 +293,89 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 133.85643751826137,
-          "run_ms": 14.649771008407697,
+          "compile_ms": 126.4081044937484,
+          "run_ms": 14.03172902064398,
           "peak_memory_kb": 1344,
           "output": "2851443500000"
         },
         {
           "language": "c",
-          "version": "Homebrew clang 22.1.3",
-          "compile_ms": 123.01399998250417,
-          "run_ms": 14.525812992360443,
+          "version": "Homebrew clang v22.1.3",
+          "compile_ms": 115.37075001979247,
+          "run_ms": 13.861479499610141,
           "peak_memory_kb": 1360,
           "output": "2851443500000"
         },
         {
           "language": "cpp",
-          "version": "Homebrew clang 22.1.3",
-          "compile_ms": 405.16862500226125,
-          "run_ms": 14.635395520599559,
-          "peak_memory_kb": 1376,
+          "version": "Homebrew clang v22.1.3",
+          "compile_ms": 117.02972900820896,
+          "run_ms": 13.906520995078608,
+          "peak_memory_kb": 1360,
           "output": "2851443500000"
         },
         {
           "language": "swift",
           "version": "Swift 6.3.1",
-          "compile_ms": 229.8491875117179,
-          "run_ms": 12.158853991422802,
+          "compile_ms": 215.50439551356249,
+          "run_ms": 11.681687028612942,
           "peak_memory_kb": 1872,
           "output": "2851443500000"
         },
         {
           "language": "go",
           "version": "go1.26.2",
-          "compile_ms": 122.21318751107901,
-          "run_ms": 20.70693750283681,
+          "compile_ms": 115.49141650903039,
+          "run_ms": 19.534582970663905,
           "peak_memory_kb": 4152,
           "output": "2851443500000"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 97.4109165254049,
-          "run_ms": 14.756166521692649,
+          "compile_ms": 92.66691701486707,
+          "run_ms": 14.190166519256309,
           "peak_memory_kb": 1536,
           "output": "2851443500000"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 217.1310630219523,
-          "run_ms": 14.590666512958705,
-          "peak_memory_kb": 1392,
+          "compile_ms": 205.77781251631677,
+          "run_ms": 14.18360450770706,
+          "peak_memory_kb": 1408,
           "output": "2851443500000"
         },
         {
           "language": "julia",
           "version": "Julia 1.12.5",
           "compile_ms": null,
-          "run_ms": 168.71924998122267,
-          "peak_memory_kb": 231760,
+          "run_ms": 152.92974951444194,
+          "peak_memory_kb": 231608,
           "output": "2851443500000"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 215.6559790018946,
-          "peak_memory_kb": 50464,
+          "run_ms": 205.8622290205676,
+          "peak_memory_kb": 50352,
           "output": "2851443500000"
         },
         {
           "language": "bun",
           "version": "Bun 1.3.9",
           "compile_ms": null,
-          "run_ms": 34.051687514875084,
-          "peak_memory_kb": 28960,
+          "run_ms": 32.11610403377563,
+          "peak_memory_kb": 28912,
           "output": "2851443500000"
         },
         {
           "language": "python",
           "version": "Python 3.14.4",
           "compile_ms": null,
-          "run_ms": 1246.776020998368,
-          "peak_memory_kb": 14832,
+          "run_ms": 1187.3807914962526,
+          "peak_memory_kb": 14800,
           "output": "2851443500000"
         }
       ]
@@ -386,89 +386,89 @@
         {
           "language": "pluto",
           "version": "pluto dev",
-          "compile_ms": 135.0379794894252,
-          "run_ms": 13.368854008149356,
+          "compile_ms": 125.53533300524577,
+          "run_ms": 12.60397900477983,
           "peak_memory_kb": 1360,
           "output": "16.695311"
         },
         {
           "language": "c",
-          "version": "Homebrew clang 22.1.3",
-          "compile_ms": 122.22437449963763,
-          "run_ms": 13.069937005639076,
+          "version": "Homebrew clang v22.1.3",
+          "compile_ms": 118.24960401281714,
+          "run_ms": 12.570854014484212,
           "peak_memory_kb": 1344,
           "output": "16.695311"
         },
         {
           "language": "cpp",
-          "version": "Homebrew clang 22.1.3",
-          "compile_ms": 407.3504794796463,
-          "run_ms": 13.14662501681596,
+          "version": "Homebrew clang v22.1.3",
+          "compile_ms": 117.80914550763555,
+          "run_ms": 12.57687498582527,
           "peak_memory_kb": 1376,
           "output": "16.695311"
         },
         {
           "language": "swift",
           "version": "Swift 6.3.1",
-          "compile_ms": 330.15712499036454,
-          "run_ms": 14.89885401679203,
+          "compile_ms": 310.45645847916603,
+          "run_ms": 14.058166998438537,
           "peak_memory_kb": 5744,
           "output": "16.695311"
         },
         {
           "language": "go",
           "version": "go1.26.2",
-          "compile_ms": 121.4189165038988,
-          "run_ms": 14.17308347299695,
-          "peak_memory_kb": 4248,
+          "compile_ms": 115.21241650916636,
+          "run_ms": 13.541707972763106,
+          "peak_memory_kb": 4208,
           "output": "16.695311"
         },
         {
           "language": "rust",
           "version": "rustc 1.94.1",
-          "compile_ms": 98.25108299264684,
-          "run_ms": 13.544833462219685,
+          "compile_ms": 93.59291649889201,
+          "run_ms": 12.928561976877972,
           "peak_memory_kb": 1552,
           "output": "16.695311"
         },
         {
           "language": "zig",
           "version": "zig 0.15.2",
-          "compile_ms": 403.6170830077026,
-          "run_ms": 13.428166479570791,
-          "peak_memory_kb": 1408,
+          "compile_ms": 377.8025204956066,
+          "run_ms": 12.834729510359466,
+          "peak_memory_kb": 1400,
           "output": "16.695311"
         },
         {
           "language": "julia",
           "version": "Julia 1.12.5",
           "compile_ms": null,
-          "run_ms": 259.95475001400337,
-          "peak_memory_kb": 253768,
+          "run_ms": 236.8821664713323,
+          "peak_memory_kb": 253424,
           "output": "16.695311"
         },
         {
           "language": "node",
           "version": "Node v25.9.0",
           "compile_ms": null,
-          "run_ms": 77.88379152771086,
-          "peak_memory_kb": 50488,
+          "run_ms": 73.9587499992922,
+          "peak_memory_kb": 50576,
           "output": "16.695311"
         },
         {
           "language": "bun",
           "version": "Bun 1.3.9",
           "compile_ms": null,
-          "run_ms": 23.937687481520697,
-          "peak_memory_kb": 27656,
+          "run_ms": 22.008375002769753,
+          "peak_memory_kb": 27608,
           "output": "16.695311"
         },
         {
           "language": "python",
           "version": "Python 3.14.4 + NumPy 2.4.4",
           "compile_ms": null,
-          "run_ms": 80.66289601265453,
-          "peak_memory_kb": 44448,
+          "run_ms": 73.95216648001224,
+          "peak_memory_kb": 44472,
           "output": "16.695311"
         }
       ]

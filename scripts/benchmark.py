@@ -336,18 +336,13 @@ def normalize_version(language: str, raw: str) -> str:
         return "unknown"
     if language == "pluto":
         return raw.split(" (", 1)[0]
-    if language in {"c", "cpp"} and raw.startswith("Apple clang version "):
-        parts = raw.split()
-        if len(parts) >= 4:
-            return f"Apple clang {parts[3]}"
-    if language in {"c", "cpp"} and raw.startswith("Homebrew clang version "):
-        parts = raw.split()
-        if len(parts) >= 4:
-            return f"Homebrew clang {parts[3]}"
-    if language in {"c", "cpp"} and raw.startswith("clang version "):
-        parts = raw.split()
-        if len(parts) >= 3:
-            return f"clang {parts[2]}"
+    if language in {"c", "cpp"}:
+        distro_match = re.match(r"^(Apple|Homebrew|Ubuntu)\s+clang version\s+(\S+)", raw)
+        if distro_match:
+            return f"{distro_match.group(1)} clang v{distro_match.group(2)}"
+        clang_match = re.match(r"^clang version\s+(\S+)", raw)
+        if clang_match:
+            return f"clang v{clang_match.group(1)}"
     if language == "swift":
         marker = "Swift version "
         idx = raw.find(marker)
@@ -1481,16 +1476,16 @@ def print_case(results: list[Result]) -> None:
 
     case = results[0].case
     show_peak_memory = any(result.peak_memory_kb is not None for result in results)
+    language_width = max(len("Language"), *(len(display_label(result)) for result in results))
     print(f"Case: {case}")
-    header = f"{'Language':<20} {'Version':<18} {'Compile ms':>12} {'Run ms':>12}"
+    header = f"{'Language':<{language_width}} {'Compile ms':>12} {'Run ms':>12}"
     if show_peak_memory:
         header += f" {'Peak Memory':>12}"
     print(header)
     for result in results:
         compile_text = "-" if result.compile_ms is None else f"{result.compile_ms:>.3f}"
         row = (
-            f"{display_label(result)[:20]:<20} "
-            f"{result.version[:18]:<18} "
+            f"{display_label(result):<{language_width}} "
             f"{compile_text:>12} "
             f"{result.run_ms:>12.3f}"
         )

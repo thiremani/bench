@@ -1,5 +1,5 @@
 #include <cstdint>
-#include <iostream>
+#include <cstdio>
 
 static std::uint64_t fib(std::uint64_t n) {
     if (n <= 1) {
@@ -9,6 +9,6 @@ static std::uint64_t fib(std::uint64_t n) {
 }
 
 int main() {
-    std::cout << fib(32) << "\n";
+    std::printf("%llu\n", static_cast<unsigned long long>(fib(32)));
     return 0;
 }

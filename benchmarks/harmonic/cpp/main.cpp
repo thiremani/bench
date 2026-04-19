@@ -1,6 +1,5 @@
-#include <iostream>
 #include <cstdint>
-#include <iomanip>
+#include <cstdio>
 
 int main() {
     double sum = 0.0;
@@ -10,6 +9,6 @@ int main() {
         sum += 1.0 / (double)i;
     }
 
-    std::cout << std::fixed << std::setprecision(6) << sum << "\n";
+    std::printf("%.6f\n", sum);
     return 0;
 }

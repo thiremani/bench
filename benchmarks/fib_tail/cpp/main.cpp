@@ -1,5 +1,5 @@
 #include <cstdint>
-#include <iostream>
+#include <cstdio>
 
 static std::uint64_t fib_aux(std::uint64_t n, std::uint64_t a, std::uint64_t b) {
     if (n == 0) {
@@ -20,6 +20,6 @@ int main() {
         sum += fib(32 + (i % 2));
     }
 
-    std::cout << sum << "\n";
+    std::printf("%llu\n", static_cast<unsigned long long>(sum));
     return 0;
 }

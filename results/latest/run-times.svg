@@ -17,38 +17,38 @@
 <line x1="542.0" y1="162" x2="542.0" y2="462" stroke="#e2e8f0" stroke-width="1" />
 <text x="542.0" y="156" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">200 ms</text>
 <text x="185" y="178.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto</text>
-<rect x="195" y="162" width="15.1" height="24" rx="4" fill="#c2410c" fill-opacity="1.0" stroke="#c2410c" stroke-width="1.5" />
-<text x="218.1" y="178.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">8.72 ms</text>
-<text x="185" y="216.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C++</text>
-<rect x="195" y="202" width="15.0" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
-<text x="218.0" y="216.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">8.65 ms</text>
-<text x="185" y="242.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C</text>
-<rect x="195" y="228" width="15.0" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
-<text x="218.0" y="242.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">8.66 ms</text>
+<rect x="195" y="162" width="14.3" height="24" rx="4" fill="#c2410c" fill-opacity="1.0" stroke="#c2410c" stroke-width="1.5" />
+<text x="217.3" y="178.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">8.22 ms</text>
+<text x="185" y="216.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C</text>
+<rect x="195" y="202" width="14.3" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
+<text x="217.3" y="216.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">8.24 ms</text>
+<text x="185" y="242.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C++</text>
+<rect x="195" y="228" width="14.3" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
+<text x="217.3" y="242.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">8.26 ms</text>
 <text x="185" y="268.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Zig</text>
-<rect x="195" y="254" width="26.5" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
-<text x="229.5" y="268.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">15.3 ms</text>
+<rect x="195" y="254" width="25.6" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
+<text x="228.6" y="268.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.8 ms</text>
 <text x="185" y="294.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Swift</text>
-<rect x="195" y="280" width="36.1" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
-<text x="239.1" y="294.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">20.8 ms</text>
+<rect x="195" y="280" width="34.4" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
+<text x="237.4" y="294.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">19.8 ms</text>
 <text x="185" y="320.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Go</text>
-<rect x="195" y="306" width="39.9" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
-<text x="242.9" y="320.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">23.0 ms</text>
+<rect x="195" y="306" width="37.9" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
+<text x="240.9" y="320.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">21.8 ms</text>
 <text x="185" y="346.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Rust</text>
-<rect x="195" y="332" width="43.7" height="20" rx="4" fill="#6d28d9" fill-opacity="0.82" />
-<text x="246.7" y="346.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">25.2 ms</text>
+<rect x="195" y="332" width="41.4" height="20" rx="4" fill="#6d28d9" fill-opacity="0.82" />
+<text x="244.4" y="346.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">23.8 ms</text>
 <text x="185" y="372.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Bun</text>
-<rect x="195" y="358" width="61.9" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
-<text x="264.9" y="372.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">35.7 ms</text>
+<rect x="195" y="358" width="57.3" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
+<text x="260.3" y="372.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">33.0 ms</text>
 <text x="185" y="398.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Node</text>
-<rect x="195" y="384" width="155.3" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
-<text x="358.3" y="398.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">89.5 ms</text>
+<rect x="195" y="384" width="150.7" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
+<text x="353.7" y="398.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">86.8 ms</text>
 <text x="185" y="424.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python (with NumPy)</text>
-<rect x="195" y="410" width="234.6" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
-<text x="437.6" y="424.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">135 ms</text>
+<rect x="195" y="410" width="220.8" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
+<text x="423.8" y="424.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">127 ms</text>
 <text x="185" y="450.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Julia</text>
-<rect x="195" y="436" width="264.8" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
-<text x="467.8" y="450.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">153 ms</text>
+<rect x="195" y="436" width="241.3" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
+<text x="444.3" y="450.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">139 ms</text>
 <rect x="674" y="96" width="614" height="370" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
 <text x="692" y="128" fill="#0f172a" font-size="16" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Harmonic</text>
 <line x1="837.0" y1="162" x2="837.0" y2="462" stroke="#e2e8f0" stroke-width="1" />
@@ -60,83 +60,81 @@
 <line x1="1184.0" y1="162" x2="1184.0" y2="462" stroke="#e2e8f0" stroke-width="1" />
 <text x="1184.0" y="156" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">300 ms</text>
 <text x="827" y="178.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto</text>
-<rect x="837" y="162" width="15.5" height="24" rx="4" fill="#c2410c" fill-opacity="1.0" stroke="#c2410c" stroke-width="1.5" />
-<text x="860.5" y="178.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">13.4 ms</text>
+<rect x="837" y="162" width="14.6" height="24" rx="4" fill="#c2410c" fill-opacity="1.0" stroke="#c2410c" stroke-width="1.5" />
+<text x="859.6" y="178.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">12.6 ms</text>
 <text x="827" y="216.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C</text>
-<rect x="837" y="202" width="15.1" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
-<text x="860.1" y="216.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">13.1 ms</text>
+<rect x="837" y="202" width="14.5" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
+<text x="859.5" y="216.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">12.6 ms</text>
 <text x="827" y="242.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C++</text>
-<rect x="837" y="228" width="15.2" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
-<text x="860.2" y="242.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">13.1 ms</text>
+<rect x="837" y="228" width="14.5" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
+<text x="859.5" y="242.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">12.6 ms</text>
 <text x="827" y="268.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Zig</text>
-<rect x="837" y="254" width="15.5" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
-<text x="860.5" y="268.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">13.4 ms</text>
+<rect x="837" y="254" width="14.8" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
+<text x="859.8" y="268.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">12.8 ms</text>
 <text x="827" y="294.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Rust</text>
-<rect x="837" y="280" width="15.7" height="20" rx="4" fill="#6d28d9" fill-opacity="0.82" />
-<text x="860.7" y="294.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">13.5 ms</text>
+<rect x="837" y="280" width="15.0" height="20" rx="4" fill="#6d28d9" fill-opacity="0.82" />
+<text x="860.0" y="294.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">12.9 ms</text>
 <text x="827" y="320.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Go</text>
-<rect x="837" y="306" width="16.4" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
-<text x="861.4" y="320.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.2 ms</text>
+<rect x="837" y="306" width="15.7" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
+<text x="860.7" y="320.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">13.5 ms</text>
 <text x="827" y="346.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Swift</text>
-<rect x="837" y="332" width="17.2" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
-<text x="862.2" y="346.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.9 ms</text>
+<rect x="837" y="332" width="16.3" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
+<text x="861.3" y="346.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.1 ms</text>
 <text x="827" y="372.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Bun</text>
-<rect x="837" y="358" width="27.7" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
-<text x="872.7" y="372.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">23.9 ms</text>
-<text x="827" y="398.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Node</text>
-<rect x="837" y="384" width="90.1" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
-<text x="935.1" y="398.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">77.9 ms</text>
-<text x="827" y="424.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python (with NumPy)</text>
-<rect x="837" y="410" width="93.3" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
-<text x="938.3" y="424.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">80.7 ms</text>
+<rect x="837" y="358" width="25.5" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
+<text x="870.5" y="372.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">22.0 ms</text>
+<text x="827" y="398.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python (with NumPy)</text>
+<rect x="837" y="384" width="85.5" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
+<text x="930.5" y="398.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">74.0 ms</text>
+<text x="827" y="424.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Node</text>
+<rect x="837" y="410" width="85.5" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
+<text x="930.5" y="424.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">74.0 ms</text>
 <text x="827" y="450.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Julia</text>
-<rect x="837" y="436" width="300.7" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
-<text x="1145.7" y="450.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">260 ms</text>
+<rect x="837" y="436" width="274.0" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
+<text x="1119.0" y="450.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">237 ms</text>
 <rect x="32" y="494" width="614" height="370" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
 <text x="50" y="526" fill="#0f172a" font-size="16" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Fib</text>
 <line x1="195.0" y1="560" x2="195.0" y2="860" stroke="#e2e8f0" stroke-width="1" />
 <text x="195.0" y="554" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">0.00 ms</text>
-<line x1="281.8" y1="560" x2="281.8" y2="860" stroke="#e2e8f0" stroke-width="1" />
-<text x="281.8" y="554" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">100 ms</text>
-<line x1="368.5" y1="560" x2="368.5" y2="860" stroke="#e2e8f0" stroke-width="1" />
-<text x="368.5" y="554" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">200 ms</text>
-<line x1="455.2" y1="560" x2="455.2" y2="860" stroke="#e2e8f0" stroke-width="1" />
-<text x="455.2" y="554" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">300 ms</text>
+<line x1="310.7" y1="560" x2="310.7" y2="860" stroke="#e2e8f0" stroke-width="1" />
+<text x="310.7" y="554" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">100 ms</text>
+<line x1="426.3" y1="560" x2="426.3" y2="860" stroke="#e2e8f0" stroke-width="1" />
+<text x="426.3" y="554" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">200 ms</text>
 <line x1="542.0" y1="560" x2="542.0" y2="860" stroke="#e2e8f0" stroke-width="1" />
-<text x="542.0" y="554" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">400 ms</text>
+<text x="542.0" y="554" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">300 ms</text>
 <text x="185" y="576.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto</text>
-<rect x="195" y="560" width="7.9" height="24" rx="4" fill="#c2410c" fill-opacity="1.0" stroke="#c2410c" stroke-width="1.5" />
-<text x="210.9" y="576.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">9.16 ms</text>
+<rect x="195" y="560" width="10.1" height="24" rx="4" fill="#c2410c" fill-opacity="1.0" stroke="#c2410c" stroke-width="1.5" />
+<text x="213.1" y="576.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">8.70 ms</text>
 <text x="185" y="614.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C</text>
-<rect x="195" y="600" width="8.5" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
-<text x="211.5" y="614.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">9.85 ms</text>
+<rect x="195" y="600" width="10.8" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
+<text x="213.8" y="614.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">9.38 ms</text>
 <text x="185" y="640.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C++</text>
-<rect x="195" y="626" width="8.6" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
-<text x="211.6" y="640.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">9.90 ms</text>
+<rect x="195" y="626" width="11.1" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
+<text x="214.1" y="640.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">9.56 ms</text>
 <text x="185" y="666.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Zig</text>
-<rect x="195" y="652" width="8.9" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
-<text x="211.9" y="666.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">10.2 ms</text>
+<rect x="195" y="652" width="11.4" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
+<text x="214.4" y="666.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">9.85 ms</text>
 <text x="185" y="692.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Rust</text>
-<rect x="195" y="678" width="9.0" height="20" rx="4" fill="#6d28d9" fill-opacity="0.82" />
-<text x="212.0" y="692.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">10.3 ms</text>
+<rect x="195" y="678" width="11.4" height="20" rx="4" fill="#6d28d9" fill-opacity="0.82" />
+<text x="214.4" y="692.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">9.86 ms</text>
 <text x="185" y="718.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Go</text>
-<rect x="195" y="704" width="10.1" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
-<text x="213.1" y="718.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">11.6 ms</text>
+<rect x="195" y="704" width="12.8" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
+<text x="215.8" y="718.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">11.1 ms</text>
 <text x="185" y="744.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Swift</text>
-<rect x="195" y="730" width="11.6" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
-<text x="214.6" y="744.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">13.4 ms</text>
+<rect x="195" y="730" width="14.7" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
+<text x="217.7" y="744.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">12.7 ms</text>
 <text x="185" y="770.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Bun</text>
-<rect x="195" y="756" width="21.5" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
-<text x="224.5" y="770.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">24.8 ms</text>
+<rect x="195" y="756" width="27.8" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
+<text x="230.8" y="770.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">24.0 ms</text>
 <text x="185" y="796.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Node</text>
-<rect x="195" y="782" width="78.4" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
-<text x="281.4" y="796.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">90.3 ms</text>
+<rect x="195" y="782" width="100.1" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
+<text x="303.1" y="796.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">86.6 ms</text>
 <text x="185" y="822.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Julia</text>
-<rect x="195" y="808" width="130.7" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
-<text x="333.7" y="822.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">151 ms</text>
+<rect x="195" y="808" width="161.0" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
+<text x="364.0" y="822.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">139 ms</text>
 <text x="185" y="848.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python</text>
-<rect x="195" y="834" width="243.7" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
-<text x="446.7" y="848.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">281 ms</text>
+<rect x="195" y="834" width="304.2" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
+<text x="507.2" y="848.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">263 ms</text>
 <rect x="674" y="494" width="614" height="370" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
 <text x="692" y="526" fill="#0f172a" font-size="16" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Fib Tail</text>
 <line x1="837.0" y1="560" x2="837.0" y2="860" stroke="#e2e8f0" stroke-width="1" />
@@ -148,37 +146,37 @@
 <line x1="1184.0" y1="560" x2="1184.0" y2="860" stroke="#e2e8f0" stroke-width="1" />
 <text x="1184.0" y="554" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1500 ms</text>
 <text x="827" y="576.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto</text>
-<rect x="837" y="560" width="3.4" height="24" rx="4" fill="#c2410c" fill-opacity="1.0" stroke="#c2410c" stroke-width="1.5" />
-<text x="848.4" y="576.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.6 ms</text>
+<rect x="837" y="560" width="3.2" height="24" rx="4" fill="#c2410c" fill-opacity="1.0" stroke="#c2410c" stroke-width="1.5" />
+<text x="848.2" y="576.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.0 ms</text>
 <text x="827" y="614.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Swift</text>
-<rect x="837" y="600" width="2.8" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
-<text x="847.8" y="614.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">12.2 ms</text>
+<rect x="837" y="600" width="2.7" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
+<text x="847.7" y="614.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">11.7 ms</text>
 <text x="827" y="640.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C</text>
-<rect x="837" y="626" width="3.4" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
-<text x="848.4" y="640.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.5 ms</text>
-<text x="827" y="666.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Zig</text>
-<rect x="837" y="652" width="3.4" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
-<text x="848.4" y="666.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.6 ms</text>
-<text x="827" y="692.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C++</text>
-<rect x="837" y="678" width="3.4" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
-<text x="848.4" y="692.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.6 ms</text>
+<rect x="837" y="626" width="3.2" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
+<text x="848.2" y="640.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">13.9 ms</text>
+<text x="827" y="666.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C++</text>
+<rect x="837" y="652" width="3.2" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
+<text x="848.2" y="666.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">13.9 ms</text>
+<text x="827" y="692.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Zig</text>
+<rect x="837" y="678" width="3.3" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
+<text x="848.3" y="692.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.2 ms</text>
 <text x="827" y="718.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Rust</text>
-<rect x="837" y="704" width="3.4" height="20" rx="4" fill="#6d28d9" fill-opacity="0.82" />
-<text x="848.4" y="718.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.8 ms</text>
+<rect x="837" y="704" width="3.3" height="20" rx="4" fill="#6d28d9" fill-opacity="0.82" />
+<text x="848.3" y="718.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.2 ms</text>
 <text x="827" y="744.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Go</text>
-<rect x="837" y="730" width="4.8" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
-<text x="849.8" y="744.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">20.7 ms</text>
+<rect x="837" y="730" width="4.5" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
+<text x="849.5" y="744.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">19.5 ms</text>
 <text x="827" y="770.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Bun</text>
-<rect x="837" y="756" width="7.9" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
-<text x="852.9" y="770.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">34.1 ms</text>
+<rect x="837" y="756" width="7.4" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
+<text x="852.4" y="770.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">32.1 ms</text>
 <text x="827" y="796.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Julia</text>
-<rect x="837" y="782" width="39.0" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
-<text x="884.0" y="796.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">169 ms</text>
+<rect x="837" y="782" width="35.4" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
+<text x="880.4" y="796.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">153 ms</text>
 <text x="827" y="822.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Node</text>
-<rect x="837" y="808" width="49.9" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
-<text x="894.9" y="822.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">216 ms</text>
+<rect x="837" y="808" width="47.6" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
+<text x="892.6" y="822.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">206 ms</text>
 <text x="827" y="848.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python</text>
-<rect x="837" y="834" width="288.4" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
-<text x="1133.4" y="848.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1247 ms</text>
+<rect x="837" y="834" width="274.7" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
+<text x="1119.7" y="848.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1187 ms</text>
 <text x="660.0" y="888" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Lower is better</text>
 </svg>

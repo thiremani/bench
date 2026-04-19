@@ -1,5 +1,5 @@
 #include <cstdint>
-#include <iostream>
+#include <cstdio>
 
 int main() {
     std::uint64_t sum = 0;
@@ -9,6 +9,6 @@ int main() {
         sum += (i * 3) % 17;
     }
 
-    std::cout << sum << "\n";
+    std::printf("%llu\n", static_cast<unsigned long long>(sum));
     return 0;
 }
