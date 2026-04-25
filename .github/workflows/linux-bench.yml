@@ -73,6 +73,7 @@ jobs:
             libstdc++-13-dev \
             libxml2-dev \
             libz3-dev \
+            luajit \
             pkg-config \
             tzdata \
             unzip \
@@ -134,6 +135,7 @@ jobs:
           go version
           rustc --version
           zig version
+          luajit -v
           node --version
           bun --version
           julia --version

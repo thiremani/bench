@@ -1,6 +1,6 @@
 # Pluto Bench
 
-Cross-language benchmarks for Pluto, C, C++, Swift, Go, Rust, Zig, Julia, Node, Bun, and Python.
+Cross-language benchmarks for Pluto, C, C++, Swift, Go, Rust, Zig, Julia, LuaJIT, Node, Bun, and Python.
 The Python `sum` and `harmonic` cases use NumPy-backed implementations; the
 recursive `fib` and `fib_tail` cases stay plain Python.
 
@@ -10,7 +10,7 @@ them in each language, checks output parity, and reports timings.
 
 ## Latest Results
 
-Tested on `2026-04-19 09:26:34 UTC+05:30` with:
+Tested on `2026-04-25 09:19:35 UTC+04:00` with:
 
 - Machine: Apple M1 Pro
 - CPU cores: 10
@@ -61,65 +61,69 @@ Compile time overview:
 
 | Language | Version | Compile ms | Run ms | Peak Memory | Output |
 | --- | --- | ---: | ---: | ---: | --- |
-| **Pluto** | `pluto dev` | **126.486** | **8.274** | **1.3 MiB** | `160000000` |
-| C | `Homebrew clang 22.1.3` | 117.682 | 8.228 | 1.3 MiB | `160000000` |
-| C++ | `Homebrew clang 22.1.3` | 120.253 | 8.339 | 1.3 MiB | `160000000` |
-| Swift | `Swift 6.3.1` | 209.303 | 19.761 | 1.8 MiB | `160000000` |
-| Go | `go1.26.2` | 116.447 | 21.764 | 4.1 MiB | `160000000` |
-| Rust | `rustc 1.94.1` | 92.345 | 23.744 | 1.5 MiB | `160000000` |
-| Zig | `zig 0.15.2` | 209.288 | 14.569 | 1.4 MiB | `160000000` |
-| Julia | `Julia 1.12.5` | - | 140.355 | 225.9 MiB | `160000000` |
-| Node | `Node v25.9.0` | - | 84.255 | 48.8 MiB | `160000000` |
-| Bun | `Bun 1.3.9` | - | 32.405 | 27.0 MiB | `160000000` |
-| Python | `Python 3.14.4 + NumPy 2.4.4` | - | 126.487 | 35.8 MiB | `160000000` |
+| **Pluto** | `pluto dev` | **129.743** | **8.540** | **1.3 MiB** | `160000000` |
+| C | `Homebrew clang 22.1.4` | 120.759 | 8.567 | 1.3 MiB | `160000000` |
+| C++ | `Homebrew clang 22.1.4` | 119.174 | 8.416 | 1.3 MiB | `160000000` |
+| Swift | `Swift 6.3.1` | 212.448 | 20.054 | 1.8 MiB | `160000000` |
+| Go | `go1.26.2` | 118.480 | 22.214 | 4.1 MiB | `160000000` |
+| Rust | `rustc 1.95.0` | 91.880 | 24.093 | 1.5 MiB | `160000000` |
+| Zig | `zig 0.15.2` | 211.439 | 14.655 | 1.4 MiB | `160000000` |
+| Julia | `Julia 1.12.5` | - | 146.381 | 225.9 MiB | `160000000` |
+| LuaJIT | `LuaJIT 2.1.1774896198` | - | 40.652 | 1.8 MiB | `160000000` |
+| Node | `Node v25.9.0` | - | 84.742 | 48.8 MiB | `160000000` |
+| Bun | `Bun 1.3.9` | - | 32.885 | 27.0 MiB | `160000000` |
+| Python | `Python 3.14.4 + NumPy 2.4.4` | - | 127.188 | 35.9 MiB | `160000000` |
 
 ### Fib
 
 | Language | Version | Compile ms | Run ms | Peak Memory | Output |
 | --- | --- | ---: | ---: | ---: | --- |
-| **Pluto** | `pluto dev` | **125.821** | **8.704** | **1.3 MiB** | `2178309` |
-| C | `Homebrew clang 22.1.3` | 115.235 | 9.527 | 1.3 MiB | `2178309` |
-| C++ | `Homebrew clang 22.1.3` | 117.109 | 9.457 | 1.3 MiB | `2178309` |
-| Swift | `Swift 6.3.1` | 195.381 | 12.506 | 1.8 MiB | `2178309` |
-| Go | `go1.26.2` | 114.281 | 11.255 | 4.0 MiB | `2178309` |
-| Rust | `rustc 1.94.1` | 89.322 | 9.829 | 1.5 MiB | `2178309` |
-| Zig | `zig 0.15.2` | 206.332 | 9.831 | 1.4 MiB | `2178309` |
-| Julia | `Julia 1.12.5` | - | 141.281 | 225.5 MiB | `2178309` |
-| Node | `Node v25.9.0` | - | 86.059 | 48.7 MiB | `2178309` |
-| Bun | `Bun 1.3.9` | - | 22.752 | 26.0 MiB | `2178309` |
-| Python | `Python 3.14.4` | - | 263.437 | 14.5 MiB | `2178309` |
+| **Pluto** | `pluto dev` | **128.082** | **9.017** | **1.3 MiB** | `2178309` |
+| C | `Homebrew clang 22.1.4` | 118.368 | 9.815 | 1.3 MiB | `2178309` |
+| C++ | `Homebrew clang 22.1.4` | 118.220 | 9.494 | 1.4 MiB | `2178309` |
+| Swift | `Swift 6.3.1` | 197.113 | 12.851 | 1.8 MiB | `2178309` |
+| Go | `go1.26.2` | 117.014 | 11.289 | 4.1 MiB | `2178309` |
+| Rust | `rustc 1.95.0` | 90.184 | 9.997 | 1.5 MiB | `2178309` |
+| Zig | `zig 0.15.2` | 206.742 | 9.865 | 1.4 MiB | `2178309` |
+| Julia | `Julia 1.12.5` | - | 142.072 | 225.5 MiB | `2178309` |
+| LuaJIT | `LuaJIT 2.1.1774896198` | - | 16.331 | 1.8 MiB | `2178309` |
+| Node | `Node v25.9.0` | - | 85.837 | 48.7 MiB | `2178309` |
+| Bun | `Bun 1.3.9` | - | 23.376 | 26.0 MiB | `2178309` |
+| Python | `Python 3.14.4` | - | 263.584 | 14.5 MiB | `2178309` |
 
 ### Fib Tail
 
 | Language | Version | Compile ms | Run ms | Peak Memory | Output |
 | --- | --- | ---: | ---: | ---: | --- |
-| **Pluto** | `pluto dev` | **126.922** | **13.952** | **1.3 MiB** | `2851443500000` |
-| C | `Homebrew clang 22.1.3` | 116.196 | 13.952 | 1.3 MiB | `2851443500000` |
-| C++ | `Homebrew clang 22.1.3` | 116.523 | 13.967 | 1.3 MiB | `2851443500000` |
-| Swift | `Swift 6.3.1` | 216.717 | 11.596 | 1.8 MiB | `2851443500000` |
-| Go | `go1.26.2` | 114.438 | 19.688 | 4.1 MiB | `2851443500000` |
-| Rust | `rustc 1.94.1` | 94.062 | 15.389 | 1.5 MiB | `2851443500000` |
-| Zig | `zig 0.15.2` | 202.174 | 14.175 | 1.4 MiB | `2851443500000` |
-| Julia | `Julia 1.12.5` | - | 153.311 | 226.2 MiB | `2851443500000` |
-| Node | `Node v25.9.0` | - | 206.327 | 49.1 MiB | `2851443500000` |
-| Bun | `Bun 1.3.9` | - | 31.984 | 28.2 MiB | `2851443500000` |
-| Python | `Python 3.14.4` | - | 1188.790 | 14.5 MiB | `2851443500000` |
+| **Pluto** | `pluto dev` | **128.263** | **14.196** | **1.3 MiB** | `2851443500000` |
+| C | `Homebrew clang 22.1.4` | 117.995 | 14.233 | 1.3 MiB | `2851443500000` |
+| C++ | `Homebrew clang 22.1.4` | 119.281 | 14.200 | 1.3 MiB | `2851443500000` |
+| Swift | `Swift 6.3.1` | 221.596 | 11.800 | 1.8 MiB | `2851443500000` |
+| Go | `go1.26.2` | 117.413 | 19.829 | 4.1 MiB | `2851443500000` |
+| Rust | `rustc 1.95.0` | 92.650 | 14.416 | 1.5 MiB | `2851443500000` |
+| Zig | `zig 0.15.2` | 208.650 | 14.271 | 1.4 MiB | `2851443500000` |
+| Julia | `Julia 1.12.5` | - | 160.053 | 226.1 MiB | `2851443500000` |
+| LuaJIT | `LuaJIT 2.1.1774896198` | - | 23.219 | 1.8 MiB | `2851443500000` |
+| Node | `Node v25.9.0` | - | 206.536 | 49.1 MiB | `2851443500000` |
+| Bun | `Bun 1.3.9` | - | 33.212 | 28.3 MiB | `2851443500000` |
+| Python | `Python 3.14.4` | - | 1187.078 | 14.5 MiB | `2851443500000` |
 
 ### Harmonic
 
 | Language | Version | Compile ms | Run ms | Peak Memory | Output |
 | --- | --- | ---: | ---: | ---: | --- |
-| **Pluto** | `pluto dev` | **125.450** | **12.571** | **1.3 MiB** | `16.695311` |
-| C | `Homebrew clang 22.1.3` | 117.286 | 12.579 | 1.3 MiB | `16.695311` |
-| C++ | `Homebrew clang 22.1.3` | 117.860 | 12.584 | 1.3 MiB | `16.695311` |
-| Swift | `Swift 6.3.1` | 310.408 | 14.139 | 5.6 MiB | `16.695311` |
-| Go | `go1.26.2` | 114.752 | 13.754 | 4.1 MiB | `16.695311` |
-| Rust | `rustc 1.94.1` | 92.396 | 12.878 | 1.5 MiB | `16.695311` |
-| Zig | `zig 0.15.2` | 381.900 | 12.879 | 1.4 MiB | `16.695311` |
-| Julia | `Julia 1.12.5` | - | 235.311 | 247.5 MiB | `16.695311` |
-| Node | `Node v25.9.0` | - | 73.214 | 49.4 MiB | `16.695311` |
-| Bun | `Bun 1.3.9` | - | 22.104 | 27.0 MiB | `16.695311` |
-| Python | `Python 3.14.4 + NumPy 2.4.4` | - | 74.213 | 43.4 MiB | `16.695311` |
+| **Pluto** | `pluto dev` | **128.022** | **12.877** | **1.3 MiB** | `16.695311` |
+| C | `Homebrew clang 22.1.4` | 119.509 | 12.862 | 1.3 MiB | `16.695311` |
+| C++ | `Homebrew clang 22.1.4` | 119.454 | 12.792 | 1.3 MiB | `16.695311` |
+| Swift | `Swift 6.3.1` | 317.742 | 14.390 | 5.6 MiB | `16.695311` |
+| Go | `go1.26.2` | 117.858 | 13.698 | 4.1 MiB | `16.695311` |
+| Rust | `rustc 1.95.0` | 95.127 | 13.113 | 1.5 MiB | `16.695311` |
+| Zig | `zig 0.15.2` | 386.321 | 13.017 | 1.4 MiB | `16.695311` |
+| Julia | `Julia 1.12.5` | - | 246.535 | 247.5 MiB | `16.695311` |
+| LuaJIT | `LuaJIT 2.1.1774896198` | - | 12.830 | 1.8 MiB | `16.695311` |
+| Node | `Node v25.9.0` | - | 75.208 | 49.2 MiB | `16.695311` |
+| Bun | `Bun 1.3.9` | - | 22.473 | 27.0 MiB | `16.695311` |
+| Python | `Python 3.14.4 + NumPy 2.4.4` | - | 75.440 | 43.4 MiB | `16.695311` |
 
 ## Benchmarks
 
@@ -181,22 +185,23 @@ python3 scripts/benchmark.py fib_tail
 python3 scripts/benchmark.py harmonic
 ```
 
-Override tool locations when needed with `--pluto`, `--zig`, `--cc`, and `--cxx`
-or the matching environment variables `PLUTO_BIN`, `ZIG_BIN`, `CC_BIN`, and
-`CXX_BIN`.
+Override tool locations when needed with `--pluto`, `--zig`, `--cc`, `--cxx`,
+and `--luajit` or the matching environment variables `PLUTO_BIN`, `ZIG_BIN`,
+`CC_BIN`, `CXX_BIN`, and `LUAJIT_BIN`.
 
 ```sh
 python3 scripts/benchmark.py \
   --pluto /path/to/pluto \
   --zig /path/to/zig \
   --cc /path/to/clang \
-  --cxx /path/to/clang++
+  --cxx /path/to/clang++ \
+  --luajit /path/to/luajit
 ```
 
 ## Measurement Notes
 
 - Pluto, C, C++, Swift, Go, Rust, and Zig report native compile time and execution time separately.
-- Julia, Node, Bun, and Python are reported as runtime or JIT execution only, so their compile column is `-`.
+- Julia, LuaJIT, Node, Bun, and Python are reported as runtime or JIT execution only, so their compile column is `-`.
 - Python uses NumPy-backed implementations for `sum` and `harmonic`, and plain Python for `fib` and `fib_tail`.
 - Snapshot tables only include languages whose toolchains were available on the host where the snapshot was generated.
 - Peak Memory is collected automatically when the host supports `/usr/bin/time`; it is the median peak resident set size from the warm-up runs.
@@ -205,6 +210,7 @@ python3 scripts/benchmark.py \
 - Compiled languages use their standard optimized modes plus host-native CPU tuning where supported.
 - C and C++ use `-O3`, Swift uses `-O`, Rust uses `-C opt-level=3`, and Zig uses `-O ReleaseFast`.
 - Julia runs with `julia --startup-file=no`.
+- LuaJIT runs with `luajit`.
 - The harness creates isolated temp work directories, copies benchmark files into them, and launches a fresh process for every timed sample.
 - One warm-up execution runs before each timed sample.
 - Short runtime cases such as `sum` and `harmonic` still include non-trivial process-startup noise, so treat small differences there with caution.
