@@ -177,6 +177,15 @@ class CaseSource:
     source_name: str
 
 
+@dataclass(frozen=True)
+class Toolchain:
+    pluto: Path
+    zig: Path
+    cc: Path
+    cxx: Path
+    luajit: Path
+
+
 def ordered_cases(cases: list[str] | set[str]) -> list[str]:
     seen = set(cases)
     ordered = [case for case in CASE_ORDER if case in seen]
@@ -458,27 +467,23 @@ def zig_compile_target_args() -> list[str]:
 def commands_for(
     source: CaseSource,
     workdir: Path,
-    pluto_bin: Path,
-    zig_bin: Path,
-    cc_bin: Path,
-    cxx_bin: Path,
-    luajit_bin: Path,
+    toolchain: Toolchain,
 ) -> tuple[CommandSpec | None, CommandSpec]:
     stem = Path(source.source_name).stem
     if source.language == "pluto":
         compile_cmd = CommandSpec(
-            [str(pluto_bin), source.source_name],
+            [str(toolchain.pluto), source.source_name],
             env=pluto_compile_env(),
         )
         run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "c":
         compile_cmd = CommandSpec(
-            [str(cc_bin), "-O3", *c_family_target_args(), source.source_name, "-o", stem],
+            [str(toolchain.cc), "-O3", *c_family_target_args(), source.source_name, "-o", stem],
         )
         run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "cpp":
         compile_cmd = CommandSpec(
-            [str(cxx_bin), "-O3", *c_family_target_args(), source.source_name, "-o", stem],
+            [str(toolchain.cxx), "-O3", *c_family_target_args(), source.source_name, "-o", stem],
         )
         run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "swift":
@@ -500,7 +505,7 @@ def commands_for(
     elif source.language == "zig":
         compile_cmd = CommandSpec(
             [
-                str(zig_bin),
+                str(toolchain.zig),
                 "build-exe",
                 "-O",
                 "ReleaseFast",
@@ -515,7 +520,7 @@ def commands_for(
         run_cmd = CommandSpec(["julia", "--startup-file=no", source.source_name])
     elif source.language == "luajit":
         compile_cmd = None
-        run_cmd = CommandSpec([str(luajit_bin), source.source_name])
+        run_cmd = CommandSpec([str(toolchain.luajit), source.source_name])
     elif source.language == "node":
         compile_cmd = None
         run_cmd = CommandSpec(["node", source.source_name])
@@ -578,24 +583,17 @@ def resolve_luajit(path_arg: str | None) -> Path:
     return resolve_tool(path_arg, "LUAJIT_BIN", "luajit")
 
 
-def language_available(
-    language: str,
-    pluto_bin: Path,
-    zig_bin: Path,
-    cc_bin: Path,
-    cxx_bin: Path,
-    luajit_bin: Path,
-) -> bool:
+def language_available(language: str, toolchain: Toolchain) -> bool:
     if language == "pluto":
-        return pluto_bin.exists()
+        return toolchain.pluto.exists()
     if language == "c":
-        return cc_bin.exists()
+        return toolchain.cc.exists()
     if language == "cpp":
-        return cxx_bin.exists()
+        return toolchain.cxx.exists()
     if language == "zig":
-        return zig_bin.exists()
+        return toolchain.zig.exists()
     if language == "luajit":
-        return luajit_bin.exists()
+        return toolchain.luajit.exists()
     if language == "python":
         return True
     tool = LANGUAGE_TO_TOOL.get(language)
@@ -604,19 +602,12 @@ def language_available(
     return shutil.which(tool) is not None
 
 
-def language_version(
-    language: str,
-    pluto_bin: Path,
-    zig_bin: Path,
-    cc_bin: Path,
-    cxx_bin: Path,
-    luajit_bin: Path,
-) -> str:
+def language_version(language: str, toolchain: Toolchain) -> str:
     if language == "pluto":
-        if not pluto_bin.exists():
+        if not toolchain.pluto.exists():
             return "not found"
         proc = subprocess.run(
-            [str(pluto_bin), "-version"],
+            [str(toolchain.pluto), "-version"],
             capture_output=True,
             text=True,
             check=False,
@@ -624,27 +615,27 @@ def language_version(
         text = proc.stdout if proc.stdout.strip() else proc.stderr
         return normalize_version(language, first_line(text))
     if language == "c":
-        if not cc_bin.exists():
+        if not toolchain.cc.exists():
             return "not found"
-        proc = subprocess.run([str(cc_bin), "--version"], capture_output=True, text=True, check=False)
+        proc = subprocess.run([str(toolchain.cc), "--version"], capture_output=True, text=True, check=False)
         text = proc.stdout if proc.stdout.strip() else proc.stderr
         return normalize_version(language, first_line(text))
     if language == "cpp":
-        if not cxx_bin.exists():
+        if not toolchain.cxx.exists():
             return "not found"
-        proc = subprocess.run([str(cxx_bin), "--version"], capture_output=True, text=True, check=False)
+        proc = subprocess.run([str(toolchain.cxx), "--version"], capture_output=True, text=True, check=False)
         text = proc.stdout if proc.stdout.strip() else proc.stderr
         return normalize_version(language, first_line(text))
     if language == "zig":
-        if not zig_bin.exists():
+        if not toolchain.zig.exists():
             return "not found"
-        proc = subprocess.run([str(zig_bin), "version"], capture_output=True, text=True, check=False)
+        proc = subprocess.run([str(toolchain.zig), "version"], capture_output=True, text=True, check=False)
         text = proc.stdout if proc.stdout.strip() else proc.stderr
         return normalize_version(language, first_line(text))
     if language == "luajit":
-        if not luajit_bin.exists():
+        if not toolchain.luajit.exists():
             return "not found"
-        proc = subprocess.run([str(luajit_bin), "-v"], capture_output=True, text=True, check=False)
+        proc = subprocess.run([str(toolchain.luajit), "-v"], capture_output=True, text=True, check=False)
         text = proc.stdout if proc.stdout.strip() else proc.stderr
         return normalize_version(language, first_line(text))
 
@@ -666,23 +657,9 @@ def source_uses_numpy(source: CaseSource) -> bool:
     return "import numpy" in text or "from numpy" in text
 
 
-def source_available(
-    source: CaseSource,
-    pluto_bin: Path,
-    zig_bin: Path,
-    cc_bin: Path,
-    cxx_bin: Path,
-    luajit_bin: Path,
-) -> bool:
+def source_available(source: CaseSource, toolchain: Toolchain) -> bool:
     if source.language != "python" or not source_uses_numpy(source):
-        return language_available(
-            source.language,
-            pluto_bin,
-            zig_bin,
-            cc_bin,
-            cxx_bin,
-            luajit_bin,
-        )
+        return language_available(source.language, toolchain)
     proc = subprocess.run(
         [sys.executable, "-c", "import numpy"],
         capture_output=True,
@@ -692,23 +669,9 @@ def source_available(
     return proc.returncode == 0
 
 
-def source_version(
-    source: CaseSource,
-    pluto_bin: Path,
-    zig_bin: Path,
-    cc_bin: Path,
-    cxx_bin: Path,
-    luajit_bin: Path,
-) -> str:
+def source_version(source: CaseSource, toolchain: Toolchain) -> str:
     if source.language != "python" or not source_uses_numpy(source):
-        return language_version(
-            source.language,
-            pluto_bin,
-            zig_bin,
-            cc_bin,
-            cxx_bin,
-            luajit_bin,
-        )
+        return language_version(source.language, toolchain)
     proc = subprocess.run(
         PYTHON_NUMPY_VERSION_CMD,
         capture_output=True,
@@ -841,28 +804,15 @@ def llvm_tool_metadata() -> dict[str, str | None]:
     return metadata
 
 
-def snapshot_metadata(
-    pluto_bin: Path,
-    zig_bin: Path,
-    cc_bin: Path,
-    cxx_bin: Path,
-    luajit_bin: Path,
-) -> dict[str, object]:
+def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
     prefix = peak_memory_command_prefix()
     target_policy = target_policy_metadata()
     pluto = {
-        "bin": str(pluto_bin),
-        "version": language_version(
-            "pluto",
-            pluto_bin,
-            zig_bin,
-            cc_bin,
-            cxx_bin,
-            luajit_bin,
-        ),
+        "bin": str(toolchain.pluto),
+        "version": language_version("pluto", toolchain),
         "target_cpu": target_policy["pluto"]["env"]["PLUTO_TARGET_CPU"],
     }
-    pluto_repo = git_repo_metadata(pluto_bin)
+    pluto_repo = git_repo_metadata(toolchain.pluto)
     if pluto_repo is not None:
         pluto.update(pluto_repo)
 
@@ -877,20 +827,20 @@ def snapshot_metadata(
         "bench": git_repo_metadata(REPO_ROOT),
         "pluto": pluto,
         "c": {
-            "bin": str(cc_bin),
-            "version": language_version("c", pluto_bin, zig_bin, cc_bin, cxx_bin, luajit_bin),
+            "bin": str(toolchain.cc),
+            "version": language_version("c", toolchain),
         },
         "cpp": {
-            "bin": str(cxx_bin),
-            "version": language_version("cpp", pluto_bin, zig_bin, cc_bin, cxx_bin, luajit_bin),
+            "bin": str(toolchain.cxx),
+            "version": language_version("cpp", toolchain),
         },
         "zig": {
-            "bin": str(zig_bin),
-            "version": language_version("zig", pluto_bin, zig_bin, cc_bin, cxx_bin, luajit_bin),
+            "bin": str(toolchain.zig),
+            "version": language_version("zig", toolchain),
         },
         "luajit": {
-            "bin": str(luajit_bin),
-            "version": language_version("luajit", pluto_bin, zig_bin, cc_bin, cxx_bin, luajit_bin),
+            "bin": str(toolchain.luajit),
+            "version": language_version("luajit", toolchain),
         },
         "memory_measurement": {
             "enabled": prefix is not None,
@@ -1342,27 +1292,17 @@ def write_snapshot(
     cases: list[str],
     results_by_case: dict[str, list[Result]],
     repeat: int,
-    pluto_bin: Path,
-    zig_bin: Path,
-    cc_bin: Path,
-    cxx_bin: Path,
-    luajit_bin: Path,
+    toolchain: Toolchain,
 ) -> None:
     snapshot_dir.mkdir(parents=True, exist_ok=True)
     generated_at = dt.datetime.now().astimezone().isoformat()
     snapshot = {
         "generated_at": generated_at,
         "repeat": repeat,
-        "pluto_bin": str(pluto_bin),
+        "pluto_bin": str(toolchain.pluto),
         "platform": platform.platform(),
         "machine": platform.machine(),
-        "metadata": snapshot_metadata(
-            pluto_bin,
-            zig_bin,
-            cc_bin,
-            cxx_bin,
-            luajit_bin,
-        ),
+        "metadata": snapshot_metadata(toolchain),
         "cases": [
             {
                 "name": case,
@@ -1450,11 +1390,7 @@ def write_snapshot(
 def benchmark_source(
     source: CaseSource,
     repeat: int,
-    pluto_bin: Path,
-    zig_bin: Path,
-    cc_bin: Path,
-    cxx_bin: Path,
-    luajit_bin: Path,
+    toolchain: Toolchain,
     measure_memory: bool,
 ) -> Result:
     compile_samples = []
@@ -1467,15 +1403,7 @@ def benchmark_source(
         workdir = prepare_workdir(source.case, source.language, idx)
         try:
             copy_case_files(source.source_dir, workdir)
-            compile_spec, run_spec = commands_for(
-                source,
-                workdir,
-                pluto_bin,
-                zig_bin,
-                cc_bin,
-                cxx_bin,
-                luajit_bin,
-            )
+            compile_spec, run_spec = commands_for(source, workdir, toolchain)
             if compile_spec is not None:
                 compile_ms, _ = timed_run(compile_spec, workdir)
                 compile_samples.append(compile_ms)
@@ -1508,7 +1436,7 @@ def benchmark_source(
     return Result(
         case=source.case,
         language=source.language,
-        version=source_version(source, pluto_bin, zig_bin, cc_bin, cxx_bin, luajit_bin),
+        version=source_version(source, toolchain),
         compile_ms=statistics.median(compile_samples) if compile_samples else None,
         run_ms=statistics.median(run_samples),
         peak_memory_kb=int(statistics.median(memory_samples)) if memory_samples else None,
@@ -1565,26 +1493,18 @@ def sources_for_case(case: str) -> list[CaseSource]:
 def benchmark_case(
     case: str,
     repeat: int,
-    pluto_bin: Path,
-    zig_bin: Path,
-    cc_bin: Path,
-    cxx_bin: Path,
-    luajit_bin: Path,
+    toolchain: Toolchain,
     measure_memory: bool,
 ) -> list[Result]:
     results = []
     for source in sources_for_case(case):
-        if not source_available(source, pluto_bin, zig_bin, cc_bin, cxx_bin, luajit_bin):
+        if not source_available(source, toolchain):
             continue
         results.append(
             benchmark_source(
                 source,
                 repeat,
-                pluto_bin,
-                zig_bin,
-                cc_bin,
-                cxx_bin,
-                luajit_bin,
+                toolchain,
                 measure_memory,
             )
         )
@@ -1687,21 +1607,23 @@ def main() -> int:
     if args.repeat < 1:
         raise SystemExit("--repeat must be at least 1")
 
-    pluto_bin = resolve_pluto(args.pluto)
-    zig_bin = resolve_zig(args.zig)
-    cc_bin = resolve_cc(args.cc)
-    cxx_bin = resolve_cxx(args.cxx)
-    luajit_bin = resolve_luajit(args.luajit)
-    if not pluto_bin.exists():
-        print(f"warning: Pluto compiler not found at {pluto_bin}", file=sys.stderr)
-    if not zig_bin.exists():
-        print(f"warning: Zig compiler not found at {zig_bin}", file=sys.stderr)
-    if not cc_bin.exists():
-        print(f"warning: C compiler not found at {cc_bin}", file=sys.stderr)
-    if not cxx_bin.exists():
-        print(f"warning: C++ compiler not found at {cxx_bin}", file=sys.stderr)
-    if not luajit_bin.exists():
-        print(f"warning: LuaJIT binary not found at {luajit_bin}", file=sys.stderr)
+    toolchain = Toolchain(
+        pluto=resolve_pluto(args.pluto),
+        zig=resolve_zig(args.zig),
+        cc=resolve_cc(args.cc),
+        cxx=resolve_cxx(args.cxx),
+        luajit=resolve_luajit(args.luajit),
+    )
+    if not toolchain.pluto.exists():
+        print(f"warning: Pluto compiler not found at {toolchain.pluto}", file=sys.stderr)
+    if not toolchain.zig.exists():
+        print(f"warning: Zig compiler not found at {toolchain.zig}", file=sys.stderr)
+    if not toolchain.cc.exists():
+        print(f"warning: C compiler not found at {toolchain.cc}", file=sys.stderr)
+    if not toolchain.cxx.exists():
+        print(f"warning: C++ compiler not found at {toolchain.cxx}", file=sys.stderr)
+    if not toolchain.luajit.exists():
+        print(f"warning: LuaJIT binary not found at {toolchain.luajit}", file=sys.stderr)
 
     cases = discover_cases(args.cases)
     if not cases:
@@ -1709,7 +1631,7 @@ def main() -> int:
         return 1
 
     measure_memory = peak_memory_command_prefix() is not None
-    metadata = snapshot_metadata(pluto_bin, zig_bin, cc_bin, cxx_bin, luajit_bin)
+    metadata = snapshot_metadata(toolchain)
     print_metadata_summary(metadata)
     shutil.rmtree(WORK_ROOT, ignore_errors=True)
     try:
@@ -1718,11 +1640,7 @@ def main() -> int:
             results = benchmark_case(
                 case,
                 args.repeat,
-                pluto_bin,
-                zig_bin,
-                cc_bin,
-                cxx_bin,
-                luajit_bin,
+                toolchain,
                 measure_memory,
             )
             results_by_case[case] = results
@@ -1738,11 +1656,7 @@ def main() -> int:
                 cases=cases,
                 results_by_case=results_by_case,
                 repeat=args.repeat,
-                pluto_bin=pluto_bin,
-                zig_bin=zig_bin,
-                cc_bin=cc_bin,
-                cxx_bin=cxx_bin,
-                luajit_bin=luajit_bin,
+                toolchain=toolchain,
             )
             print(f"Snapshot written: {snapshot_dir / 'results.json'}")
     finally:
