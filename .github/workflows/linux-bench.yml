@@ -26,7 +26,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25"
+          go-version: "1.26"
           cache-dependency-path: pluto/go.sum
 
       - name: Set up Node
@@ -53,11 +53,11 @@ jobs:
         run: |
           python3 -m pip install --break-system-packages --user numpy==2.4.4
 
-      - name: Install LLVM 21
+      - name: Install LLVM 22
         run: |
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 21
+          sudo ./llvm.sh 22
           sudo apt-get update
           sudo apt-get install -y \
             binutils \
@@ -79,19 +79,18 @@ jobs:
             unzip \
             zip \
             zlib1g-dev \
-            llvm-21-dev \
-            lld-21 \
-            clang-21
-          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-21 100
-          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-21 100
+            llvm-22-dev \
+            lld-22 \
+            clang-22
+          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-22 100
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-22 100
 
       - name: Set LLVM environment
         run: |
-          echo "LLVM_BIN_DIR=/usr/lib/llvm-21/bin" >> "$GITHUB_ENV"
-          echo "CGO_CFLAGS=-I/usr/lib/llvm-21/include" >> "$GITHUB_ENV"
-          echo "CGO_LDFLAGS=-L/usr/lib/llvm-21/lib" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=/usr/lib/llvm-21/lib" >> "$GITHUB_ENV"
-          echo "/usr/lib/llvm-21/bin" >> "$GITHUB_PATH"
+          cd pluto
+          LLVM_BIN=/usr/lib/llvm-22/bin \
+            LLVM_CONFIG=/usr/lib/llvm-22/bin/llvm-config \
+            python3 scripts/llvm_env.py --github-actions
 
       - name: Install Swift 6.2.4
         run: |
@@ -114,15 +113,15 @@ jobs:
           tar xf "${ZIG_ARCHIVE}"
           echo "${PWD}/zig-x86_64-linux-${ZIG_VERSION}" >> "$GITHUB_PATH"
 
-      - name: Reassert LLVM 21 toolchain precedence
+      - name: Reassert LLVM 22 toolchain precedence
         run: |
           # Swift ships its own clang/lld; keep the benchmark and Pluto build on
           # the same LLVM toolchain we installed above.
-          echo "$LLVM_BIN_DIR" >> "$GITHUB_PATH"
+          echo "/usr/lib/llvm-22/bin" >> "$GITHUB_PATH"
 
       - name: Build Pluto
         working-directory: pluto
-        run: go build -o pluto
+        run: python3 build.py -o pluto
 
       - name: Verify toolchain
         run: |
@@ -187,12 +186,6 @@ jobs:
               return f"{gib:.1f} GiB RAM"
 
           with summary.open("a", encoding="utf-8") as out:
-              out.write("## Linux benchmark snapshot\n\n")
-              out.write(f"- Platform: `{data['platform']}`\n")
-              out.write(f"- Machine: `{data['machine']}`\n")
-              out.write(f"- Repeat: `{data['repeat']}`\n")
-              out.write(f"- Pluto binary: `{data['pluto_bin']}`\n\n")
-
               host = metadata.get("host", {})
               bench = metadata.get("bench", {})
               pluto = metadata.get("pluto", {})
@@ -200,12 +193,26 @@ jobs:
               target_policy = metadata.get("target_policy", {})
               llvm = metadata.get("llvm_tools", {})
 
+              out.write("## Linux benchmark snapshot\n\n")
+              out.write(f"- Platform: `{data['platform']}`\n")
+              out.write(f"- Machine: `{data['machine']}`\n")
+              out.write(f"- Repeat: `{data['repeat']}`\n")
+              pluto_binary = data["pluto_bin"]
+              pluto_mtime = pluto.get("binary_mtime")
+              if pluto_mtime:
+                  out.write(f"- Pluto binary: `{pluto_binary}` (modified `{pluto_mtime}`)\n\n")
+              else:
+                  out.write(f"- Pluto binary: `{pluto_binary}`\n\n")
+
               out.write("### Provenance\n\n")
               out.write(
                   f"- Bench: `{branch_label(bench)}` @ `{short_commit(bench.get('git_commit'))}`\n"
               )
               out.write(
-                  f"- Pluto: `{pluto.get('version', 'unknown')}` on `{branch_label(pluto)}` @ "
+                  f"- Pluto version: `{pluto.get('version', 'unknown')}`\n"
+              )
+              out.write(
+                  f"- Pluto repo: `{branch_label(pluto)}` @ "
                   f"`{short_commit(pluto.get('git_commit'))}`\n"
               )
               out.write(
@@ -228,7 +235,7 @@ jobs:
                       f"{name} {version}" if version else f"{name} unavailable"
                       for name, version in llvm.items()
                   )
-                  out.write(f"- LLVM: `{llvm_text}`\n")
+                  out.write(f"- Host LLVM tools: `{llvm_text}`\n")
               out.write("\n")
 
               for case in data["cases"]:

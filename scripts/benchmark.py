@@ -726,6 +726,18 @@ def git_repo_metadata(start: Path) -> dict[str, str | bool | None] | None:
     }
 
 
+def file_metadata(path: Path) -> dict[str, object]:
+    try:
+        stat = path.stat()
+    except OSError:
+        return {}
+    modified = dt.datetime.fromtimestamp(stat.st_mtime, dt.timezone.utc)
+    return {
+        "binary_mtime": modified.isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "binary_size_bytes": stat.st_size,
+    }
+
+
 def total_memory_kb() -> int | None:
     if sys.platform == "darwin":
         raw = probe_first_line(["sysctl", "-n", "hw.memsize"])
@@ -812,6 +824,7 @@ def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
         "version": language_version("pluto", toolchain),
         "target_cpu": target_policy["pluto"]["env"]["PLUTO_TARGET_CPU"],
     }
+    pluto.update(file_metadata(toolchain.pluto))
     pluto_repo = git_repo_metadata(toolchain.pluto)
     if pluto_repo is not None:
         pluto.update(pluto_repo)
@@ -899,10 +912,12 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
     lines = [
         "Benchmark metadata:",
         f"  Bench: {branch_label(bench)} @ {short_commit(bench.get('git_commit'))}",
+        f"  Pluto: {pluto.get('version') or 'unknown'}",
         (
-            f"  Pluto: {pluto.get('version') or 'unknown'} | "
-            f"{branch_label(pluto)} @ {short_commit(pluto.get('git_commit'))}"
+            f"  Pluto Binary: {pluto.get('bin') or 'unknown'}"
+            + (f" | modified {pluto['binary_mtime']}" if pluto.get("binary_mtime") else "")
         ),
+        f"  Pluto Repo: {branch_label(pluto)} @ {short_commit(pluto.get('git_commit'))}",
         f"  Host: {' | '.join(str(bit) for bit in host_bits if bit)}",
         (
             "  Mode: "
@@ -926,7 +941,7 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
         for name, version in llvm.items()
     ]
     if llvm_bits:
-        lines.append("  LLVM: " + " | ".join(llvm_bits))
+        lines.append("  Host LLVM Tools: " + " | ".join(llvm_bits))
     return lines
 
 
@@ -1347,7 +1362,7 @@ def write_snapshot(
     render_bar_chart(
         snapshot_dir / "compile-times.svg",
         title="Compile Time Median by Benchmark",
-        subtitle="Native languages only. Pluto includes frontend plus LLVM opt, llc, and link.",
+        subtitle="Native languages only. Pluto includes frontend, in-process LLVM O3/object emission, and link.",
         cases=cases,
         results_by_case=results_by_case,
         metric_name="compile",
@@ -1356,7 +1371,7 @@ def write_snapshot(
     render_bar_chart(
         snapshot_dir / "compile-times-mobile.svg",
         title="Compile Time Median by Benchmark",
-        subtitle="Native languages only. Pluto includes frontend plus LLVM opt, llc, and link.",
+        subtitle="Native languages only. Pluto includes frontend, in-process LLVM O3/object emission, and link.",
         cases=cases,
         results_by_case=results_by_case,
         metric_name="compile",
