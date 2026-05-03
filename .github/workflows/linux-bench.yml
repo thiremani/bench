@@ -194,7 +194,6 @@ jobs:
               cpp_meta = metadata.get("cpp", {})
               memory = metadata.get("memory_measurement", {})
               target_policy = metadata.get("target_policy", {})
-              llvm = metadata.get("llvm_tools", {})
 
               out.write("## Linux benchmark snapshot\n\n")
               out.write(f"- Platform: `{data['platform']}`\n")
@@ -218,6 +217,19 @@ jobs:
                   f"- Pluto Repo: `{branch_label(pluto)}` @ "
                   f"`{short_commit(pluto.get('git_commit'))}`\n"
               )
+              pluto_llvm = pluto.get("llvm", {})
+              if pluto_llvm:
+                  llvm_mode = pluto_llvm.get("mode", "in-process")
+                  llvm_version = pluto_llvm.get("version", "unknown LLVM")
+                  llvm_source = pluto_llvm.get("source")
+                  llvm_bin = pluto_llvm.get("bin")
+                  if llvm_source and llvm_bin:
+                      out.write(
+                          f"- Pluto LLVM: `{llvm_mode} {llvm_version}` | "
+                          f"`{llvm_source} {llvm_bin}`\n"
+                      )
+                  else:
+                      out.write(f"- Pluto LLVM: `{llvm_mode} {llvm_version}`\n")
               linker = pluto.get("linker", {})
               if linker:
                   linker_bin = linker.get("bin") or linker.get("command") or "clang"
@@ -248,12 +260,6 @@ jobs:
                   out.write(
                       f"- Target Policy: `{target_policy.get('mode', 'unknown')}`\n"
                   )
-              if llvm:
-                  llvm_text = " | ".join(
-                      f"{name} {version}" if version else f"{name} unavailable"
-                      for name, version in llvm.items()
-                  )
-                  out.write(f"- Host Tool Versions: `{llvm_text}`\n")
               out.write("\n")
 
               for case in data["cases"]:

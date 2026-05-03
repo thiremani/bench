@@ -738,6 +738,27 @@ def format_tool_metadata(tool: dict[str, object]) -> str:
     return f"{tool.get('command') or 'tool'} unavailable"
 
 
+def pluto_llvm_metadata() -> dict[str, str | None]:
+    llvm_config = resolved_command_metadata("llvm-config", ["--version"])
+    version = llvm_config.get("version")
+    return {
+        "mode": "in-process",
+        "version": f"LLVM {version}" if version else None,
+        "source": "llvm-config" if llvm_config.get("bin") else None,
+        "bin": llvm_config.get("bin"),
+    }
+
+
+def format_pluto_llvm_metadata(tool: dict[str, object]) -> str:
+    mode = tool.get("mode") or "in-process"
+    version = tool.get("version") or "unknown LLVM"
+    bin_path = tool.get("bin")
+    source = tool.get("source")
+    if bin_path and source:
+        return f"{mode} {version} | {source} {bin_path}"
+    return f"{mode} {version}"
+
+
 def find_git_repo_root(start: Path) -> Path | None:
     current = start.resolve()
     if current.is_file():
@@ -822,23 +843,6 @@ def host_metadata() -> dict[str, object]:
     return host
 
 
-def llvm_tool_metadata() -> dict[str, str | None]:
-    tools = {
-        "opt": ["--version"],
-        "llc": ["--version"],
-        "ld.lld": ["--version"],
-    }
-    metadata: dict[str, str | None] = {}
-    for name, args in tools.items():
-        tool_path = shutil.which(name)
-        if tool_path is None:
-            metadata[name] = None
-            continue
-        version = probe_first_line([tool_path, *args])
-        metadata[name] = f"{tool_path} | {version}" if version else tool_path
-    return metadata
-
-
 def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
     prefix = peak_memory_command_prefix()
     target_policy = target_policy_metadata()
@@ -846,6 +850,7 @@ def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
         "bin": str(toolchain.pluto),
         "version": language_version("pluto", toolchain),
         "target_cpu": target_policy["pluto"]["env"]["PLUTO_TARGET_CPU"],
+        "llvm": pluto_llvm_metadata(),
         "linker": resolved_command_metadata(
             "clang",
             ["--version"],
@@ -890,8 +895,6 @@ def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
         },
         "target_policy": target_policy,
     }
-    llvm = llvm_tool_metadata()
-    metadata["llvm_tools"] = llvm
     return metadata
 
 
@@ -927,7 +930,6 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
     cpp_meta = metadata.get("cpp", {})
     memory = metadata.get("memory_measurement", {})
     target_policy = metadata.get("target_policy", {})
-    llvm = metadata.get("llvm_tools", {})
 
     host_bits = [
         host.get("cpu_name") or host.get("machine") or "unknown host",
@@ -956,6 +958,8 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
             f"units {benchmark.get('time_unit') or '?'}"
         ),
     ]
+    if isinstance(pluto, dict) and isinstance(pluto.get("llvm"), dict):
+        lines.append("  Pluto LLVM: " + format_pluto_llvm_metadata(pluto["llvm"]))
     if isinstance(pluto, dict) and isinstance(pluto.get("linker"), dict):
         lines.append("  Pluto Linker: " + format_tool_metadata(pluto["linker"]))
     if isinstance(c_meta, dict) and c_meta.get("bin"):
@@ -972,12 +976,6 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
             "  Target Policy: "
             + str(target_policy.get("mode") or "unknown")
         )
-    llvm_bits = [
-        f"{name} {version}" if version else f"{name} unavailable"
-        for name, version in llvm.items()
-    ]
-    if llvm_bits:
-        lines.append("  Host Tool Versions: " + " | ".join(llvm_bits))
     return lines
 
 

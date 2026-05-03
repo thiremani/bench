@@ -17,6 +17,7 @@ Tested on `2026-05-03 06:06:48 UTC+04:00` with:
 - Memory: 16 GiB
 - OS: macOS 26.4.1 (25E253)
 - Command: `PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH" CC_BIN=/usr/bin/clang CXX_BIN=/usr/bin/clang++ /opt/homebrew/bin/python3 scripts/benchmark.py --repeat 10 --pluto ../pluto/pluto --snapshot-dir results/latest`
+- Pluto LLVM: in-process LLVM 22.1.4
 - Pluto linker: `/usr/bin/clang` (`Apple clang 21.0.0`)
 - C/C++ compilers: `/usr/bin/clang`, `/usr/bin/clang++` (`Apple clang 21.0.0`)
 - Benchmark mode: median of 10 samples
@@ -212,8 +213,8 @@ python3 scripts/benchmark.py \
 - Python uses NumPy-backed implementations for `sum` and `harmonic`, and plain Python for `fib` and `fib_tail`.
 - Snapshot tables only include languages whose toolchains were available on the host where the snapshot was generated.
 - Peak Memory is collected automatically when the host supports `/usr/bin/time`; it is the median peak resident set size from the warm-up runs.
-- Pluto uses its in-process LLVM `default<O3>` pipeline and links executables through the `clang`
-  resolved from `PATH`; benchmark metadata records that linker separately from the C/C++ compilers.
+- Pluto uses its in-process LLVM `default<O3>` pipeline to optimize IR and emit native objects, then
+  links executables through the `clang` resolved from `PATH`; benchmark metadata records both separately.
 - The checked-in macOS snapshot uses Apple clang for Pluto's linker and for the C/C++ rows.
 - Pluto is compiled with `PLUTO_TARGET_CPU=native`.
 - For dev builds, rebuild the Pluto binary immediately before benchmarking; the metadata records
@@ -222,8 +223,6 @@ python3 scripts/benchmark.py \
 - C and C++ use `-O3`, Swift uses `-O`, Rust uses `-C opt-level=3`, and Zig uses `-O ReleaseFast`.
 - Julia runs with `julia --startup-file=no`.
 - LuaJIT runs with `luajit`.
-- The metadata's "Host Tool Versions" line records auxiliary PATH-resolved tool availability on the
-  benchmark host; it does not mean Pluto shells out to `opt` or `llc`.
 - The harness creates isolated temp work directories, copies benchmark files into them, and launches a fresh process for every timed sample.
 - One warm-up execution runs before each timed sample.
 - Short runtime cases such as `sum` and `harmonic` still include non-trivial process-startup noise, so treat small differences there with caution.
