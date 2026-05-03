@@ -23,11 +23,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 BENCHMARKS_DIR = REPO_ROOT / "benchmarks"
 DEFAULT_PLUTO = (REPO_ROOT / "../pluto/pluto").resolve()
 DEFAULT_ZIG = (REPO_ROOT / ".toolchains/zig-aarch64-macos-0.15.2/zig").resolve()
-DEFAULT_CC_CANDIDATES = (
+DEFAULT_CC_CANDIDATES = (Path("/usr/bin/clang"),) if sys.platform == "darwin" else ()
+DEFAULT_CC_CANDIDATES += (
     Path("/opt/homebrew/opt/llvm/bin/clang"),
     Path("/usr/local/opt/llvm/bin/clang"),
 )
-DEFAULT_CXX_CANDIDATES = (
+DEFAULT_CXX_CANDIDATES = (Path("/usr/bin/clang++"),) if sys.platform == "darwin" else ()
+DEFAULT_CXX_CANDIDATES += (
     Path("/opt/homebrew/opt/llvm/bin/clang++"),
     Path("/usr/local/opt/llvm/bin/clang++"),
 )
@@ -212,8 +214,31 @@ def normalized_machine() -> str:
     }.get(machine, machine)
 
 
-def pluto_compile_env() -> dict[str, str]:
-    return {"PLUTO_TARGET_CPU": "native"}
+def prepend_path(entries: list[Path], base: str | None = None) -> str:
+    existing = base if base is not None else os.environ.get("PATH", "")
+    parts = [str(entry) for entry in entries]
+    if existing:
+        parts.append(existing)
+    return os.pathsep.join(parts)
+
+
+def compiler_bin_dir(compiler: Path) -> Path | None:
+    expanded = compiler.expanduser()
+    if expanded.is_absolute():
+        return expanded.parent
+    found = shutil.which(str(expanded))
+    return Path(found).parent if found else None
+
+
+def pluto_compile_env(toolchain: Toolchain | None = None) -> dict[str, str]:
+    env = {"PLUTO_TARGET_CPU": "native"}
+    if toolchain is None:
+        return env
+
+    bin_dir = compiler_bin_dir(toolchain.cc)
+    if bin_dir is not None:
+        env["PATH"] = prepend_path([bin_dir])
+    return env
 
 
 def c_family_target_args() -> list[str]:
@@ -315,13 +340,13 @@ def go_compile_env() -> dict[str, str]:
     return {}
 
 
-def target_policy_metadata() -> dict[str, object]:
+def target_policy_metadata(toolchain: Toolchain) -> dict[str, object]:
     go_env = go_compile_env()
     return {
         "mode": TARGET_POLICY_MODE,
         "machine": normalized_machine(),
         "pluto": {
-            "env": pluto_compile_env(),
+            "env": pluto_compile_env(toolchain),
         },
         "c": {
             "flags": c_family_target_args(),
@@ -473,7 +498,7 @@ def commands_for(
     if source.language == "pluto":
         compile_cmd = CommandSpec(
             [str(toolchain.pluto), source.source_name],
-            env=pluto_compile_env(),
+            env=pluto_compile_env(toolchain),
         )
         run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "c":
@@ -701,6 +726,64 @@ def probe_first_line(cmd: list[str], cwd: Path | None = None) -> str | None:
     return line or None
 
 
+def command_env(extra: dict[str, str] | None = None) -> dict[str, str]:
+    if extra is None:
+        return dict(os.environ)
+    return {**os.environ, **extra}
+
+
+def resolved_command_metadata(
+    name: str,
+    args: list[str],
+    *,
+    env: dict[str, str] | None = None,
+) -> dict[str, str | None]:
+    path = shutil.which(name, path=env.get("PATH") if env else None)
+    if path is None:
+        return {
+            "command": name,
+            "bin": None,
+            "version": None,
+        }
+    version = probe_first_line([path, *args])
+    return {
+        "command": name,
+        "bin": path,
+        "version": version,
+    }
+
+
+def format_tool_metadata(tool: dict[str, object]) -> str:
+    bin_path = tool.get("bin")
+    version = tool.get("version")
+    if bin_path and version:
+        return f"{bin_path} | {version}"
+    if bin_path:
+        return str(bin_path)
+    return f"{tool.get('command') or 'tool'} unavailable"
+
+
+def pluto_llvm_metadata() -> dict[str, str | None]:
+    llvm_config = resolved_command_metadata("llvm-config", ["--version"])
+    version = llvm_config.get("version")
+    return {
+        "mode": "in-process",
+        "version": f"LLVM {version}" if version else None,
+        "source": "llvm-config" if llvm_config.get("bin") else None,
+        "bin": llvm_config.get("bin"),
+    }
+
+
+def format_pluto_llvm_metadata(tool: dict[str, object]) -> str:
+    mode = tool.get("mode") or "in-process"
+    version = tool.get("version") or "unknown LLVM"
+    bin_path = tool.get("bin")
+    source = tool.get("source")
+    if bin_path and source:
+        return f"{mode} {version} | {source} {bin_path}"
+    return f"{mode} {version}"
+
+
 def find_git_repo_root(start: Path) -> Path | None:
     current = start.resolve()
     if current.is_file():
@@ -723,6 +806,17 @@ def git_repo_metadata(start: Path) -> dict[str, str | bool | None] | None:
         "git_commit": commit,
         "git_branch": branch,
         "git_dirty": bool(status),
+    }
+
+
+def file_metadata(path: Path) -> dict[str, object]:
+    try:
+        stat = path.stat()
+    except OSError:
+        return {}
+    modified = dt.datetime.fromtimestamp(stat.st_mtime, dt.timezone.utc)
+    return {
+        "binary_mtime": modified.isoformat(timespec="seconds").replace("+00:00", "Z"),
     }
 
 
@@ -774,44 +868,21 @@ def host_metadata() -> dict[str, object]:
     return host
 
 
-def llvm_tool_metadata() -> dict[str, str | None]:
-    search_dirs = (
-        Path("/opt/homebrew/bin"),
-        Path("/opt/homebrew/opt/llvm/bin"),
-        Path("/usr/local/bin"),
-        Path("/usr/local/opt/llvm/bin"),
-    )
-    tools = {
-        "opt": ["--version"],
-        "llc": ["--version"],
-        "clang": ["--version"],
-        "ld.lld": ["--version"],
-    }
-    metadata: dict[str, str | None] = {}
-    for name, args in tools.items():
-        tool_path = None
-        for search_dir in search_dirs:
-            candidate = search_dir / name
-            if candidate.exists():
-                tool_path = str(candidate)
-                break
-        if tool_path is None:
-            tool_path = shutil.which(name)
-        if tool_path is None:
-            metadata[name] = None
-            continue
-        metadata[name] = probe_first_line([tool_path, *args])
-    return metadata
-
-
 def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
     prefix = peak_memory_command_prefix()
-    target_policy = target_policy_metadata()
+    target_policy = target_policy_metadata(toolchain)
     pluto = {
         "bin": str(toolchain.pluto),
         "version": language_version("pluto", toolchain),
         "target_cpu": target_policy["pluto"]["env"]["PLUTO_TARGET_CPU"],
+        "llvm": pluto_llvm_metadata(),
+        "linker": resolved_command_metadata(
+            "clang",
+            ["--version"],
+            env=command_env(pluto_compile_env(toolchain)),
+        ),
     }
+    pluto.update(file_metadata(toolchain.pluto))
     pluto_repo = git_repo_metadata(toolchain.pluto)
     if pluto_repo is not None:
         pluto.update(pluto_repo)
@@ -849,8 +920,6 @@ def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
         },
         "target_policy": target_policy,
     }
-    llvm = llvm_tool_metadata()
-    metadata["llvm_tools"] = llvm
     return metadata
 
 
@@ -882,9 +951,10 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
     host = metadata.get("host", {})
     bench = metadata.get("bench", {})
     pluto = metadata.get("pluto", {})
+    c_meta = metadata.get("c", {})
+    cpp_meta = metadata.get("cpp", {})
     memory = metadata.get("memory_measurement", {})
     target_policy = metadata.get("target_policy", {})
-    llvm = metadata.get("llvm_tools", {})
 
     host_bits = [
         host.get("cpu_name") or host.get("machine") or "unknown host",
@@ -899,10 +969,12 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
     lines = [
         "Benchmark metadata:",
         f"  Bench: {branch_label(bench)} @ {short_commit(bench.get('git_commit'))}",
+        f"  Pluto: {pluto.get('version') or 'unknown'}",
         (
-            f"  Pluto: {pluto.get('version') or 'unknown'} | "
-            f"{branch_label(pluto)} @ {short_commit(pluto.get('git_commit'))}"
+            f"  Pluto Binary: {pluto.get('bin') or 'unknown'}"
+            + (f" | modified {pluto['binary_mtime']}" if pluto.get("binary_mtime") else "")
         ),
+        f"  Pluto Repo: {branch_label(pluto)} @ {short_commit(pluto.get('git_commit'))}",
         f"  Host: {' | '.join(str(bit) for bit in host_bits if bit)}",
         (
             "  Mode: "
@@ -911,6 +983,14 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
             f"units {benchmark.get('time_unit') or '?'}"
         ),
     ]
+    if isinstance(pluto, dict) and isinstance(pluto.get("llvm"), dict):
+        lines.append("  Pluto LLVM: " + format_pluto_llvm_metadata(pluto["llvm"]))
+    if isinstance(pluto, dict) and isinstance(pluto.get("linker"), dict):
+        lines.append("  Pluto Linker: " + format_tool_metadata(pluto["linker"]))
+    if isinstance(c_meta, dict) and c_meta.get("bin"):
+        lines.append(f"  C Compiler: {c_meta['bin']} | {c_meta.get('version') or 'unknown'}")
+    if isinstance(cpp_meta, dict) and cpp_meta.get("bin"):
+        lines.append(f"  C++ Compiler: {cpp_meta['bin']} | {cpp_meta.get('version') or 'unknown'}")
     if memory.get("enabled"):
         collector = memory.get("collector") or "unknown collector"
         lines.append(f"  Peak Memory: enabled via {collector}")
@@ -921,12 +1001,6 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
             "  Target Policy: "
             + str(target_policy.get("mode") or "unknown")
         )
-    llvm_bits = [
-        f"{name} {version}" if version else f"{name} unavailable"
-        for name, version in llvm.items()
-    ]
-    if llvm_bits:
-        lines.append("  LLVM: " + " | ".join(llvm_bits))
     return lines
 
 
@@ -1347,7 +1421,7 @@ def write_snapshot(
     render_bar_chart(
         snapshot_dir / "compile-times.svg",
         title="Compile Time Median by Benchmark",
-        subtitle="Native languages only. Pluto includes frontend plus LLVM opt, llc, and link.",
+        subtitle="Native languages only. Pluto includes frontend, in-process LLVM O3/object emission, and link.",
         cases=cases,
         results_by_case=results_by_case,
         metric_name="compile",
@@ -1356,7 +1430,7 @@ def write_snapshot(
     render_bar_chart(
         snapshot_dir / "compile-times-mobile.svg",
         title="Compile Time Median by Benchmark",
-        subtitle="Native languages only. Pluto includes frontend plus LLVM opt, llc, and link.",
+        subtitle="Native languages only. Pluto includes frontend, in-process LLVM O3/object emission, and link.",
         cases=cases,
         results_by_case=results_by_case,
         metric_name="compile",
@@ -1585,11 +1659,11 @@ def main() -> int:
     )
     parser.add_argument(
         "--cc",
-        help="Path to the C compiler binary. Defaults to Homebrew LLVM clang, `cc` on PATH, or $CC_BIN.",
+        help="Path to the C compiler binary. Defaults to Apple clang on macOS, then Homebrew LLVM clang, `cc` on PATH, or $CC_BIN.",
     )
     parser.add_argument(
         "--cxx",
-        help="Path to the C++ compiler binary. Defaults to Homebrew LLVM clang++, `c++` on PATH, or $CXX_BIN.",
+        help="Path to the C++ compiler binary. Defaults to Apple clang++ on macOS, then Homebrew LLVM clang++, `c++` on PATH, or $CXX_BIN.",
     )
     parser.add_argument(
         "--luajit",
