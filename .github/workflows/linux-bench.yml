@@ -236,7 +236,7 @@ jobs:
                       f"{name} {version}" if version else f"{name} unavailable"
                       for name, version in llvm.items()
                   )
-                  out.write(f"- Host LLVM Tools: `{llvm_text}`\n")
+                  out.write(f"- Host Tool Versions: `{llvm_text}`\n")
               out.write("\n")
 
               for case in data["cases"]:

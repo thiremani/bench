@@ -786,12 +786,6 @@ def host_metadata() -> dict[str, object]:
 
 
 def llvm_tool_metadata() -> dict[str, str | None]:
-    search_dirs = (
-        Path("/opt/homebrew/bin"),
-        Path("/opt/homebrew/opt/llvm/bin"),
-        Path("/usr/local/bin"),
-        Path("/usr/local/opt/llvm/bin"),
-    )
     tools = {
         "opt": ["--version"],
         "llc": ["--version"],
@@ -800,18 +794,12 @@ def llvm_tool_metadata() -> dict[str, str | None]:
     }
     metadata: dict[str, str | None] = {}
     for name, args in tools.items():
-        tool_path = None
-        for search_dir in search_dirs:
-            candidate = search_dir / name
-            if candidate.exists():
-                tool_path = str(candidate)
-                break
-        if tool_path is None:
-            tool_path = shutil.which(name)
+        tool_path = shutil.which(name)
         if tool_path is None:
             metadata[name] = None
             continue
-        metadata[name] = probe_first_line([tool_path, *args])
+        version = probe_first_line([tool_path, *args])
+        metadata[name] = f"{tool_path} | {version}" if version else tool_path
     return metadata
 
 
@@ -940,7 +928,7 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
         for name, version in llvm.items()
     ]
     if llvm_bits:
-        lines.append("  Host LLVM Tools: " + " | ".join(llvm_bits))
+        lines.append("  Host Tool Versions: " + " | ".join(llvm_bits))
     return lines
 
 
@@ -1599,11 +1587,11 @@ def main() -> int:
     )
     parser.add_argument(
         "--cc",
-        help="Path to the C compiler binary. Defaults to Homebrew LLVM clang, `cc` on PATH, or $CC_BIN.",
+        help="Path to the C compiler binary. Defaults to Homebrew LLVM clang, `cc` on PATH, or $CC_BIN. Use CC_BIN=/usr/bin/clang for the macOS platform toolchain.",
     )
     parser.add_argument(
         "--cxx",
-        help="Path to the C++ compiler binary. Defaults to Homebrew LLVM clang++, `c++` on PATH, or $CXX_BIN.",
+        help="Path to the C++ compiler binary. Defaults to Homebrew LLVM clang++, `c++` on PATH, or $CXX_BIN. Use CXX_BIN=/usr/bin/clang++ for the macOS platform toolchain.",
     )
     parser.add_argument(
         "--luajit",

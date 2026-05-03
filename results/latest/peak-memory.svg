@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1320" height="952" viewBox="0 0 1320 952" role="img" aria-labelledby="chart-title chart-desc">
-<title id="chart-title">Peak Memory Median by Benchmark</title>
-<desc id="chart-desc">Resident set size from warm-up execution. Pluto pinned first, rest sorted lowest-first.</desc>
+<title id="chart-title">Peak Memory Use by Benchmark</title>
+<desc id="chart-desc">Approximate peak RAM used by each process, measured from the untimed warm-up run. Lower is better.</desc>
 <rect width="1320" height="952" fill="#f8fafc" />
-<text x="145" y="40" fill="#0f172a" font-size="24" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Peak Memory Median by Benchmark</text>
-<text x="145" y="64" fill="#475569" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Resident set size from warm-up execution. Pluto pinned first, rest sorted lowest-first.</text>
+<text x="145" y="40" fill="#0f172a" font-size="24" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Peak Memory Use by Benchmark</text>
+<text x="145" y="64" fill="#475569" font-size="13" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Approximate peak RAM used by each process, measured from the untimed warm-up run. Lower is better.</text>
 <rect x="32" y="96" width="614" height="396" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
 <text x="50" y="128" fill="#0f172a" font-size="16" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Sum</text>
 <line x1="195.0" y1="162" x2="195.0" y2="488" stroke="#e2e8f0" stroke-width="1" />
@@ -23,13 +23,13 @@
 <text x="205.0" y="178.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.31 MiB</text>
 <text x="185" y="216.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C</text>
 <rect x="195" y="202" width="2.0" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
-<text x="205.0" y="216.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.33 MiB</text>
+<text x="205.0" y="216.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.31 MiB</text>
 <text x="185" y="242.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C++</text>
 <rect x="195" y="228" width="2.0" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
-<text x="205.0" y="242.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.34 MiB</text>
+<text x="205.0" y="242.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.33 MiB</text>
 <text x="185" y="268.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Zig</text>
 <rect x="195" y="254" width="2.0" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
-<text x="205.0" y="268.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.35 MiB</text>
+<text x="205.0" y="268.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.36 MiB</text>
 <text x="185" y="294.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Rust</text>
 <rect x="195" y="280" width="2.0" height="20" rx="4" fill="#6d28d9" fill-opacity="0.82" />
 <text x="205.0" y="294.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.47 MiB</text>
@@ -40,17 +40,17 @@
 <rect x="195" y="332" width="2.5" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
 <text x="205.5" y="346.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.80 MiB</text>
 <text x="185" y="372.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Go</text>
-<rect x="195" y="358" width="5.4" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
-<text x="208.4" y="372.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">3.91 MiB</text>
+<rect x="195" y="358" width="5.5" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
+<text x="208.5" y="372.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">3.93 MiB</text>
 <text x="185" y="398.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Bun</text>
 <rect x="195" y="384" width="37.5" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
 <text x="240.5" y="398.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">27.0 MiB</text>
 <text x="185" y="424.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python (with NumPy)</text>
-<rect x="195" y="410" width="49.9" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
-<text x="252.9" y="424.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">36.0 MiB</text>
+<rect x="195" y="410" width="50.0" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
+<text x="253.0" y="424.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">36.0 MiB</text>
 <text x="185" y="450.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Node</text>
-<rect x="195" y="436" width="67.8" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
-<text x="270.8" y="450.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">48.9 MiB</text>
+<rect x="195" y="436" width="67.9" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
+<text x="270.9" y="450.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">49.0 MiB</text>
 <text x="185" y="476.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Julia</text>
 <rect x="195" y="462" width="314.3" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
 <text x="517.3" y="476.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">226 MiB</text>
@@ -66,13 +66,13 @@
 <text x="1184.0" y="156" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">300 MiB</text>
 <text x="827" y="178.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto</text>
 <rect x="837" y="162" width="2.0" height="24" rx="4" fill="#c2410c" fill-opacity="1.0" stroke="#c2410c" stroke-width="1.5" />
-<text x="847.0" y="178.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.30 MiB</text>
+<text x="847.0" y="178.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.31 MiB</text>
 <text x="827" y="216.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C</text>
 <rect x="837" y="202" width="2.0" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
-<text x="847.0" y="216.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.31 MiB</text>
+<text x="847.0" y="216.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.33 MiB</text>
 <text x="827" y="242.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C++</text>
 <rect x="837" y="228" width="2.0" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
-<text x="847.0" y="242.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.33 MiB</text>
+<text x="847.0" y="242.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.34 MiB</text>
 <text x="827" y="268.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Zig</text>
 <rect x="837" y="254" width="2.0" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
 <text x="847.0" y="268.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.34 MiB</text>
@@ -83,23 +83,23 @@
 <rect x="837" y="306" width="2.0" height="20" rx="4" fill="#0e7490" fill-opacity="0.82" />
 <text x="847.0" y="320.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.75 MiB</text>
 <text x="827" y="346.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Go</text>
-<rect x="837" y="332" width="4.5" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
-<text x="849.5" y="346.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">3.91 MiB</text>
+<rect x="837" y="332" width="4.6" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
+<text x="849.6" y="346.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">3.96 MiB</text>
 <text x="827" y="372.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Swift</text>
 <rect x="837" y="358" width="6.4" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
 <text x="851.4" y="372.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">5.56 MiB</text>
 <text x="827" y="398.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Bun</text>
-<rect x="837" y="384" width="31.3" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
-<text x="876.3" y="398.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">27.0 MiB</text>
+<rect x="837" y="384" width="31.2" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
+<text x="876.2" y="398.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">27.0 MiB</text>
 <text x="827" y="424.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python (with NumPy)</text>
-<rect x="837" y="410" width="50.5" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
-<text x="895.5" y="424.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">43.6 MiB</text>
+<rect x="837" y="410" width="50.3" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
+<text x="895.3" y="424.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">43.5 MiB</text>
 <text x="827" y="450.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Node</text>
-<rect x="837" y="436" width="57.1" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
-<text x="902.1" y="450.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">49.3 MiB</text>
+<rect x="837" y="436" width="57.0" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
+<text x="902.0" y="450.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">49.2 MiB</text>
 <text x="827" y="476.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Julia</text>
-<rect x="837" y="462" width="286.8" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
-<text x="1131.8" y="476.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">248 MiB</text>
+<rect x="837" y="462" width="286.6" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
+<text x="1131.6" y="476.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">248 MiB</text>
 <rect x="32" y="520" width="614" height="396" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
 <text x="50" y="552" fill="#0f172a" font-size="16" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Fib</text>
 <line x1="195.0" y1="586" x2="195.0" y2="912" stroke="#e2e8f0" stroke-width="1" />
@@ -125,7 +125,7 @@
 <text x="205.0" y="666.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.34 MiB</text>
 <text x="185" y="692.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Zig</text>
 <rect x="195" y="678" width="2.0" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
-<text x="205.0" y="692.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.36 MiB</text>
+<text x="205.0" y="692.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.34 MiB</text>
 <text x="185" y="718.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Rust</text>
 <rect x="195" y="704" width="2.0" height="20" rx="4" fill="#6d28d9" fill-opacity="0.82" />
 <text x="205.0" y="718.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.45 MiB</text>
@@ -134,10 +134,10 @@
 <text x="205.5" y="744.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.81 MiB</text>
 <text x="185" y="770.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">LuaJIT</text>
 <rect x="195" y="756" width="2.5" height="20" rx="4" fill="#0e7490" fill-opacity="0.82" />
-<text x="205.5" y="770.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.81 MiB</text>
+<text x="205.5" y="770.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.83 MiB</text>
 <text x="185" y="796.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Go</text>
-<rect x="195" y="782" width="5.4" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
-<text x="208.4" y="796.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">3.88 MiB</text>
+<rect x="195" y="782" width="5.3" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
+<text x="208.3" y="796.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">3.83 MiB</text>
 <text x="185" y="822.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python</text>
 <rect x="195" y="808" width="20.3" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
 <text x="223.3" y="822.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.6 MiB</text>
@@ -145,8 +145,8 @@
 <rect x="195" y="834" width="36.1" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
 <text x="239.1" y="848.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">26.0 MiB</text>
 <text x="185" y="874.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Node</text>
-<rect x="195" y="860" width="67.8" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
-<text x="270.8" y="874.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">48.8 MiB</text>
+<rect x="195" y="860" width="67.7" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
+<text x="270.7" y="874.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">48.8 MiB</text>
 <text x="185" y="900.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Julia</text>
 <rect x="195" y="886" width="313.7" height="20" rx="4" fill="#7c3aed" fill-opacity="0.82" />
 <text x="516.7" y="900.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">226 MiB</text>
@@ -167,12 +167,12 @@
 <text x="827" y="602.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="700" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Pluto</text>
 <rect x="837" y="586" width="2.0" height="24" rx="4" fill="#c2410c" fill-opacity="1.0" stroke="#c2410c" stroke-width="1.5" />
 <text x="847.0" y="602.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.31 MiB</text>
-<text x="827" y="640.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C</text>
-<rect x="837" y="626" width="2.0" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
-<text x="847.0" y="640.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.32 MiB</text>
-<text x="827" y="666.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C++</text>
-<rect x="837" y="652" width="2.0" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
-<text x="847.0" y="666.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.33 MiB</text>
+<text x="827" y="640.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C++</text>
+<rect x="837" y="626" width="2.0" height="20" rx="4" fill="#16a34a" fill-opacity="0.82" />
+<text x="847.0" y="640.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.31 MiB</text>
+<text x="827" y="666.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">C</text>
+<rect x="837" y="652" width="2.0" height="20" rx="4" fill="#2563eb" fill-opacity="0.82" />
+<text x="847.0" y="666.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.32 MiB</text>
 <text x="827" y="692.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Zig</text>
 <rect x="837" y="678" width="2.0" height="20" rx="4" fill="#ca8a04" fill-opacity="0.82" />
 <text x="847.0" y="692.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.36 MiB</text>
@@ -186,14 +186,14 @@
 <rect x="837" y="756" width="2.5" height="20" rx="4" fill="#dc2626" fill-opacity="0.82" />
 <text x="847.5" y="770.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">1.81 MiB</text>
 <text x="827" y="796.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Go</text>
-<rect x="837" y="782" width="5.3" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
-<text x="850.3" y="796.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">3.84 MiB</text>
+<rect x="837" y="782" width="5.4" height="20" rx="4" fill="#0891b2" fill-opacity="0.82" />
+<text x="850.4" y="796.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">3.91 MiB</text>
 <text x="827" y="822.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Python</text>
 <rect x="837" y="808" width="20.3" height="20" rx="4" fill="#9333ea" fill-opacity="0.82" />
 <text x="865.3" y="822.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">14.6 MiB</text>
 <text x="827" y="848.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Bun</text>
-<rect x="837" y="834" width="39.3" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
-<text x="884.3" y="848.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">28.3 MiB</text>
+<rect x="837" y="834" width="39.2" height="20" rx="4" fill="#0f172a" fill-opacity="0.82" />
+<text x="884.2" y="848.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">28.3 MiB</text>
 <text x="827" y="874.5" text-anchor="end" fill="#0f172a" font-size="13" font-weight="400" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">Node</text>
 <rect x="837" y="860" width="68.3" height="20" rx="4" fill="#15803d" fill-opacity="0.82" />
 <text x="913.3" y="874.5" text-anchor="start" fill="#334155" font-size="12" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif">49.2 MiB</text>
