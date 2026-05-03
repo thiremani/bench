@@ -20,8 +20,6 @@ Tested on `2026-05-02 23:48:47 UTC+04:00` with:
 - Benchmark mode: median of 10 samples
 - All languages are timed as fresh processes
 - Compiled languages use host-native CPU tuning where the toolchain exposes it
-- Runtime values can drift with host load and thermal state; this snapshot's
-  primary change is Pluto compile-time measurement after in-process LLVM codegen.
 - Pluto rows are bolded for quick comparison
 
 ## Visual Summary
