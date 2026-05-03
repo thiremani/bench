@@ -23,11 +23,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 BENCHMARKS_DIR = REPO_ROOT / "benchmarks"
 DEFAULT_PLUTO = (REPO_ROOT / "../pluto/pluto").resolve()
 DEFAULT_ZIG = (REPO_ROOT / ".toolchains/zig-aarch64-macos-0.15.2/zig").resolve()
-DEFAULT_CC_CANDIDATES = (
+DEFAULT_CC_CANDIDATES = (Path("/usr/bin/clang"),) if sys.platform == "darwin" else ()
+DEFAULT_CC_CANDIDATES += (
     Path("/opt/homebrew/opt/llvm/bin/clang"),
     Path("/usr/local/opt/llvm/bin/clang"),
 )
-DEFAULT_CXX_CANDIDATES = (
+DEFAULT_CXX_CANDIDATES = (Path("/usr/bin/clang++"),) if sys.platform == "darwin" else ()
+DEFAULT_CXX_CANDIDATES += (
     Path("/opt/homebrew/opt/llvm/bin/clang++"),
     Path("/usr/local/opt/llvm/bin/clang++"),
 )
@@ -212,8 +214,31 @@ def normalized_machine() -> str:
     }.get(machine, machine)
 
 
-def pluto_compile_env() -> dict[str, str]:
-    return {"PLUTO_TARGET_CPU": "native"}
+def prepend_path(entries: list[Path], base: str | None = None) -> str:
+    existing = base if base is not None else os.environ.get("PATH", "")
+    parts = [str(entry) for entry in entries]
+    if existing:
+        parts.append(existing)
+    return os.pathsep.join(parts)
+
+
+def compiler_bin_dir(compiler: Path) -> Path | None:
+    expanded = compiler.expanduser()
+    if expanded.is_absolute():
+        return expanded.parent
+    found = shutil.which(str(expanded))
+    return Path(found).parent if found else None
+
+
+def pluto_compile_env(toolchain: Toolchain | None = None) -> dict[str, str]:
+    env = {"PLUTO_TARGET_CPU": "native"}
+    if toolchain is None:
+        return env
+
+    bin_dir = compiler_bin_dir(toolchain.cc)
+    if bin_dir is not None:
+        env["PATH"] = prepend_path([bin_dir])
+    return env
 
 
 def c_family_target_args() -> list[str]:
@@ -315,13 +340,13 @@ def go_compile_env() -> dict[str, str]:
     return {}
 
 
-def target_policy_metadata() -> dict[str, object]:
+def target_policy_metadata(toolchain: Toolchain) -> dict[str, object]:
     go_env = go_compile_env()
     return {
         "mode": TARGET_POLICY_MODE,
         "machine": normalized_machine(),
         "pluto": {
-            "env": pluto_compile_env(),
+            "env": pluto_compile_env(toolchain),
         },
         "c": {
             "flags": c_family_target_args(),
@@ -473,7 +498,7 @@ def commands_for(
     if source.language == "pluto":
         compile_cmd = CommandSpec(
             [str(toolchain.pluto), source.source_name],
-            env=pluto_compile_env(),
+            env=pluto_compile_env(toolchain),
         )
         run_cmd = CommandSpec([str(workdir / stem)])
     elif source.language == "c":
@@ -845,7 +870,7 @@ def host_metadata() -> dict[str, object]:
 
 def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
     prefix = peak_memory_command_prefix()
-    target_policy = target_policy_metadata()
+    target_policy = target_policy_metadata(toolchain)
     pluto = {
         "bin": str(toolchain.pluto),
         "version": language_version("pluto", toolchain),
@@ -854,7 +879,7 @@ def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
         "linker": resolved_command_metadata(
             "clang",
             ["--version"],
-            env=command_env(pluto_compile_env()),
+            env=command_env(pluto_compile_env(toolchain)),
         ),
     }
     pluto.update(file_metadata(toolchain.pluto))
@@ -1634,11 +1659,11 @@ def main() -> int:
     )
     parser.add_argument(
         "--cc",
-        help="Path to the C compiler binary. Defaults to Homebrew LLVM clang, `cc` on PATH, or $CC_BIN. Use CC_BIN=/usr/bin/clang for the macOS platform toolchain.",
+        help="Path to the C compiler binary. Defaults to Apple clang on macOS, then Homebrew LLVM clang, `cc` on PATH, or $CC_BIN.",
     )
     parser.add_argument(
         "--cxx",
-        help="Path to the C++ compiler binary. Defaults to Homebrew LLVM clang++, `c++` on PATH, or $CXX_BIN. Use CXX_BIN=/usr/bin/clang++ for the macOS platform toolchain.",
+        help="Path to the C++ compiler binary. Defaults to Apple clang++ on macOS, then Homebrew LLVM clang++, `c++` on PATH, or $CXX_BIN.",
     )
     parser.add_argument(
         "--luajit",

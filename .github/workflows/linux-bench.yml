@@ -14,6 +14,8 @@ jobs:
     env:
       LLVM_BIN: /usr/lib/llvm-22/bin
       LLVM_CONFIG: /usr/lib/llvm-22/bin/llvm-config
+      CC_BIN: /usr/lib/llvm-22/bin/clang
+      CXX_BIN: /usr/lib/llvm-22/bin/clang++
 
     steps:
       - name: Checkout bench
@@ -128,8 +130,8 @@ jobs:
         run: |
           python3 --version
           python3 -c "import numpy as np; print(f'NumPy {np.__version__}')"
-          cc --version | head -n 1
-          c++ --version | head -n 1
+          "$CC_BIN" --version | head -n 1
+          "$CXX_BIN" --version | head -n 1
           swift --version
           swiftc --version
           go version
