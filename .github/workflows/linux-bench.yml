@@ -190,6 +190,8 @@ jobs:
               host = metadata.get("host", {})
               bench = metadata.get("bench", {})
               pluto = metadata.get("pluto", {})
+              c_meta = metadata.get("c", {})
+              cpp_meta = metadata.get("cpp", {})
               memory = metadata.get("memory_measurement", {})
               target_policy = metadata.get("target_policy", {})
               llvm = metadata.get("llvm_tools", {})
@@ -216,6 +218,21 @@ jobs:
                   f"- Pluto Repo: `{branch_label(pluto)}` @ "
                   f"`{short_commit(pluto.get('git_commit'))}`\n"
               )
+              linker = pluto.get("linker", {})
+              if linker:
+                  linker_bin = linker.get("bin") or linker.get("command") or "clang"
+                  linker_version = linker.get("version") or "unavailable"
+                  out.write(f"- Pluto Linker: `{linker_bin}` | `{linker_version}`\n")
+              if c_meta.get("bin"):
+                  out.write(
+                      f"- C Compiler: `{c_meta.get('bin')}` | "
+                      f"`{c_meta.get('version', 'unknown')}`\n"
+                  )
+              if cpp_meta.get("bin"):
+                  out.write(
+                      f"- C++ Compiler: `{cpp_meta.get('bin')}` | "
+                      f"`{cpp_meta.get('version', 'unknown')}`\n"
+                  )
               out.write(
                   f"- Host: `{host.get('cpu_name', host.get('machine', 'unknown host'))}` | "
                   f"`{host.get('platform', data['platform'])}` | "

@@ -701,6 +701,43 @@ def probe_first_line(cmd: list[str], cwd: Path | None = None) -> str | None:
     return line or None
 
 
+def command_env(extra: dict[str, str] | None = None) -> dict[str, str]:
+    if extra is None:
+        return dict(os.environ)
+    return {**os.environ, **extra}
+
+
+def resolved_command_metadata(
+    name: str,
+    args: list[str],
+    *,
+    env: dict[str, str] | None = None,
+) -> dict[str, str | None]:
+    path = shutil.which(name, path=env.get("PATH") if env else None)
+    if path is None:
+        return {
+            "command": name,
+            "bin": None,
+            "version": None,
+        }
+    version = probe_first_line([path, *args])
+    return {
+        "command": name,
+        "bin": path,
+        "version": version,
+    }
+
+
+def format_tool_metadata(tool: dict[str, object]) -> str:
+    bin_path = tool.get("bin")
+    version = tool.get("version")
+    if bin_path and version:
+        return f"{bin_path} | {version}"
+    if bin_path:
+        return str(bin_path)
+    return f"{tool.get('command') or 'tool'} unavailable"
+
+
 def find_git_repo_root(start: Path) -> Path | None:
     current = start.resolve()
     if current.is_file():
@@ -789,7 +826,6 @@ def llvm_tool_metadata() -> dict[str, str | None]:
     tools = {
         "opt": ["--version"],
         "llc": ["--version"],
-        "clang": ["--version"],
         "ld.lld": ["--version"],
     }
     metadata: dict[str, str | None] = {}
@@ -810,6 +846,11 @@ def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
         "bin": str(toolchain.pluto),
         "version": language_version("pluto", toolchain),
         "target_cpu": target_policy["pluto"]["env"]["PLUTO_TARGET_CPU"],
+        "linker": resolved_command_metadata(
+            "clang",
+            ["--version"],
+            env=command_env(pluto_compile_env()),
+        ),
     }
     pluto.update(file_metadata(toolchain.pluto))
     pluto_repo = git_repo_metadata(toolchain.pluto)
@@ -882,6 +923,8 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
     host = metadata.get("host", {})
     bench = metadata.get("bench", {})
     pluto = metadata.get("pluto", {})
+    c_meta = metadata.get("c", {})
+    cpp_meta = metadata.get("cpp", {})
     memory = metadata.get("memory_measurement", {})
     target_policy = metadata.get("target_policy", {})
     llvm = metadata.get("llvm_tools", {})
@@ -913,6 +956,12 @@ def metadata_summary_lines(metadata: dict[str, object]) -> list[str]:
             f"units {benchmark.get('time_unit') or '?'}"
         ),
     ]
+    if isinstance(pluto, dict) and isinstance(pluto.get("linker"), dict):
+        lines.append("  Pluto Linker: " + format_tool_metadata(pluto["linker"]))
+    if isinstance(c_meta, dict) and c_meta.get("bin"):
+        lines.append(f"  C Compiler: {c_meta['bin']} | {c_meta.get('version') or 'unknown'}")
+    if isinstance(cpp_meta, dict) and cpp_meta.get("bin"):
+        lines.append(f"  C++ Compiler: {cpp_meta['bin']} | {cpp_meta.get('version') or 'unknown'}")
     if memory.get("enabled"):
         collector = memory.get("collector") or "unknown collector"
         lines.append(f"  Peak Memory: enabled via {collector}")

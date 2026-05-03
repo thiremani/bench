@@ -28,6 +28,11 @@
       "bin": "/Users/tejas/Downloads/pluto/pluto",
       "version": "pluto dev",
       "target_cpu": "native",
+      "linker": {
+        "command": "clang",
+        "bin": "/usr/bin/clang",
+        "version": "Apple clang version 21.0.0 (clang-2100.0.123.102)"
+      },
       "binary_mtime": "2026-05-03T01:49:16Z",
       "git_commit": "9cdc24e50a2b1a758bc39864b3dda13a6fd64520",
       "git_branch": "master",
@@ -101,7 +106,6 @@
     "llvm_tools": {
       "opt": "/opt/homebrew/opt/llvm/bin/opt | Homebrew LLVM version 22.1.4",
       "llc": "/opt/homebrew/opt/llvm/bin/llc | Homebrew LLVM version 22.1.4",
-      "clang": "/usr/bin/clang | Apple clang version 21.0.0 (clang-2100.0.123.102)",
       "ld.lld": "/opt/homebrew/bin/ld.lld | Homebrew LLD 22.1.4 (compatible with GNU linkers)"
     }
   },
