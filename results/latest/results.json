@@ -29,7 +29,6 @@
       "version": "pluto dev",
       "target_cpu": "native",
       "binary_mtime": "2026-05-02T19:36:17Z",
-      "binary_size_bytes": 5969426,
       "git_commit": "9cdc24e50a2b1a758bc39864b3dda13a6fd64520",
       "git_branch": "master",
       "git_dirty": false

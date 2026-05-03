@@ -11,6 +11,9 @@ jobs:
   benchmark:
     runs-on: ubuntu-24.04
     timeout-minutes: 90
+    env:
+      LLVM_BIN: /usr/lib/llvm-22/bin
+      LLVM_CONFIG: /usr/lib/llvm-22/bin/llvm-config
 
     steps:
       - name: Checkout bench
@@ -88,9 +91,7 @@ jobs:
       - name: Set LLVM environment
         run: |
           cd pluto
-          LLVM_BIN=/usr/lib/llvm-22/bin \
-            LLVM_CONFIG=/usr/lib/llvm-22/bin/llvm-config \
-            python3 scripts/llvm_env.py --github-actions
+          python3 scripts/llvm_env.py --github-actions
 
       - name: Install Swift 6.2.4
         run: |
@@ -117,7 +118,7 @@ jobs:
         run: |
           # Swift ships its own clang/lld; keep the benchmark and Pluto build on
           # the same LLVM toolchain we installed above.
-          echo "/usr/lib/llvm-22/bin" >> "$GITHUB_PATH"
+          echo "$LLVM_BIN" >> "$GITHUB_PATH"
 
       - name: Build Pluto
         working-directory: pluto
@@ -200,19 +201,19 @@ jobs:
               pluto_binary = data["pluto_bin"]
               pluto_mtime = pluto.get("binary_mtime")
               if pluto_mtime:
-                  out.write(f"- Pluto binary: `{pluto_binary}` (modified `{pluto_mtime}`)\n\n")
+                  out.write(f"- Pluto Binary: `{pluto_binary}` (modified `{pluto_mtime}`)\n\n")
               else:
-                  out.write(f"- Pluto binary: `{pluto_binary}`\n\n")
+                  out.write(f"- Pluto Binary: `{pluto_binary}`\n\n")
 
               out.write("### Provenance\n\n")
               out.write(
                   f"- Bench: `{branch_label(bench)}` @ `{short_commit(bench.get('git_commit'))}`\n"
               )
               out.write(
-                  f"- Pluto version: `{pluto.get('version', 'unknown')}`\n"
+                  f"- Pluto: `{pluto.get('version', 'unknown')}`\n"
               )
               out.write(
-                  f"- Pluto repo: `{branch_label(pluto)}` @ "
+                  f"- Pluto Repo: `{branch_label(pluto)}` @ "
                   f"`{short_commit(pluto.get('git_commit'))}`\n"
               )
               out.write(
@@ -223,19 +224,19 @@ jobs:
                   f"`Python {host.get('python_version', '?')}`\n"
               )
               if memory.get("enabled"):
-                  out.write(f"- Peak memory: `{memory.get('collector', 'enabled')}`\n")
+                  out.write(f"- Peak Memory: `{memory.get('collector', 'enabled')}`\n")
               else:
-                  out.write("- Peak memory: unavailable on this host\n")
+                  out.write("- Peak Memory: unavailable on this host\n")
               if target_policy:
                   out.write(
-                      f"- Target policy: `{target_policy.get('mode', 'unknown')}`\n"
+                      f"- Target Policy: `{target_policy.get('mode', 'unknown')}`\n"
                   )
               if llvm:
                   llvm_text = " | ".join(
                       f"{name} {version}" if version else f"{name} unavailable"
                       for name, version in llvm.items()
                   )
-                  out.write(f"- Host LLVM tools: `{llvm_text}`\n")
+                  out.write(f"- Host LLVM Tools: `{llvm_text}`\n")
               out.write("\n")
 
               for case in data["cases"]:

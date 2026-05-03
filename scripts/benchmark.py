@@ -734,7 +734,6 @@ def file_metadata(path: Path) -> dict[str, object]:
     modified = dt.datetime.fromtimestamp(stat.st_mtime, dt.timezone.utc)
     return {
         "binary_mtime": modified.isoformat(timespec="seconds").replace("+00:00", "Z"),
-        "binary_size_bytes": stat.st_size,
     }
 
 
