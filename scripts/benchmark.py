@@ -36,6 +36,7 @@ DEFAULT_CXX_CANDIDATES += (
 PT_MOD = REPO_ROOT / "pt.mod"
 WORK_ROOT = Path(tempfile.gettempdir()) / "pluto-bench"
 TARGET_POLICY_MODE = "host-native-where-supported"
+DEFAULT_WARMUP_RUNS = 5
 # Keep the benchmark tables and CLI output in the natural progression order.
 CASE_ORDER = ("sum", "fib", "fib_tail", "harmonic")
 # The chart grid uses a different order so the short-running loop cases share
@@ -868,7 +869,7 @@ def host_metadata() -> dict[str, object]:
     return host
 
 
-def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
+def snapshot_metadata(toolchain: Toolchain, warmup_runs: int) -> dict[str, object]:
     prefix = peak_memory_command_prefix()
     target_policy = target_policy_metadata(toolchain)
     pluto = {
@@ -891,7 +892,7 @@ def snapshot_metadata(toolchain: Toolchain) -> dict[str, object]:
         "benchmark": {
             "generator": str(Path(__file__).resolve().relative_to(REPO_ROOT)),
             "process_model": "fresh-process",
-            "warmup_runs_per_sample": 1,
+            "warmup_runs_per_sample": warmup_runs,
             "time_unit": "ms",
         },
         "host": host_metadata(),
@@ -1366,6 +1367,7 @@ def write_snapshot(
     cases: list[str],
     results_by_case: dict[str, list[Result]],
     repeat: int,
+    warmup_runs: int,
     toolchain: Toolchain,
 ) -> None:
     snapshot_dir.mkdir(parents=True, exist_ok=True)
@@ -1373,10 +1375,11 @@ def write_snapshot(
     snapshot = {
         "generated_at": generated_at,
         "repeat": repeat,
+        "warmup_runs": warmup_runs,
         "pluto_bin": str(toolchain.pluto),
         "platform": platform.platform(),
         "machine": platform.machine(),
-        "metadata": snapshot_metadata(toolchain),
+        "metadata": snapshot_metadata(toolchain, warmup_runs),
         "cases": [
             {
                 "name": case,
@@ -1444,7 +1447,7 @@ def write_snapshot(
         render_bar_chart(
             snapshot_dir / "peak-memory.svg",
             title="Peak Memory Use by Benchmark",
-            subtitle="Approximate peak RAM used by each process, measured from the untimed warm-up run. Lower is better.",
+            subtitle="Approximate peak RAM used by each process, measured from the first untimed warm-up. Lower is better.",
             cases=cases,
             results_by_case=results_by_case,
             metric_name="memory",
@@ -1453,7 +1456,7 @@ def write_snapshot(
         render_bar_chart(
             snapshot_dir / "peak-memory-mobile.svg",
             title="Peak Memory Use by Benchmark",
-            subtitle="Approximate peak RAM used by each process, measured from the untimed warm-up run. Lower is better.",
+            subtitle="Approximate peak RAM used by each process, measured from the first untimed warm-up. Lower is better.",
             cases=cases,
             results_by_case=results_by_case,
             metric_name="memory",
@@ -1464,6 +1467,7 @@ def write_snapshot(
 def benchmark_source(
     source: CaseSource,
     repeat: int,
+    warmup_runs: int,
     toolchain: Toolchain,
     measure_memory: bool,
 ) -> Result:
@@ -1482,7 +1486,7 @@ def benchmark_source(
                 compile_ms, _ = timed_run(compile_spec, workdir)
                 compile_samples.append(compile_ms)
 
-            # Warm up one execution before timing to reduce one-off startup noise.
+            warmups_done = 0
             if memory_enabled:
                 try:
                     peak_memory_kb = probe_peak_memory_kb(run_spec, workdir)
@@ -1491,15 +1495,18 @@ def benchmark_source(
                     # running and simply drop peak-memory sampling for this source. This avoids a
                     # flaky /usr/bin/time probe killing the whole suite.
                     timed_run(run_spec, workdir)
+                    warmups_done = 1
                     print(
                         f"warning: peak memory probe disabled for {source.case}/{source.language}: {err}",
                         file=sys.stderr,
                     )
                     memory_enabled = False
                 else:
+                    warmups_done = 1
                     if peak_memory_kb is not None:
                         memory_samples.append(peak_memory_kb)
-            else:
+
+            for _ in range(max(0, warmup_runs - warmups_done)):
                 timed_run(run_spec, workdir)
             run_ms, run_proc = timed_run(run_spec, workdir)
             run_samples.append(run_ms)
@@ -1567,6 +1574,7 @@ def sources_for_case(case: str) -> list[CaseSource]:
 def benchmark_case(
     case: str,
     repeat: int,
+    warmup_runs: int,
     toolchain: Toolchain,
     measure_memory: bool,
 ) -> list[Result]:
@@ -1578,6 +1586,7 @@ def benchmark_case(
             benchmark_source(
                 source,
                 repeat,
+                warmup_runs,
                 toolchain,
                 measure_memory,
             )
@@ -1650,6 +1659,15 @@ def main() -> int:
         help="Number of times to compile and run each source; results use the median.",
     )
     parser.add_argument(
+        "--warmup-runs",
+        type=int,
+        default=DEFAULT_WARMUP_RUNS,
+        help=(
+            "Untimed executions before each timed sample. Defaults to 5 to avoid "
+            "post-link first-run artifacts on freshly built binaries."
+        ),
+    )
+    parser.add_argument(
         "--pluto",
         help="Path to the Pluto compiler binary. Defaults to ../pluto/pluto or $PLUTO_BIN.",
     )
@@ -1680,6 +1698,8 @@ def main() -> int:
 
     if args.repeat < 1:
         raise SystemExit("--repeat must be at least 1")
+    if args.warmup_runs < 1:
+        raise SystemExit("--warmup-runs must be at least 1")
 
     toolchain = Toolchain(
         pluto=resolve_pluto(args.pluto),
@@ -1705,7 +1725,7 @@ def main() -> int:
         return 1
 
     measure_memory = peak_memory_command_prefix() is not None
-    metadata = snapshot_metadata(toolchain)
+    metadata = snapshot_metadata(toolchain, args.warmup_runs)
     print_metadata_summary(metadata)
     shutil.rmtree(WORK_ROOT, ignore_errors=True)
     try:
@@ -1714,6 +1734,7 @@ def main() -> int:
             results = benchmark_case(
                 case,
                 args.repeat,
+                args.warmup_runs,
                 toolchain,
                 measure_memory,
             )
@@ -1730,6 +1751,7 @@ def main() -> int:
                 cases=cases,
                 results_by_case=results_by_case,
                 repeat=args.repeat,
+                warmup_runs=args.warmup_runs,
                 toolchain=toolchain,
             )
             print(f"Snapshot written: {snapshot_dir / 'results.json'}")

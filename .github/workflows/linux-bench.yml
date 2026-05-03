@@ -155,6 +155,7 @@ jobs:
         run: |
           python3 -u scripts/benchmark.py \
             --repeat 10 \
+            --warmup-runs 5 \
             --pluto pluto/pluto \
             --snapshot-dir results/linux-gha
 
@@ -201,6 +202,7 @@ jobs:
               out.write(f"- Platform: `{data['platform']}`\n")
               out.write(f"- Machine: `{data['machine']}`\n")
               out.write(f"- Repeat: `{data['repeat']}`\n")
+              out.write(f"- Warm-up runs per sample: `{data.get('warmup_runs', metadata.get('benchmark', {}).get('warmup_runs_per_sample', 'unknown'))}`\n")
               pluto_binary = data["pluto_bin"]
               pluto_mtime = pluto.get("binary_mtime")
               if pluto_mtime:
