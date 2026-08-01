@@ -10,6 +10,12 @@ them in each language, checks output parity, and reports timings.
 
 ## Latest Results
 
+> **Note:** `results/latest/results.json` holds a newer snapshot
+> (2026-07-23) than the tables and charts below, and is the run published on
+> [pluto-lang.dev](https://pluto-lang.dev). The prose, tables, and SVGs here
+> still describe the 2026-05-03 run; they regenerate on the next full
+> `scripts/benchmark.py` sweep.
+
 Tested on `2026-05-03 22:31:24 UTC+04:00` with:
 
 - Machine: Apple M1 Pro
