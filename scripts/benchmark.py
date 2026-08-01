@@ -1403,6 +1403,45 @@ def write_snapshot(
         encoding="utf-8",
     )
 
+    render_charts(snapshot_dir, cases=cases, results_by_case=results_by_case)
+
+
+def load_snapshot(snapshot_dir: Path) -> tuple[dict, list[str], dict[str, list[Result]]]:
+    """Read a results.json back into the shapes the renderers expect."""
+    snapshot = json.loads((snapshot_dir / "results.json").read_text(encoding="utf-8"))
+    cases: list[str] = []
+    results_by_case: dict[str, list[Result]] = {}
+    for case in snapshot.get("cases", []):
+        name = case["name"]
+        cases.append(name)
+        results_by_case[name] = [
+            Result(
+                case=name,
+                language=entry["language"],
+                version=entry["version"],
+                compile_ms=entry["compile_ms"],
+                run_ms=entry["run_ms"],
+                peak_memory_kb=entry["peak_memory_kb"],
+                output=entry["output"],
+            )
+            for entry in case.get("results", [])
+        ]
+    return snapshot, cases, results_by_case
+
+
+def render_charts(
+    snapshot_dir: Path,
+    *,
+    cases: list[str],
+    results_by_case: dict[str, list[Result]],
+) -> None:
+    """Write a snapshot's SVG charts.
+
+    Split out of write_snapshot so an existing results.json can be re-rendered
+    (--render-only) without re-running the benchmarks, which would otherwise
+    require every language toolchain to be installed.
+    """
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
     render_bar_chart(
         snapshot_dir / "run-times.svg",
         title="Run Time Median by Benchmark",
@@ -1694,7 +1733,27 @@ def main() -> int:
             "SVG charts."
         ),
     )
+    parser.add_argument(
+        "--render-only",
+        action="store_true",
+        help=(
+            "Re-render the SVG charts from the results.json already in "
+            "--snapshot-dir instead of running the benchmarks. Use after editing "
+            "chart code, or to refresh charts a snapshot has outgrown, without "
+            "needing every language toolchain installed."
+        ),
+    )
     args = parser.parse_args()
+
+    if args.render_only:
+        if not args.snapshot_dir:
+            raise SystemExit("--render-only requires --snapshot-dir")
+        snapshot_dir = Path(args.snapshot_dir).resolve()
+        snapshot, cases, results_by_case = load_snapshot(snapshot_dir)
+        render_charts(snapshot_dir, cases=cases, results_by_case=results_by_case)
+        print(f"Charts re-rendered from {snapshot_dir / 'results.json'}")
+        print(f"Snapshot generated at: {snapshot.get('generated_at')}")
+        return 0
 
     if args.repeat < 1:
         raise SystemExit("--repeat must be at least 1")
