@@ -1428,6 +1428,13 @@ def scrub_local_paths(value):
     return value
 
 
+def looks_like_absolute_path(value: str) -> bool:
+    """POSIX absolute, Windows drive-letter, or UNC path."""
+    if value.startswith("/") or value.startswith("\\\\"):
+        return True
+    return bool(re.match(r"^[A-Za-z]:[\\/]", value))
+
+
 def assert_no_local_paths(snapshot, _path: str = "") -> None:
     """Raise if a snapshot still contains an absolute filesystem path."""
     if isinstance(snapshot, dict):
@@ -1436,7 +1443,7 @@ def assert_no_local_paths(snapshot, _path: str = "") -> None:
     elif isinstance(snapshot, list):
         for index, item in enumerate(snapshot):
             assert_no_local_paths(item, f"{_path}[{index}]")
-    elif isinstance(snapshot, str) and snapshot.startswith("/"):
+    elif isinstance(snapshot, str) and looks_like_absolute_path(snapshot):
         raise AssertionError(f"snapshot leaks a local path at {_path}: {snapshot!r}")
 
 
