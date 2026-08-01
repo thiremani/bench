@@ -1376,7 +1376,6 @@ def write_snapshot(
         "generated_at": generated_at,
         "repeat": repeat,
         "warmup_runs": warmup_runs,
-        "pluto_bin": str(toolchain.pluto),
         "platform": platform.platform(),
         "machine": platform.machine(),
         "metadata": snapshot_metadata(toolchain, warmup_runs),
@@ -1399,11 +1398,46 @@ def write_snapshot(
         ],
     }
     (snapshot_dir / "results.json").write_text(
-        json.dumps(snapshot, indent=2) + "\n",
+        json.dumps(scrub_local_paths(snapshot), indent=2) + "\n",
         encoding="utf-8",
     )
 
     render_charts(snapshot_dir, cases=cases, results_by_case=results_by_case)
+
+
+SCRUBBED_KEYS = frozenset({"bin", "collector", "pluto_bin", "PATH"})
+
+
+def scrub_local_paths(value):
+    """Drop fields that record where the machine that ran the benchmark keeps
+    its toolchains.
+
+    Snapshots are committed to a public repo, so they must not carry the
+    runner's home directory or full $PATH. Everything a reader needs -- the
+    tool versions, the host CPU, the timings -- is kept; only the filesystem
+    locations go. assert_no_local_paths() is the regression test.
+    """
+    if isinstance(value, dict):
+        return {
+            key: scrub_local_paths(item)
+            for key, item in value.items()
+            if key not in SCRUBBED_KEYS
+        }
+    if isinstance(value, list):
+        return [scrub_local_paths(item) for item in value]
+    return value
+
+
+def assert_no_local_paths(snapshot, _path: str = "") -> None:
+    """Raise if a snapshot still contains an absolute filesystem path."""
+    if isinstance(snapshot, dict):
+        for key, item in snapshot.items():
+            assert_no_local_paths(item, f"{_path}/{key}")
+    elif isinstance(snapshot, list):
+        for index, item in enumerate(snapshot):
+            assert_no_local_paths(item, f"{_path}[{index}]")
+    elif isinstance(snapshot, str) and snapshot.startswith("/"):
+        raise AssertionError(f"snapshot leaks a local path at {_path}: {snapshot!r}")
 
 
 def load_snapshot(snapshot_dir: Path) -> tuple[dict, list[str], dict[str, list[Result]]]:
