@@ -21,6 +21,10 @@ jobs:
       - name: Checkout bench
         uses: actions/checkout@v4
 
+      # Fail quickly on scrubber, snapshot-writer, and summary-schema drift.
+      - name: Check snapshot contract
+        run: python3 scripts/test_snapshot.py
+
       - name: Checkout Pluto
         uses: actions/checkout@v4
         with:
@@ -161,7 +165,7 @@ jobs:
 
       # Checks the snapshot just generated, plus the scrubber itself. The
       # published job summary and artifact both come from this file.
-      - name: Check snapshot carries no local paths
+      - name: Check generated snapshot contract
         run: python3 scripts/test_snapshot.py results/linux-gha/results.json
 
       - name: Write job summary

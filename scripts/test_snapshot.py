@@ -11,6 +11,7 @@ full $PATH.
 """
 from __future__ import annotations
 
+import io
 import json
 import subprocess
 import sys
@@ -20,6 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import benchmark  # noqa: E402
+from render_summary import render as render_summary  # noqa: E402
 from benchmark import (  # noqa: E402
     Result,
     Toolchain,
@@ -56,17 +58,35 @@ def test_scrub_removes_paths() -> None:
 def test_assert_catches_leaks() -> None:
     for leak in (
         {"metadata": {"pluto": {"bin": "/Users/someone/pluto"}}},
+        {"version": "clang installed at /Users/someone/toolchain/bin/clang"},
+        {"version": "clang --sysroot=/opt/sdk"},
+        {"flags": "-I/usr/include -L/opt/toolchain/lib"},
+        {"source": "file:///Users/someone/toolchain/manifest.json"},
         {"metadata": {"pluto": {"bin": "C:\\Users\\someone\\pluto.exe"}}},
+        {"version": "compiler=C:\\Users\\someone\\pluto.exe"},
+        {"flags": r"-IC:\Users\someone\sdk -LC:\toolchain\lib"},
         {"metadata": {"pluto": {"bin": "\\\\fileserver\\share\\pluto.exe"}}},
+        {"version": "compiler at \\\\fileserver\\share\\pluto.exe"},
+        {"flags": r"-I\\fileserver\share\sdk"},
     ):
         try:
             assert_no_local_paths(leak)
         except AssertionError:
             continue
         raise AssertionError(f"assert_no_local_paths missed a leak: {leak}")
-    for benign in ("pluto dev", "go1.26.5", "in-process LLVM 22.1.8", "arm64"):
+    for benign in (
+        "pluto dev",
+        "go1.26.5",
+        "in-process LLVM 22.1.8",
+        "arm64",
+        "x86_64-linux/gnu",
+        "ratio 1/2",
+        "LLVM 22.1.8 / API 3",
+        "https://example.com/releases/22.1.8/toolchain.tar.xz",
+        "source https://github.com/llvm/llvm-project.git at llvmorg-22.1.8",
+    ):
         assert not looks_like_absolute_path(benign), f"false positive on {benign!r}"
-    print("ok: assert_no_local_paths catches POSIX, Windows and UNC paths")
+    print("ok: assert_no_local_paths catches standalone and embedded local paths")
 
 
 def test_write_snapshot_scrubs() -> None:
@@ -135,10 +155,26 @@ def test_snapshots_are_clean(paths: list[Path]) -> None:
         print(f"ok: {rel} carries no local paths")
 
 
+def test_summary_renderer(paths: list[Path]) -> None:
+    """Keep the public summary coupled to the sanitized snapshot schema."""
+    for path in paths:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        out = io.StringIO()
+        render_summary(data, out)
+        rendered = out.getvalue()
+        assert rendered.startswith("## Linux benchmark snapshot\n")
+        assert f"- Platform: `{data['platform']}`" in rendered
+        assert_no_local_paths(rendered, "/job-summary")
+        rel = path.relative_to(REPO_ROOT) if path.is_absolute() else path
+        print(f"ok: {rel} renders with the sanitized snapshot schema")
+
+
 if __name__ == "__main__":
     explicit = [Path(arg) for arg in sys.argv[1:]]
+    snapshots = explicit or committed_snapshots()
     test_scrub_removes_paths()
     test_assert_catches_leaks()
     test_write_snapshot_scrubs()
-    test_snapshots_are_clean(explicit or committed_snapshots())
+    test_snapshots_are_clean(snapshots)
+    test_summary_renderer(snapshots)
     print("all snapshot checks passed")

@@ -1407,6 +1407,30 @@ def write_snapshot(
 
 SCRUBBED_KEYS = frozenset({"bin", "collector", "pluto_bin", "PATH"})
 
+# Ignore web URLs before looking for path-shaped tokens. Their `/release/file`
+# components are not local paths, but can otherwise resemble POSIX paths once
+# embedded in a longer version string.
+WEB_URL_RE = re.compile(r"\b(?:https?|ftp)://[^\s<>\"']+", re.IGNORECASE)
+FILE_URI_PATH_RE = re.compile(
+    r"\bfile://(?:localhost)?/[^\s<>\"']+", re.IGNORECASE
+)
+POSIX_ABSOLUTE_PATH_RE = re.compile(
+    r"(?<![A-Za-z0-9_./-])/(?!/)(?=[^\s])[^\s<>\"']+"
+)
+POSIX_OPTION_PATH_RE = re.compile(
+    r"(?:^|\s)(?:-[A-Za-z]|--[A-Za-z0-9_-]+=)/(?!/)[^\s<>\"']+"
+)
+WINDOWS_DRIVE_PATH_RE = re.compile(
+    r"(?<![A-Za-z0-9_])[A-Za-z]:[\\/][^\s<>\"']*"
+)
+WINDOWS_UNC_PATH_RE = re.compile(
+    r"(?<![A-Za-z0-9_\\])\\\\[^\s\\/]+[\\/][^\s<>\"']+"
+)
+WINDOWS_OPTION_PATH_RE = re.compile(
+    r"(?:^|\s)(?:-[A-Za-z]|--[A-Za-z0-9_-]+=)"
+    r"(?:[A-Za-z]:[\\/]|\\\\[^\s\\/]+[\\/])[^\s<>\"']+"
+)
+
 
 def scrub_local_paths(value):
     """Drop fields that record where the machine that ran the benchmark keeps
@@ -1429,10 +1453,19 @@ def scrub_local_paths(value):
 
 
 def looks_like_absolute_path(value: str) -> bool:
-    """POSIX absolute, Windows drive-letter, or UNC path."""
-    if value.startswith("/") or value.startswith("\\\\"):
-        return True
-    return bool(re.match(r"^[A-Za-z]:[\\/]", value))
+    """Find POSIX, Windows drive-letter, or UNC paths anywhere in a string."""
+    candidate = WEB_URL_RE.sub("", value)
+    return any(
+        pattern.search(candidate)
+        for pattern in (
+            FILE_URI_PATH_RE,
+            POSIX_ABSOLUTE_PATH_RE,
+            POSIX_OPTION_PATH_RE,
+            WINDOWS_DRIVE_PATH_RE,
+            WINDOWS_UNC_PATH_RE,
+            WINDOWS_OPTION_PATH_RE,
+        )
+    )
 
 
 def assert_no_local_paths(snapshot, _path: str = "") -> None:
