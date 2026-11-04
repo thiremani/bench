@@ -183,8 +183,9 @@ python3 scripts/benchmark.py --render-only --snapshot-dir results/latest
 The harness is compatible with Python 3.9+.
 
 GitHub Actions also runs the suite on `ubuntu-24.04`. That workflow checks out
-`pluto`, builds it with Pluto's `build.py` on LLVM 22, runs the same harness,
-and uploads a separate snapshot artifact under `results/linux-gha` semantics.
+`pluto`, builds it with Pluto's `build.py` on the LLVM major in Pluto's
+`.llvm-version`, runs the same harness, and uploads a separate snapshot
+artifact under `results/linux-gha` semantics.
 It does not overwrite the checked-in `results/latest` macOS snapshot.
 
 Run a single benchmark:
